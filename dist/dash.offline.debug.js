@@ -1823,7 +1823,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @property {string} [mode="liveCatchupModeDefault"]
  * Use this parameter to switch between different catchup modes.
  *
- * Options: "liveCatchupModeDefault" or "liveCatchupModeLOLP".
+ * Options: "liveCatchupModeDefault" or "liveCatchupModeLOLP" or "liveCatchupModeStep".
  *
  * Note: Catch-up mechanism is automatically applied when playing low latency live streams.
  */
@@ -13419,6 +13419,13 @@ var Constants = /*#__PURE__*/function () {
        */
 
       this.LIVE_CATCHUP_MODE_LOLP = 'liveCatchupModeLoLP';
+      /**
+       *  @constant {string} LIVE_CATCHUP_MODE_STEP Throughput calculation based on moof parsing
+       *  @memberof Constants#
+       *  @static
+       */
+
+      this.LIVE_CATCHUP_MODE_STEP = 'liveCatchupModeStep';
       /**
        *  @constant {string} MOVING_AVERAGE_SLIDING_WINDOW Moving average sliding window
        *  @memberof Constants#
