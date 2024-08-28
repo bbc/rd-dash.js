@@ -26597,7 +26597,7 @@ function CatchupController() {
 
         if (_getCatchupMode() === _constants_Constants__WEBPACK_IMPORTED_MODULE_3__["default"].LIVE_CATCHUP_MODE_STEP) {
           // Custom playback control: Based on minimising playback rate changes
-          newRate = _calculateNewPlaybackRateStep(liveCatchupPlaybackRates, currentLiveLatency, targetLiveDelay);
+          newRate = _calculateNewPlaybackRateStep(liveCatchupPlaybackRates, currentLiveLatency, targetLiveDelay, bufferLevel);
         } else {
           // Default playback control: Based on target and current latency
           newRate = _calculateNewPlaybackRateDefault(liveCatchupPlaybackRates, currentLiveLatency, targetLiveDelay, bufferLevel);
@@ -26834,12 +26834,13 @@ function CatchupController() {
   * @param {number} liveCatchUpPlaybackRates.max - maximum playback rate increase limit
   * @param {number} currentLiveLatency
   * @param {number} liveDelay
+  * @param {number} bufferLevel
   * @return {number}
   * @private
   */
 
 
-  function _calculateNewPlaybackRateStep(liveCatchUpPlaybackRates, currentLiveLatency, liveDelay) {
+  function _calculateNewPlaybackRateStep(liveCatchUpPlaybackRates, currentLiveLatency, liveDelay, bufferLevel) {
     var newRate = 1.0; // Only adjust playback rates if playback has not stalled
 
     if (!playbackStalled) {
@@ -26849,6 +26850,15 @@ function CatchupController() {
       if (ratio < 0.9 || ratio > 1.1) {
         var cpr = deltaLatency < 0 ? liveCatchUpPlaybackRates.min : liveCatchUpPlaybackRates.max;
         newRate = 1 + cpr;
+      } // take into account situations in which there are buffer stalls,
+      // in which increasing playbackRate to reach target latency will
+      // just cause more and more stall situations
+
+
+      if (playbackController.getPlaybackStalled()) {
+        if (bufferLevel <= liveDelay / 2 && deltaLatency > 0) {
+          newRate = 1.0;
+        }
       }
     }
 
