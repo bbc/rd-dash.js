@@ -26718,6 +26718,7 @@ function CatchupController() {
 
       var currentLiveLatency = playbackController.getCurrentLiveLatency();
       var targetLiveDelay = playbackController.getLiveDelay();
+      var currentPlaybackRate = videoModel.getPlaybackRate();
       var ratio = currentLiveLatency / targetLiveDelay; //If latency is outside bottom of target window
 
       if (latencyDrift > 0 && ratio > 1.4) {
@@ -26726,7 +26727,7 @@ function CatchupController() {
       else if (latencyDrift < 0 && ratio < 0.8) {
         return true;
       } //If latency is within acceptable windows
-      else if (ratio > 0.9 || ratio < 1.1) {
+      else if (currentPlaybackRate !== 1 && ratio > 0.95 || currentPlaybackRate !== 1 && ratio < 1.05) {
         return true;
       }
     } catch (e) {
@@ -26847,7 +26848,7 @@ function CatchupController() {
       var deltaLatency = currentLiveLatency - liveDelay;
       var ratio = currentLiveLatency / liveDelay;
 
-      if (ratio < 0.9 || ratio > 1.1) {
+      if (ratio < 0.95 || ratio > 1.05) {
         var cpr = deltaLatency < 0 ? liveCatchUpPlaybackRates.min : liveCatchUpPlaybackRates.max;
         newRate = 1 + cpr;
       } // take into account situations in which there are buffer stalls,
