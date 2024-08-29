@@ -265,7 +265,7 @@ function CatchupController() {
      */
     function _shouldStartCatchUp() {
         try {
-            if (!playbackController.getTime() > 0 || isCatchupSeekInProgress) {
+            if (playbackController.getTime() < 0 || isCatchupSeekInProgress) {
                 return false;
             }
 
@@ -346,24 +346,13 @@ function CatchupController() {
      */
     function _stepNeedToCatchUp() {
         try {
-            const latencyDrift = _getLatencyDrift();
-
             const currentLiveLatency = playbackController.getCurrentLiveLatency();
             const targetLiveDelay = playbackController.getLiveDelay();
-            const currentPlaybackRate = videoModel.getPlaybackRate();
 
             const ratio = currentLiveLatency / targetLiveDelay;
 
-            //If latency is outside bottom of target window
-            if (latencyDrift > 0 && ratio > 1.4) {
-                return true;
-            }
-            //If latency is ahead of top of target window
-            else if (latencyDrift < 0 && ratio < 0.8) {
-                return true;
-            }
-            //If latency is within acceptable windows
-            else if (currentPlaybackRate !== 1 && ratio > 0.95 || currentPlaybackRate !== 1 && ratio < 1.05) {
+            //If latency is outside of the target window
+            if (ratio < 0.8 || ratio > 1.4) {
                 return true;
             }
 
@@ -482,9 +471,15 @@ function CatchupController() {
         if (!playbackStalled) {
             const deltaLatency = currentLiveLatency - liveDelay;
             const ratio = currentLiveLatency / liveDelay;
-            if (ratio < 0.95 || ratio > 1.05) {
-                const cpr = (deltaLatency < 0) ? liveCatchUpPlaybackRates.min : liveCatchUpPlaybackRates.max;
-                newRate = 1 + cpr
+
+            if (ratio > 1.1 && deltaLatency > 0) {
+                newRate = 1 + liveCatchUpPlaybackRates.max
+            }
+            else if (ratio > 0.90 && deltaLatency < 0) {
+                newRate = 1 + liveCatchUpPlaybackRates.min
+            }
+            else {
+                newRate = 1.0;
             }
 
             // take into account situations in which there are buffer stalls,
@@ -496,7 +491,6 @@ function CatchupController() {
                 }
             }
         }
-
         return newRate;
     }
 
