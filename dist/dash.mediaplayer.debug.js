@@ -26635,7 +26635,7 @@ function CatchupController() {
 
   function _shouldStartCatchUp() {
     try {
-      if (!playbackController.getTime() > 0 || isCatchupSeekInProgress) {
+      if (playbackController.getTime() < 0 || isCatchupSeekInProgress) {
         return false;
       }
 
@@ -26714,20 +26714,11 @@ function CatchupController() {
 
   function _stepNeedToCatchUp() {
     try {
-      var latencyDrift = _getLatencyDrift();
-
       var currentLiveLatency = playbackController.getCurrentLiveLatency();
       var targetLiveDelay = playbackController.getLiveDelay();
-      var currentPlaybackRate = videoModel.getPlaybackRate();
-      var ratio = currentLiveLatency / targetLiveDelay; //If latency is outside bottom of target window
+      var ratio = currentLiveLatency / targetLiveDelay; //If latency is outside of the target window
 
-      if (latencyDrift > 0 && ratio > 1.4) {
-        return true;
-      } //If latency is ahead of top of target window
-      else if (latencyDrift < 0 && ratio < 0.8) {
-        return true;
-      } //If latency is within acceptable windows
-      else if (currentPlaybackRate !== 1 && ratio > 0.95 || currentPlaybackRate !== 1 && ratio < 1.05) {
+      if (ratio < 0.8 || ratio > 1.4) {
         return true;
       }
     } catch (e) {
@@ -26848,9 +26839,12 @@ function CatchupController() {
       var deltaLatency = currentLiveLatency - liveDelay;
       var ratio = currentLiveLatency / liveDelay;
 
-      if (ratio < 0.95 || ratio > 1.05) {
-        var cpr = deltaLatency < 0 ? liveCatchUpPlaybackRates.min : liveCatchUpPlaybackRates.max;
-        newRate = 1 + cpr;
+      if (ratio > 1.1 && deltaLatency > 0) {
+        newRate = 1 + liveCatchUpPlaybackRates.max;
+      } else if (ratio > 0.90 && deltaLatency < 0) {
+        newRate = 1 + liveCatchUpPlaybackRates.min;
+      } else {
+        newRate = 1.0;
       } // take into account situations in which there are buffer stalls,
       // in which increasing playbackRate to reach target latency will
       // just cause more and more stall situations
