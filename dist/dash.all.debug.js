@@ -26857,7 +26857,7 @@ function CatchupController() {
 
 
   function _startPlaybackCatchUp() {
-    // we are seeking dont do anything for now
+    // we are seeking don't do anything for now
     if (isCatchupSeekInProgress) {
       return;
     }
@@ -27009,9 +27009,15 @@ function CatchupController() {
     try {
       var currentLiveLatency = playbackController.getCurrentLiveLatency();
       var targetLiveDelay = playbackController.getLiveDelay();
-      var ratio = currentLiveLatency / targetLiveDelay; //If latency is outside of the target window
+      var ratio = Math.abs(currentLiveLatency / targetLiveDelay);
+      console.log("Ratio: ".concat(ratio, " Speed:").concat(playbackController.getPlaybackRate())); //If latency is outside of the acceptable window, consider a new speed
 
-      if (ratio < 0.8 || ratio > 1.4) {
+      if (ratio < 0.9 || ratio > 1.2) {
+        return true;
+      } //If we're already catching up, consider a new speed
+
+
+      if (playbackController.getPlaybackRate() !== 1) {
         return true;
       }
     } catch (e) {
@@ -27132,9 +27138,9 @@ function CatchupController() {
       var deltaLatency = currentLiveLatency - liveDelay;
       var ratio = currentLiveLatency / liveDelay;
 
-      if (ratio > 1.1 && deltaLatency > 0) {
+      if (ratio > 1.03 && deltaLatency > 0) {
         newRate = 1 + liveCatchUpPlaybackRates.max;
-      } else if (ratio > 0.90 && deltaLatency < 0) {
+      } else if (ratio < 0.97 && deltaLatency < 0) {
         newRate = 1 + liveCatchUpPlaybackRates.min;
       } else {
         newRate = 1.0;
