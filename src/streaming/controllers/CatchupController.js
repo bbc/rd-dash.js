@@ -183,7 +183,8 @@ function CatchupController() {
             mediaPlayerModel.getCatchupModeEnabled() &&
             ((mediaPlayerModel.getCatchupPlaybackRates().max > 0) || (mediaPlayerModel.getCatchupPlaybackRates().min < 0)) &&
             !playbackController.isPaused() &&
-            !playbackController.isSeeking() && _shouldStartCatchUp()
+            !playbackController.isSeeking() &&
+            _shouldStartCatchUp()
         ) {
             _startPlaybackCatchUp();
         }
@@ -194,7 +195,7 @@ function CatchupController() {
      */
     function _startPlaybackCatchUp() {
 
-        // we are seeking dont do anything for now
+        // we are seeking don't do anything for now
         if (isCatchupSeekInProgress) {
             return;
         }
@@ -349,10 +350,15 @@ function CatchupController() {
             const currentLiveLatency = playbackController.getCurrentLiveLatency();
             const targetLiveDelay = playbackController.getLiveDelay();
 
-            const ratio = currentLiveLatency / targetLiveDelay;
+            const ratio = Math.abs(currentLiveLatency / targetLiveDelay);
 
-            //If latency is outside of the target window
-            if (ratio < 0.8 || ratio > 1.4) {
+            console.log(`Ratio: ${ratio} Speed:${playbackController.getPlaybackRate()}`)
+            //If latency is outside of the acceptable window, consider a new speed
+            if (ratio < 0.9 || ratio > 1.2) {
+                return true;
+            }
+            //If we're already catching up, consider a new speed
+            if (playbackController.getPlaybackRate() !== 1) {
                 return true;
             }
 
@@ -472,10 +478,10 @@ function CatchupController() {
             const deltaLatency = currentLiveLatency - liveDelay;
             const ratio = currentLiveLatency / liveDelay;
 
-            if (ratio > 1.1 && deltaLatency > 0) {
+            if (ratio > 1.03 && deltaLatency > 0) {
                 newRate = 1 + liveCatchUpPlaybackRates.max
             }
-            else if (ratio > 0.90 && deltaLatency < 0) {
+            else if (ratio < 0.97 && deltaLatency < 0) {
                 newRate = 1 + liveCatchUpPlaybackRates.min
             }
             else {
