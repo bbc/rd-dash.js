@@ -349,12 +349,14 @@ function CatchupController() {
         try {
             const currentLiveLatency = playbackController.getCurrentLiveLatency();
             const targetLiveDelay = playbackController.getLiveDelay();
+            const stepSettings = mediaPlayerModel.getCatchupStepSettings();
 
             const ratio = Math.abs(currentLiveLatency / targetLiveDelay);
 
-            console.log(`Ratio: ${ratio} Speed:${playbackController.getPlaybackRate()}`)
+            console.log(`Ratio: ${Math.round(ratio * 100) / 100} Speed:${playbackController.getPlaybackRate()} `)
+
             //If latency is outside of the acceptable window, consider a new speed
-            if (ratio < 0.9 || ratio > 1.2) {
+            if (ratio < stepSettings.start.min || ratio > stepSettings.start.max) {
                 return true;
             }
             //If we're already catching up, consider a new speed
@@ -472,16 +474,17 @@ function CatchupController() {
     function _calculateNewPlaybackRateStep(liveCatchUpPlaybackRates, currentLiveLatency, liveDelay, bufferLevel) {
 
         let newRate = 1.0
+        const stepSettings = mediaPlayerModel.getCatchupStepSettings();
 
         // Only adjust playback rates if playback has not stalled
         if (!playbackStalled) {
             const deltaLatency = currentLiveLatency - liveDelay;
             const ratio = currentLiveLatency / liveDelay;
 
-            if (ratio > 1.03 && deltaLatency > 0) {
+            if (ratio > stepSettings.stop.max && deltaLatency > 0) {
                 newRate = 1 + liveCatchUpPlaybackRates.max
             }
-            else if (ratio < 0.97 && deltaLatency < 0) {
+            else if (ratio < stepSettings.stop.min && deltaLatency < 0) {
                 newRate = 1 + liveCatchUpPlaybackRates.min
             }
             else {

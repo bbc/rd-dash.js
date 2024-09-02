@@ -1062,7 +1062,17 @@ declare namespace dashjs {
                 },
                 playbackBufferMin?: number,
                 enabled?: boolean
-                mode?: string
+                mode?: string,
+                step?:{
+                    start:{
+                        min?: number,
+                        max?: number
+                    },
+                    stop:{
+                        min?: number,
+                        max?: number
+                    }
+                },
             }
             lastBitrateCachingInfo?: {
                 enabled?: boolean;
