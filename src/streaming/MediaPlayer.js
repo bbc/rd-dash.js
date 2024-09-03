@@ -61,7 +61,7 @@ import Events from './../core/events/Events';
 import MediaPlayerEvents from './MediaPlayerEvents';
 import FactoryMaker from '../core/FactoryMaker';
 import Settings from '../core/Settings';
-import {getVersionString} from '../core/Version';
+import { getVersionString } from '../core/Version';
 
 //Dash
 import SegmentBaseController from '../dash/controllers/SegmentBaseController';
@@ -74,7 +74,7 @@ import {
 import BASE64 from '../../externals/base64';
 import ISOBoxer from 'codem-isoboxer';
 import DashJSError from './vo/DashJSError';
-import {checkParameterType} from './utils/SupervisorTools';
+import { checkParameterType } from './utils/SupervisorTools';
 import ManifestUpdater from './ManifestUpdater';
 import URLUtils from '../streaming/utils/URLUtils';
 import BoxParser from './utils/BoxParser';

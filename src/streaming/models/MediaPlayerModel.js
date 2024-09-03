@@ -42,8 +42,8 @@ const DEFAULT_CATCHUP_PLAYBACK_RATE_MAX = 0.5;
 const CATCHUP_PLAYBACK_RATE_MIN_LIMIT = -0.5;
 const CATCHUP_PLAYBACK_RATE_MAX_LIMIT = 1;
 
-const CATCHUP_STEP_TUNING_MIN_LIMIT = 2;
-const CATCHUP_STEP_TUNING_MAX_LIMIT = 0.01;
+const CATCHUP_STEP_TUNING_MIN_LIMIT = 0;
+const CATCHUP_STEP_TUNING_MAX_LIMIT = 2;
 const DEFAULT_CATCHUP_STEP_TUNING_START_MIN = 0.9;
 const DEFAULT_CATCHUP_STEP_TUNING_START_MAX = 1.2;
 const DEFAULT_CATCHUP_STEP_TUNING_STOP_MIN = 0.96;
@@ -129,40 +129,23 @@ function MediaPlayerModel() {
      * @param {boolean} log - whether to shown warning or not 
      * @returns {number} corrected min playback rate
      */
-    function _checkMinStepTuningRatio(ratio, log) {
+    function _checkStepRatio(ratio, log) {
         if (isNaN(ratio)) return 0;
         if (ratio < 0) {
             if (log) {
-                logger.warn(`Supplied minimum step algorithm ratio is a negative value when it should be positive or 0. The supplied ratio will not be applied and set to 0.`)
+                logger.warn(`Supplied step algorithm ratio is a negative value when it should be positive or 0. The supplied ratio will not be applied and set to 0.`)
             }
             return 0;
         }
         if (ratio < CATCHUP_STEP_TUNING_MIN_LIMIT) {
             if (log) {
-                logger.warn(`Supplied minimum step algorithm ratio is out of range and will be limited to ${CATCHUP_STEP_TUNING_MIN_LIMIT}`);
+                logger.warn(`Supplied step algorithm ratio is out of range and will be limited to ${CATCHUP_STEP_TUNING_MIN_LIMIT}`);
             }
             return CATCHUP_STEP_TUNING_MIN_LIMIT;
         }
-        return ratio;
-    };
-
-    /**
-     * Checks the supplied max ratio value for the step algorithm is a valid and within supported limits
-     * @param {number} ratio - Supplied max ratio value  
-     * @param {boolean} log - whether to shown warning or not 
-     * @returns {number} corrected max playback rate
-     */
-    function _checkMaxStepTuningRatio(ratio, log) {
-        if (isNaN(ratio)) return 0;
-        if (ratio < 0) {
-            if (log) {
-                logger.warn(`Supplied maximum step algorithm ratio is a negative value when it should be positive or 0. The supplied ratio will not be applied and set to 0.`)
-            }
-            return 0;
-        }
         if (ratio > CATCHUP_STEP_TUNING_MAX_LIMIT) {
             if (log) {
-                logger.warn(`Supplied maximum step algorithm ratio is out of range and will be limited to ${CATCHUP_STEP_TUNING_MAX_LIMIT}`);
+                logger.warn(`Supplied step algorithm ratio is out of range and will be limited to ${CATCHUP_STEP_TUNING_MAX_LIMIT}`);
             }
             return CATCHUP_STEP_TUNING_MAX_LIMIT;
         }
@@ -223,17 +206,18 @@ function MediaPlayerModel() {
      * @return {number}
      */
     function getCatchupStepSettings(log) {
-        const settingsStepTuning = settings.get().streaming.liveCatchup.step;
 
-        if (!isNaN(settingsStepTuning.start.min) || !isNaN(settingsStepTuning.start.max) || !isNaN(settingsStepTuning.stop.min) || !isNaN(settingsStepTuning.stop.max)) {
+        const settingsStep = settings.get().streaming.liveCatchup.step;
+
+        if (!isNaN(settingsStep.start.min) || !isNaN(settingsStep.start.max) || !isNaN(settingsStep.stop.min) || !isNaN(settingsStep.stop.max)) {
             return {
                 start: {
-                    min: _checkMinStepTuningRatio(settingsStepTuning.start.min, log),
-                    max: _checkMaxStepTuningRatio(settingsStepTuning.start.max, log),
+                    min: _checkStepRatio(settingsStep.start.min, log),
+                    max: _checkStepRatio(settingsStep.start.max, log),
                 },
                 stop: {
-                    min: _checkMinStepTuningRatio(settingsStepTuning.stop.min, log),
-                    max: _checkMaxStepTuningRatio(settingsStepTuning.stop.max, log),
+                    min: _checkStepRatio(settingsStep.stop.min, log),
+                    max: _checkStepRatio(settingsStep.stop.max, log),
                 }
             }
         }

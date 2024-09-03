@@ -3176,6 +3176,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *            liveCatchup: {
  *                maxDrift: NaN,
  *                playbackRate: {min: NaN, max: NaN},
+ *                step: {
+ *                  start: { min: NaN, max: NaN },
+ *                  stop: { min: NaN, max: NaN }
+ *                },
  *                playbackBufferMin: 0.5,
  *                enabled: null,
  *                mode: Constants.LIVE_CATCHUP_MODE_DEFAULT
@@ -3543,6 +3547,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *
  * These playback rate limits take precedence over any PlaybackRate values in ServiceDescription elements in an MPD. If only one of the min/max properties is given a value, the property without a value will not fall back to a ServiceDescription value. Its default value of NaN will be used.
  *
+ * Note: Catch-up mechanism is only applied when playing low latency live streams.
+ * @property {number} [step={start:{min: NaN, max: NaN},stop:{min: NaN, max: NaN}}]
+ * This object is used for setting the window parameters for "step" mode.
+ * 
+ * It is only applicable if the Catchup mechanism used is of mode "step".
+ * 
+ * The parameters are all percentages of the target latency. Where 1 is on target.
+ * 
+ * The start object sets the window within which catchup should begin. In the range of (0-2) (0% to 200% of the target latency).
+ * 
+ * The stop window is only applicable if a non-unity playback speed is in use. Again in In the range of (0-2) (0% to 200% of the target latency). It sets the point at which playback should return to unity (or stop catching up). This parameter prevents instability when using higher min and max playback rates and should be tuned to prevent overshooting the target.
+ * 
  * Note: Catch-up mechanism is only applied when playing low latency live streams.
  * @property {number} [playbackBufferMin=0.5]
  * Use this parameter to specify the minimum buffer which is used for LoL+ based playback rate reduction.
@@ -3994,6 +4010,16 @@ function Settings() {
         playbackRate: {
           min: NaN,
           max: NaN
+        },
+        step: {
+          start: {
+            min: NaN,
+            max: NaN
+          },
+          stop: {
+            min: NaN,
+            max: NaN
+          }
         },
         playbackBufferMin: 0.5,
         enabled: null,
@@ -27009,10 +27035,11 @@ function CatchupController() {
     try {
       var currentLiveLatency = playbackController.getCurrentLiveLatency();
       var targetLiveDelay = playbackController.getLiveDelay();
+      var stepSettings = mediaPlayerModel.getCatchupStepSettings();
       var ratio = Math.abs(currentLiveLatency / targetLiveDelay);
-      console.log("Ratio: ".concat(ratio, " Speed:").concat(playbackController.getPlaybackRate())); //If latency is outside of the acceptable window, consider a new speed
+      console.log("Ratio: ".concat(Math.round(ratio * 100) / 100, " Speed:").concat(playbackController.getPlaybackRate(), " Params: < ").concat(stepSettings.start.min, " | ").concat(stepSettings.stop.min, " - ").concat(stepSettings.stop.max, " | ").concat(stepSettings.start.max, " >")); //If latency is outside of the acceptable window, consider a new speed
 
-      if (ratio < 0.9 || ratio > 1.2) {
+      if (ratio < stepSettings.start.min || ratio > stepSettings.start.max) {
         return true;
       } //If we're already catching up, consider a new speed
 
@@ -27132,15 +27159,16 @@ function CatchupController() {
 
 
   function _calculateNewPlaybackRateStep(liveCatchUpPlaybackRates, currentLiveLatency, liveDelay, bufferLevel) {
-    var newRate = 1.0; // Only adjust playback rates if playback has not stalled
+    var newRate = 1.0;
+    var stepSettings = mediaPlayerModel.getCatchupStepSettings(); // Only adjust playback rates if playback has not stalled
 
     if (!playbackStalled) {
       var deltaLatency = currentLiveLatency - liveDelay;
       var ratio = currentLiveLatency / liveDelay;
 
-      if (ratio > 1.03 && deltaLatency > 0) {
+      if (ratio > stepSettings.stop.max && deltaLatency > 0) {
         newRate = 1 + liveCatchUpPlaybackRates.max;
-      } else if (ratio < 0.97 && deltaLatency < 0) {
+      } else if (ratio < stepSettings.stop.min && deltaLatency < 0) {
         newRate = 1 + liveCatchUpPlaybackRates.min;
       } else {
         newRate = 1.0;
@@ -38387,6 +38415,12 @@ var DEFAULT_CATCHUP_PLAYBACK_RATE_MIN = -0.5;
 var DEFAULT_CATCHUP_PLAYBACK_RATE_MAX = 0.5;
 var CATCHUP_PLAYBACK_RATE_MIN_LIMIT = -0.5;
 var CATCHUP_PLAYBACK_RATE_MAX_LIMIT = 1;
+var CATCHUP_STEP_TUNING_MIN_LIMIT = 0;
+var CATCHUP_STEP_TUNING_MAX_LIMIT = 2;
+var DEFAULT_CATCHUP_STEP_TUNING_START_MIN = 0.9;
+var DEFAULT_CATCHUP_STEP_TUNING_START_MAX = 1.2;
+var DEFAULT_CATCHUP_STEP_TUNING_STOP_MIN = 0.96;
+var DEFAULT_CATCHUP_STEP_TUNING_STOP_MAX = 1.04;
 /**
  * We use this model as a wrapper/proxy between Settings.js and classes that are using parameters from Settings.js.
  * In some cases we require additional logic to be applied and the settings might need to be adjusted before being used.
@@ -38474,6 +38508,44 @@ function MediaPlayerModel() {
 
   ;
   /**
+   * Checks the supplied min ratio value for the step algorithm is a valid value and within supported limits
+   * @param {number} ratio - Supplied min ratio value 
+   * @param {boolean} log - whether to shown warning or not 
+   * @returns {number} corrected min playback rate
+   */
+
+  function _checkStepRatio(ratio, log) {
+    if (isNaN(ratio)) return 0;
+
+    if (ratio < 0) {
+      if (log) {
+        logger.warn("Supplied step algorithm ratio is a negative value when it should be positive or 0. The supplied ratio will not be applied and set to 0.");
+      }
+
+      return 0;
+    }
+
+    if (ratio < CATCHUP_STEP_TUNING_MIN_LIMIT) {
+      if (log) {
+        logger.warn("Supplied step algorithm ratio is out of range and will be limited to ".concat(CATCHUP_STEP_TUNING_MIN_LIMIT));
+      }
+
+      return CATCHUP_STEP_TUNING_MIN_LIMIT;
+    }
+
+    if (ratio > CATCHUP_STEP_TUNING_MAX_LIMIT) {
+      if (log) {
+        logger.warn("Supplied step algorithm ratio is out of range and will be limited to ".concat(CATCHUP_STEP_TUNING_MAX_LIMIT));
+      }
+
+      return CATCHUP_STEP_TUNING_MAX_LIMIT;
+    }
+
+    return ratio;
+  }
+
+  ;
+  /**
    * Returns the maximum drift allowed before applying a seek back to the live edge when the catchup mode is enabled
    * @return {number}
    */
@@ -38521,6 +38593,40 @@ function MediaPlayerModel() {
     return {
       min: DEFAULT_CATCHUP_PLAYBACK_RATE_MIN,
       max: DEFAULT_CATCHUP_PLAYBACK_RATE_MAX
+    };
+  }
+  /**
+   * Returns the tuning parameters to be used when applying the catchup mode "step"
+   * If only one of the min/max values has been set then the other will default to 0 (no playback rate change).
+   * @return {number}
+   */
+
+
+  function getCatchupStepSettings(log) {
+    var settingsStep = settings.get().streaming.liveCatchup.step;
+
+    if (!isNaN(settingsStep.start.min) || !isNaN(settingsStep.start.max) || !isNaN(settingsStep.stop.min) || !isNaN(settingsStep.stop.max)) {
+      return {
+        start: {
+          min: _checkStepRatio(settingsStep.start.min, log),
+          max: _checkStepRatio(settingsStep.start.max, log)
+        },
+        stop: {
+          min: _checkStepRatio(settingsStep.stop.min, log),
+          max: _checkStepRatio(settingsStep.stop.max, log)
+        }
+      };
+    }
+
+    return {
+      start: {
+        min: DEFAULT_CATCHUP_STEP_TUNING_START_MIN,
+        max: DEFAULT_CATCHUP_STEP_TUNING_START_MAX
+      },
+      stop: {
+        min: DEFAULT_CATCHUP_STEP_TUNING_STOP_MIN,
+        max: DEFAULT_CATCHUP_STEP_TUNING_STOP_MAX
+      }
     };
   }
   /**
@@ -38621,6 +38727,7 @@ function MediaPlayerModel() {
     getRetryAttemptsForType: getRetryAttemptsForType,
     getRetryIntervalsForType: getRetryIntervalsForType,
     getCatchupPlaybackRates: getCatchupPlaybackRates,
+    getCatchupStepSettings: getCatchupStepSettings,
     getAbrBitrateParameter: getAbrBitrateParameter,
     setConfig: setConfig,
     reset: reset

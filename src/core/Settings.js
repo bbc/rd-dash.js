@@ -156,6 +156,10 @@ import Events from './events/Events';
  *            liveCatchup: {
  *                maxDrift: NaN,
  *                playbackRate: {min: NaN, max: NaN},
+ *                step: {
+ *                  start: { min: NaN, max: NaN },
+ *                  stop: { min: NaN, max: NaN }
+ *                },
  *                playbackBufferMin: 0.5,
  *                enabled: null,
  *                mode: Constants.LIVE_CATCHUP_MODE_DEFAULT
@@ -523,6 +527,18 @@ import Events from './events/Events';
  *
  * These playback rate limits take precedence over any PlaybackRate values in ServiceDescription elements in an MPD. If only one of the min/max properties is given a value, the property without a value will not fall back to a ServiceDescription value. Its default value of NaN will be used.
  *
+ * Note: Catch-up mechanism is only applied when playing low latency live streams.
+ * @property {number} [step={start:{min: NaN, max: NaN},stop:{min: NaN, max: NaN}}]
+ * This object is used for setting the window parameters for "step" mode.
+ * 
+ * It is only applicable if the Catchup mechanism used is of mode "step".
+ * 
+ * The parameters are all percentages of the target latency. Where 1 is on target.
+ * 
+ * The start object sets the window within which catchup should begin. In the range of (0-2) (0% to 200% of the target latency).
+ * 
+ * The stop window is only applicable if a non-unity playback speed is in use. Again in In the range of (0-2) (0% to 200% of the target latency). It sets the point at which playback should return to unity (or stop catching up). This parameter prevents instability when using higher min and max playback rates and should be tuned to prevent overshooting the target.
+ * 
  * Note: Catch-up mechanism is only applied when playing low latency live streams.
  * @property {number} [playbackBufferMin=0.5]
  * Use this parameter to specify the minimum buffer which is used for LoL+ based playback rate reduction.
@@ -973,6 +989,10 @@ function Settings() {
                 playbackRate: {
                     min: NaN,
                     max: NaN
+                },
+                step: {
+                    start: { min: NaN, max: NaN },
+                    stop: { min: NaN, max: NaN }
                 },
                 playbackBufferMin: 0.5,
                 enabled: null,
