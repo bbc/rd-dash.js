@@ -91,7 +91,7 @@ function AbandonRequestsRule(config) {
             }
 
             //setup some init info based on first progress event
-            if (fragmentInfo.firstByteTime === undefined) {
+            if (fragmentInfo.firstByteTime === undefined || isNaN(fragmentInfo.bytesTotal)) {
                 throughputArray[mediaType] = [];
                 fragmentInfo.firstByteTime = req.firstByteDate.getTime();
                 fragmentInfo.segmentDuration = req.duration;
