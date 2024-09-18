@@ -49,6 +49,7 @@ function FetchLoader(cfg) {
     const boxParser = cfg.boxParser;
     const settings = Settings(context).getInstance();
     let instance, dashMetrics;
+    let chunkTimer = null;
 
     function setup(cfg) {
         dashMetrics = cfg.dashMetrics;
@@ -101,23 +102,95 @@ function FetchLoader(cfg) {
             });
         }
 
-        let abortController;
         if (typeof window.AbortController === 'function') {
-            abortController = new AbortController(); /*jshint ignore:line*/
-            httpRequest.abortController = abortController;
-            abortController.signal.onabort = httpRequest.onabort;
+            httpRequest.abortController = new AbortController(); /*jshint ignore:line*/;
+            httpRequest.abortController.signal.onabort = httpRequest.onabort;
+        } else {
+            httpRequest.abortController = undefined;
         }
 
         const reqOptions = {
             method: httpRequest.method,
             headers: headers,
             credentials: httpRequest.withCredentials ? 'include' : undefined,
-            signal: abortController ? abortController.signal : undefined
+            signal: httpRequest.abortController ? httpRequest.abortController.signal : undefined
         };
 
         const calculationMode = settings.get().streaming.abr.fetchThroughputCalculationMode;
+
+        let chunkTimerConf = 0;
+        // Only activate chunk timer for Adaptation Sets with more than one rep
+        if (httpRequest.request.mediaInfo.bitrateList.length > 0) {
+            chunkTimerConf = settings.get().streaming.chunkTimerConf;
+        }
         const requestTime = Date.now();
         let throughputCapacityDelayMS = 0;
+        let downloadedData = [];
+        let startTimeData = [];
+        let endTimeData = [];
+        let lastChunkWasFinished = true;
+        let LastTraceTime = 0;
+
+        const calcNextChunkTimeOut = () => {
+            let segDuration_ms = httpRequest.request.duration*1000;
+            let now=Date.now();
+            let RemainingSegTime = Math.max(segDuration_ms - (now-requestStartTime.getTime()),0);
+            let bufferLevel = dashMetrics.getCurrentBufferLevel(request.mediaType)*1000;
+            if (bufferLevel < segDuration_ms) {
+                RemainingSegTime = bufferLevel;
+            }
+            let numChunks = 4;
+            let nextChunkTimeOut = Math.min(segDuration_ms/(numChunks-1), RemainingSegTime/(numChunks-startTimeData.length));
+            console.log('Calculated chunkTimer chunknum:', startTimeData.length, 'nextChunkTimeOut',nextChunkTimeOut,'bufferLevel',bufferLevel,'RemainingSegTime',RemainingSegTime,'RemainingSegTime RAW',segDuration_ms - (now-requestStartTime.getTime()),'req.quality',httpRequest.request.quality,'requestStartTime.getTime()',requestStartTime.getTime(), 'Date.now()',now, 'segDuration_ms', segDuration_ms, httpRequest.url);
+            return nextChunkTimeOut;
+        }
+
+        let chunkTimeOutCB = () => {
+            console.log('ChunkTimeOut: Zero bytes loaded - calling progress()');
+            let totalEst = httpRequest.request.mediaInfo.bitrateList.find((b)=>b.id==httpRequest.request.representationId).bandwidth * httpRequest.request.duration/8;
+            let timeTaken = Date.now() - requestStartTime.getTime();
+            httpRequest.progress({
+                loaded: totalEst/2*(timeTaken/httpRequest.request.duration/1000),
+                total: totalEst,
+                lengthComputable: true,
+                time: timeTaken,
+                stream: true,
+                noTrace: false,
+                traceonly: false
+            });
+        };
+
+
+        let chunkTimeOut = () => {
+            console.log('chunkTimer fired calling FetchLoader.onabort(), startTimeData.length',startTimeData.length, httpRequest.url);
+            if (startTimeData.length > 0) {
+                if (httpRequest.request.quality) {
+                    if (httpRequest.abortController) {
+                        httpRequest.abortController.signal.onabort = httpRequest.onabort;
+                    }
+                    chunkTimeOutCB(false);
+                }
+            } else {
+                console.log('IGNORING first seg aborts. chunkTimer fired calling FetchLoader.onabort(), startTimeData.length',startTimeData.length, httpRequest.url);
+            }
+            if (chunkTimer && startTimeData.length < chunkTimerConf) {
+                let timeout=calcNextChunkTimeOut();
+                let segDuration_ms = httpRequest.request.duration*1000;
+                if (!httpRequest.request.quality) {                
+                    timeout=timeout || segDuration_ms/4;
+                    console.log('chunkTimer fired at quality = 0 ignored', httpRequest.url);
+                }
+                timeout=timeout || segDuration_ms/8;
+                chunkTimer = setTimeout(chunkTimeOut, timeout);
+                console.log('chunkTimeOut finished - resetting chunkTimer timeout:', timeout, 'startTimeData.length', startTimeData.length, httpRequest.url);
+            } else {
+                chunkTimer = null;
+            }                   
+        };
+
+        if (chunkTimerConf) {
+            chunkTimer = setTimeout(chunkTimeOut, calcNextChunkTimeOut()*1.1);
+        }
 
         new Promise((resolve) => {
             if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_AAST && lowLatencyThroughputModel) {
@@ -132,6 +205,7 @@ function FetchLoader(cfg) {
         })
             .then(() => {
                 let markBeforeFetch = Date.now();
+
 
                 fetch(httpRequest.url, reqOptions).then(function (response) {
                     if (!httpRequest.response) {
@@ -202,6 +276,11 @@ function FetchLoader(cfg) {
 
                                 if (done) {
 
+                                    if (chunkTimer) {
+                                        clearTimeout(chunkTimer);
+                                        chunkTimer = null;
+                                    }
+
                                     const fetchDuration = markB - markBeforeFetch;
                                     const bytesAllChunks = measurement.reduce((prev, curr) => prev + curr.chunkBytes, 0);
 
@@ -229,23 +308,69 @@ function FetchLoader(cfg) {
                         httpRequest.reader = response.body.getReader();
                     }
 
-                    let downloadedData = [];
-                    let startTimeData = [];
-                    let endTimeData = [];
-                    let lastChunkWasFinished = true;
+                    const onabort = (traceonly=true) => {
+                        // if (chunkTimer) {
+                        //     clearTimeout(chunkTimer);
+                        //     chunkTimer = null;
+                        // }
+                        let [calculatedThroughput, thisCalculatedTime] = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url);
+                        if (!calculatedThroughput) {
+                            if (!downloadedData.length ) {
+                                return;
+                            }
+                            thisCalculatedTime = downloadedData[downloadedData.length-1].ts-startTimeData[startTimeData.length-1].ts;
+                            console.log('onabort:Used downloadedData to calc throughput:calculatedTime:',thisCalculatedTime, bytesReceived * 8/thisCalculatedTime);
+                        }
+                        console.log('onabort: thisCalculatedTime', thisCalculatedTime);
+                            // Returning zero leads to HTTPLoader calculating time difference between this and last trace
+                        httpRequest.progress({
+                            loaded: bytesReceived,
+                            total: httpRequest.request.mediaInfo.bitrateList.find(
+                                (b)=>b.id==httpRequest.request.representationId).bandwidth * httpRequest.request.duration/8,
+                            lengthComputable: true,
+                            time: thisCalculatedTime,
+                            stream: true,
+                            traceonly: traceonly
+                        });
+                        if (traceonly) {
+                            httpRequest.onabort();
+                        }
+                    };
 
+                    if (httpRequest.abortController) {
+                        httpRequest.abortController.signal.onabort = onabort;
+                    }
+
+                    if (chunkTimerConf) {
+                        chunkTimeOutCB = onabort;
+                        console.log('chunkTimer setting to onabort handler', httpRequest.url);
+                    }
 
                     const processResult = function ({ value, done }) { // Bug fix Parse whenever data is coming [value] better than 1ms looking that increase CPU
+                        // Reset abort handler so it can handler non-abandoned requests
+                        if (httpRequest.abortController) {
+                            httpRequest.abortController.signal.onabort = onabort;
+                        }
                         if (done) {
                             if (remaining) {
                                 if (calculationMode !== Constants.ABR_FETCH_THROUGHPUT_CALCULATION_AAST) {
+                                    if (chunkTimer) {
+                                        clearTimeout(chunkTimer);
+                                        chunkTimer = null;
+                                        console.log('Fetch done - end of segment: chunkTimer cleared', httpRequest.url);
+                                    } else {
+                                        console.log('Fetch done - end of segment: chunkTimer already clear', httpRequest.url);
+                                    }
+
                                     // If there is pending data, call progress so network metrics
                                     // are correctly generated
                                     // Same structure as https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequestEventTarget/
+                                    //:w
                                     let calculatedThroughput = null;
                                     let calculatedTime = null;
+                                    let calculatedTime_ = null;
                                     if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
-                                        calculatedThroughput = calculateThroughputByChunkData(startTimeData, endTimeData);
+                                        [calculatedThroughput, calculatedTime_] = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url);
                                         if (calculatedThroughput) {
                                             calculatedTime = bytesReceived * 8 / calculatedThroughput;
                                         }
@@ -253,12 +378,13 @@ function FetchLoader(cfg) {
                                     else if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
                                         calculatedTime = calculateDownloadedTime(downloadedData, bytesReceived);
                                     }
-
+                                    console.log('Final progress() CalculatedTime__', calculatedTime_, 'bytesReceived', bytesReceived, httpRequest.url);
+                                        // Returning zero leads to HTTPLoader calculating time difference between this and last trace
                                     httpRequest.progress({
                                         loaded: bytesReceived,
                                         total: isNaN(totalBytes) ? bytesReceived : totalBytes,
                                         lengthComputable: true,
-                                        time: calculatedTime,
+                                        time: calculatedTime_,
                                         stream: true
                                     });
                                 }
@@ -271,11 +397,13 @@ function FetchLoader(cfg) {
                         }
 
                         if (value && value.length > 0) {
+                            let now=performance.now();
+
                             remaining = concatTypedArray(remaining, value);
                             bytesReceived += value.length;
 
                             downloadedData.push({
-                                ts: Date.now(),
+                                ts: now, /* jshint ignore:line */
                                 bytes: value.length
                             });
 
@@ -286,7 +414,7 @@ function FetchLoader(cfg) {
                                     // Store the beginning time of each chunk download in array StartTimeData
                                     lastChunkWasFinished = false;
                                     startTimeData.push({
-                                        ts: performance.now(), /* jshint ignore:line */
+                                        ts: now, /* jshint ignore:line */
                                         bytes: value.length
                                     });
                                 }
@@ -300,9 +428,28 @@ function FetchLoader(cfg) {
                                 if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING && !lastChunkWasFinished) {
                                     lastChunkWasFinished = true;
                                     endTimeData.push({
-                                        ts: performance.now(), /* jshint ignore:line */
+                                        ts: now, /* jshint ignore:line */
                                         bytes: remaining.length
                                     });
+                                    if (chunkTimer) {
+                                        clearTimeout(chunkTimer);
+                                        console.log('Progress(): Cleared chunkTimer, startTimeData.length:', startTimeData.length, httpRequest.url);
+                                        if (startTimeData.length < chunkTimerConf) {
+                                            console.log('Setting chunkTimer',startTimeData.length, httpRequest.url);
+                                            let timeout=calcNextChunkTimeOut();
+                                            let segDuration_ms = httpRequest.request.duration*1000;
+                                            if (!httpRequest.request.quality) {                
+                                                timeout=timeout || segDuration_ms/4;
+                                                console.log('quality = 0 So avoiding timeout 0', httpRequest.url);
+                                            }
+                                            timeout=timeout || segDuration_ms/8;
+                                            chunkTimer = setTimeout(chunkTimeOut, timeout);
+                                        } else {
+                                            chunkTimer = null;
+                                        }
+                                    } else {
+                                        console.log('Progress(): chunkTimer clear - NOT setting, startTimeData.length:', startTimeData.length, httpRequest.url);
+                                    }
                                 }
 
                                 // If we are going to pass full buffer, avoid copying it and pass
@@ -319,12 +466,30 @@ function FetchLoader(cfg) {
                                 }
                                 // Announce progress but don't track traces. Throughput measures are quite unstable
                                 // when they are based in small amount of data
+                                // Do announce progress on chunk boundaries
+                                // Need to keep track of LastTraceTime as event.time is the time between events whilst the calculatedTime represents the total calculated time up to this point. 
+                                let calculatedThroughput = null;
+                                let calculatedTime__ = null;
+                                let calculatedTime = null;
+                                if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
+                                    [calculatedThroughput, calculatedTime__] = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url);
+                                    if (calculatedThroughput) {
+                                        calculatedTime = bytesReceived * 8 / calculatedThroughput;
+                                    }
+                                }
+                                else if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
+                                    calculatedTime = calculateDownloadedTime(downloadedData, bytesReceived);
+                                }
+
+                                console.log('progress: calculatedTime__', calculatedTime__, 'bytesReceived',bytesReceived, httpRequest.url, httpRequest);
                                 httpRequest.progress({
                                     data: data.buffer,
-                                    lengthComputable: false,
-                                    noTrace: true
+                                    loaded: bytesReceived,
+                                    total: httpRequest.request.mediaInfo.bitrateList.find( (b)=>b.id==httpRequest.request.representationId).bandwidth * httpRequest.request.duration/8,
+                                    lengthComputable: true,
+                                    time: calculatedTime__,
+                                    noTrace: (!calculatedTime__)?true:false
                                 });
-
                                 offset = 0;
                             } else {
                                 offset = boxesInfo.lastCompletedOffset;
@@ -356,8 +521,12 @@ function FetchLoader(cfg) {
             .then(processResult)
             .catch(function (e) {
                 if (httpRequest.onerror && httpRequest.response.status === 200) {
-                    // Error, but response code is 200, trigger error
-                    httpRequest.onerror(e);
+                    if (e.name == 'AbortError') {
+                        console.log('Caught and ignored',e);
+                    } else {
+                        // Error, but response code is 200, trigger error
+                        httpRequest.onerror(e);
+                    }
                 }
             });
     }
@@ -373,6 +542,12 @@ function FetchLoader(cfg) {
     }
 
     function abort(request) {
+        console.log('FetchLoader:abort() called',request.url);
+        if (chunkTimer) {
+            clearTimeout(chunkTimer);
+            chunkTimer = null;
+            console.log('FetchLoader:abort() cleared chunkTimer');
+        }
         if (request.abortController) {
             // For firefox and edge
             request.abortController.abort();
@@ -410,12 +585,97 @@ function FetchLoader(cfg) {
         }
     }
 
-    function calculateThroughputByChunkData(startTimeData, endTimeData) {
+    function calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, url) {
         try {
             let datum, datumE;
-            // Filter the last chunks in a segment in both arrays [StartTimeData and EndTimeData]
-            datum = startTimeData.filter((data, i) => i < startTimeData.length - 1);
-            datumE = endTimeData.filter((dataE, i) => i < endTimeData.length - 1);
+            datum = startTimeData;
+            datumE = endTimeData;
+ 
+            let chunkThroughputs = [];
+            let chunkTimes = [];
+            let chunkBytes = [];
+            // Compute the average throughput of the filtered chunk data
+            if (datum.length > 0) {
+                let shortDurationBytesReceived = 0;
+                let shortDurationStartTime = 0;
+                for (let i = 0; i < datum.length; i++) {
+                    if (datum[i] && datumE[i]) {
+                        let chunkDownloadTime = datumE[i].ts - datum[i].ts;
+                        if (chunkDownloadTime > 1) {
+                            chunkThroughputs.push((8 * datumE[i].bytes) / chunkDownloadTime);
+                            chunkTimes.push(chunkDownloadTime);
+                            chunkBytes.push(datumE[i].bytes);
+                            shortDurationStartTime = 0;
+                        } else {
+                            if (shortDurationStartTime === 0) {
+                                shortDurationStartTime = datum[i].ts;
+                                shortDurationBytesReceived = 0;
+                            }
+                            let cumulatedChunkDownloadTime = datumE[i].ts - shortDurationStartTime;
+                            if (cumulatedChunkDownloadTime > 1) {
+                                shortDurationBytesReceived += datumE[i].bytes;
+                                chunkThroughputs.push((8 * shortDurationBytesReceived) / cumulatedChunkDownloadTime);
+                                chunkTimes.push(cumulatedChunkDownloadTime);
+                                chunkBytes.push(shortDurationBytesReceived);
+                                shortDurationStartTime = 0;
+                            } else {
+                                // continue cumulating short duration data
+                                shortDurationBytesReceived += datumE[i].bytes;
+                                chunkBytes.push(0);
+                                chunkTimes.push(0);
+                            }
+                        }
+                    }
+                }
+                if (datum.length > datumE.length) {
+                    let remainingBytes = 0;
+                    let fragcount=0;
+                    for (let j=downloadedData.length; j>0; j--) {
+                        if (downloadedData[j-1].ts >= datum[datum.length-1].ts) {
+                            remainingBytes+=downloadedData[j-1].bytes;
+                            fragcount++;
+                        } else {
+                            break;
+                        }
+                    }
+                    let remainingTime = downloadedData[downloadedData.length-1].ts - datum[datum.length-1].ts;
+                    // eslint-disable-next-line no-unused-vars
+                    // let rb=downloadedData.reverse().reduce((accumulator, currentValue) => { 
+                    //     if (currentValue.ts >=datum[datum.length-1].ts) {
+                    //         return accumulator + currentValue.bytes;} }, 0);
+                    if (fragcount > 10){
+                        chunkThroughputs.push((8 * remainingBytes) / remainingTime);
+                        chunkTimes.push(remainingTime);
+                    } else {
+                        console.log('calculateThroughputByChunkData: Insufficient data for partial chunk BW calc: url:', url, 'fragcount:', fragcount)
+                    }
+                }
+
+                if (chunkThroughputs.length > 0) {
+                    const sumOfChunkThroughputs = chunkThroughputs.reduce((a, b) => a + b, 0);
+                    console.log('{ calculateThroughputByChunkData: { url:', url, ', startTimeData:',JSON.stringify(startTimeData), ', endTimeData:',JSON.stringify(endTimeData), ', downloadedData:',JSON.stringify(downloadedData),', chunkBytes:',JSON.stringify(chunkBytes),', chunkTimes:',JSON.stringify(chunkTimes),', chunkThroughputs:',JSON.stringify(chunkThroughputs),', chunkThroughPut:', sumOfChunkThroughputs / chunkThroughputs.length, '}}');
+                    return [sumOfChunkThroughputs / chunkThroughputs.length, chunkTimes[chunkTimes.length-1]];
+                } else {
+                    console.log('calculateThroughputByChunkData: Insufficient chunkThroughputs - falling back to null. url:', url)
+                }
+            }
+
+            return [null, null];
+        } catch (e) {
+            return [null, null];
+        }
+    }
+    // eslint-disable-next-line no-unused-vars
+    function calculateThroughputByChunkDataOLD(startTimeData, endTimeData, filter_last = false) {
+        try {
+            let datum, datumE;
+            datum = startTimeData;
+            datumE = endTimeData;
+            if (filter_last) {
+                // Filter the last chunks in a segment in both arrays [StartTimeData and EndTimeData]
+                datum = startTimeData.filter((data, i) => i < startTimeData.length - 1);
+                datumE = endTimeData.filter((dataE, i) => i < endTimeData.length - 1);
+            }
             let chunkThroughputs = [];
             // Compute the average throughput of the filtered chunk data
             if (datum.length > 1) {
