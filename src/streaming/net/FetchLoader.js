@@ -129,7 +129,6 @@ function FetchLoader(cfg) {
         let startTimeData = [];
         let endTimeData = [];
         let lastChunkWasFinished = true;
-        let LastTraceTime = 0;
 
         const calcNextChunkTimeOut = () => {
             let segDuration_ms = httpRequest.request.duration*1000;
@@ -313,22 +312,23 @@ function FetchLoader(cfg) {
                         //     clearTimeout(chunkTimer);
                         //     chunkTimer = null;
                         // }
-                        let [calculatedThroughput, thisCalculatedTime] = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url);
+                        let {calculatedThroughput, calculatedTime} = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url);
                         if (!calculatedThroughput) {
                             if (!downloadedData.length ) {
                                 return;
                             }
-                            thisCalculatedTime = downloadedData[downloadedData.length-1].ts-startTimeData[startTimeData.length-1].ts;
-                            console.log('onabort:Used downloadedData to calc throughput:calculatedTime:',thisCalculatedTime, bytesReceived * 8/thisCalculatedTime);
+                            calculatedTime = downloadedData[downloadedData.length-1].ts-startTimeData[startTimeData.length-1].ts;
+                            console.log('onabort:Used downloadedData to calc throughput:calculatedTime:',calculatedTime, bytesReceived * 8/calculatedTime);
                         }
-                        console.log('onabort: thisCalculatedTime', thisCalculatedTime);
-                            // Returning zero leads to HTTPLoader calculating time difference between this and last trace
+                        console.log('onabort: calculatedTime', calculatedTime);
+
+                        // Returning zero leads to HTTPLoader calculating time difference between this and last trace
                         httpRequest.progress({
                             loaded: bytesReceived,
                             total: httpRequest.request.mediaInfo.bitrateList.find(
                                 (b)=>b.id==httpRequest.request.representationId).bandwidth * httpRequest.request.duration/8,
                             lengthComputable: true,
-                            time: thisCalculatedTime,
+                            time: calculatedTime,
                             stream: true,
                             traceonly: traceonly
                         });
@@ -365,26 +365,20 @@ function FetchLoader(cfg) {
                                     // If there is pending data, call progress so network metrics
                                     // are correctly generated
                                     // Same structure as https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequestEventTarget/
-                                    //:w
-                                    let calculatedThroughput = null;
                                     let calculatedTime = null;
-                                    let calculatedTime_ = null;
                                     if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
-                                        [calculatedThroughput, calculatedTime_] = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url);
-                                        if (calculatedThroughput) {
-                                            calculatedTime = bytesReceived * 8 / calculatedThroughput;
-                                        }
+                                        ({calculatedTime} = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url));
                                     }
                                     else if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
                                         calculatedTime = calculateDownloadedTime(downloadedData, bytesReceived);
                                     }
-                                    console.log('Final progress() CalculatedTime__', calculatedTime_, 'bytesReceived', bytesReceived, httpRequest.url);
-                                        // Returning zero leads to HTTPLoader calculating time difference between this and last trace
+                                    console.log('Final progress() CalculatedTime', calculatedTime, 'bytesReceived', bytesReceived, httpRequest.url);
+                                    // Returning zero leads to HTTPLoader calculating time difference between this and last trace
                                     httpRequest.progress({
                                         loaded: bytesReceived,
                                         total: isNaN(totalBytes) ? bytesReceived : totalBytes,
                                         lengthComputable: true,
-                                        time: calculatedTime_,
+                                        time: calculatedTime,
                                         stream: true
                                     });
                                 }
@@ -468,27 +462,22 @@ function FetchLoader(cfg) {
                                 // when they are based in small amount of data
                                 // Do announce progress on chunk boundaries
                                 // Need to keep track of LastTraceTime as event.time is the time between events whilst the calculatedTime represents the total calculated time up to this point. 
-                                let calculatedThroughput = null;
-                                let calculatedTime__ = null;
                                 let calculatedTime = null;
                                 if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
-                                    [calculatedThroughput, calculatedTime__] = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url);
-                                    if (calculatedThroughput) {
-                                        calculatedTime = bytesReceived * 8 / calculatedThroughput;
-                                    }
+                                    ({calculatedTime} = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url));
                                 }
                                 else if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
                                     calculatedTime = calculateDownloadedTime(downloadedData, bytesReceived);
                                 }
 
-                                console.log('progress: calculatedTime__', calculatedTime__, 'bytesReceived',bytesReceived, httpRequest.url, httpRequest);
+                                console.log('progress: calculatedTime', calculatedTime, 'bytesReceived',bytesReceived, httpRequest.url, httpRequest);
                                 httpRequest.progress({
                                     data: data.buffer,
                                     loaded: bytesReceived,
                                     total: httpRequest.request.mediaInfo.bitrateList.find( (b)=>b.id==httpRequest.request.representationId).bandwidth * httpRequest.request.duration/8,
                                     lengthComputable: true,
-                                    time: calculatedTime__,
-                                    noTrace: (!calculatedTime__)?true:false
+                                    time: calculatedTime,
+                                    noTrace: (!calculatedTime)?true:false
                                 });
                                 offset = 0;
                             } else {
@@ -654,15 +643,15 @@ function FetchLoader(cfg) {
                 if (chunkThroughputs.length > 0) {
                     const sumOfChunkThroughputs = chunkThroughputs.reduce((a, b) => a + b, 0);
                     console.log('{ calculateThroughputByChunkData: { url:', url, ', startTimeData:',JSON.stringify(startTimeData), ', endTimeData:',JSON.stringify(endTimeData), ', downloadedData:',JSON.stringify(downloadedData),', chunkBytes:',JSON.stringify(chunkBytes),', chunkTimes:',JSON.stringify(chunkTimes),', chunkThroughputs:',JSON.stringify(chunkThroughputs),', chunkThroughPut:', sumOfChunkThroughputs / chunkThroughputs.length, '}}');
-                    return [sumOfChunkThroughputs / chunkThroughputs.length, chunkTimes[chunkTimes.length-1]];
+                    return {calculatedThroughput: sumOfChunkThroughputs / chunkThroughputs.length, calculatedTime: chunkTimes[chunkTimes.length-1]};
                 } else {
                     console.log('calculateThroughputByChunkData: Insufficient chunkThroughputs - falling back to null. url:', url)
                 }
             }
 
-            return [null, null];
+            return {calculatedThroughput: null, calculatedTime: null};
         } catch (e) {
-            return [null, null];
+            return {calculatedThroughput: null, calculatedTime: null};
         }
     }
     // eslint-disable-next-line no-unused-vars
