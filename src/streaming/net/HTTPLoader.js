@@ -99,7 +99,7 @@ function HTTPLoader(cfg) {
 
     function internalLoad(config, remainingAttempts) {
         const request = config.request;
-        const traces = [];
+        request.traces = [];
         let firstProgress = true;
         let needFailureReport = true;
         let requestStartTime = new Date();
@@ -126,7 +126,7 @@ function HTTPLoader(cfg) {
     
             const cmsd = responseHeaders && settings.get().streaming.cmsd && settings.get().streaming.cmsd.enabled ? cmsdModel.parseResponseHeaders(responseHeaders, request.mediaType) : null;
     
-            dashMetrics.addHttpRequest(request, responseUrl, responseStatus, responseHeaders, success ? traces : null, cmsd);
+            dashMetrics.addHttpRequest(request, responseUrl, responseStatus, responseHeaders, success ? request.traces : null, cmsd);
         }
     
         const handleLoaded = function (success) {
@@ -218,7 +218,7 @@ function HTTPLoader(cfg) {
             }
 
             if (!event.noTrace) {
-                traces.push({
+                request.traces.push({
                     s: lastTraceTime,
                     d: event.time ? event.time : currentTime.getTime() - lastTraceTime.getTime(),
                     b: [event.loaded ? event.loaded - lastTraceReceivedCount : 0]
