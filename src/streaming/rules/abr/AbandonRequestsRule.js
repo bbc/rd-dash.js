@@ -101,9 +101,17 @@ function AbandonRequestsRule(config) {
             fragmentInfo.bytesLoaded = req.bytesLoaded;
             fragmentInfo.elapsedTime = new Date().getTime() - fragmentInfo.firstByteTime;
 
+            let lastthroughput = NaN;
+            let lastthroughputold = NaN;
             if (fragmentInfo.bytesLoaded > 0 && fragmentInfo.elapsedTime > 0) {
+                let throughputMeasureTime = req.traces.reduce((a, b) => a + b.d, 0);
+                const downloadBytes = req.traces.reduce((a, b) => a + b.b[0], 0);
+                lastthroughput = Math.round((8 * downloadBytes) / throughputMeasureTime); // bits/ms = kbits/s
+                lastthroughputold = Math.round(fragmentInfo.bytesLoaded * 8 / fragmentInfo.elapsedTime);
+                storeLastRequestThroughputByType(mediaType, lastthroughput);
                 storeLastRequestThroughputByType(mediaType, Math.round(fragmentInfo.bytesLoaded * 8 / fragmentInfo.elapsedTime));
             }
+            logger.debug('[' + mediaType + '] frag id',fragmentInfo.id,'fragmentInfo.bytesLoaded',fragmentInfo.bytesLoaded, 'bytesTotal:',fragmentInfo.bytesTotal, 'elapsedTime:', fragmentInfo.elapsedTime, 'lastthroughput',lastthroughput,'lastthroughputold', lastthroughputold, 'thisBufferLevel',bufferLevel, 'videoBufferLevel:',dashMetrics.getCurrentBufferLevel('video'), 'audioBufferLevel', dashMetrics.getCurrentBufferLevel('audio'), 'Current req.quality', req.quality );
 
             if (throughputArray[mediaType].length >= settings.get().streaming.abr.abrRulesParameters.abandonRequestsRule.minLengthToAverage &&
                 fragmentInfo.elapsedTime > settings.get().streaming.abr.abrRulesParameters.abandonRequestsRule.graceTimeThreshold &&
