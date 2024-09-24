@@ -109,7 +109,6 @@ function AbandonRequestsRule(config) {
                 lastthroughput = Math.round((8 * downloadBytes) / throughputMeasureTime); // bits/ms = kbits/s
                 lastthroughputold = Math.round(fragmentInfo.bytesLoaded * 8 / fragmentInfo.elapsedTime);
                 storeLastRequestThroughputByType(mediaType, lastthroughput);
-                storeLastRequestThroughputByType(mediaType, Math.round(fragmentInfo.bytesLoaded * 8 / fragmentInfo.elapsedTime));
             }
             logger.debug('[' + mediaType + '] frag id',fragmentInfo.id,'fragmentInfo.bytesLoaded',fragmentInfo.bytesLoaded, 'bytesTotal:',fragmentInfo.bytesTotal, 'elapsedTime:', fragmentInfo.elapsedTime, 'lastthroughput',lastthroughput,'lastthroughputold', lastthroughputold, 'thisBufferLevel',bufferLevel, 'videoBufferLevel:',dashMetrics.getCurrentBufferLevel('video'), 'audioBufferLevel', dashMetrics.getCurrentBufferLevel('audio'), 'Current req.quality', req.quality );
 
