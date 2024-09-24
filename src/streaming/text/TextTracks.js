@@ -428,7 +428,8 @@ function TextTracks(config) {
                     logger.info('renderCaption :', err) /*TODO: add ErrorHandler management*/
                 },
                 previousISDState,
-                settings.get().streaming.text.imsc.enableRollUp
+                settings.get().streaming.text.imsc.enableRollUp,
+                settings.get().streaming.text.imsc.options
             );
             finalCue.id = cue.cueID;
             eventBus.trigger(MediaPlayerEvents.CAPTION_RENDERED, { captionDiv: finalCue, currentTrackIdx });

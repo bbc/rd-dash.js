@@ -566,6 +566,12 @@ import Events from './events/Events.js';
  * When true, only those captions where itts:forcedDisplay="true" will be displayed.
  * @property {boolean} [imsc.enableRollUp=true]
  * Enable/disable rollUp style display of IMSC captions.
+ * @property {number} [imsc.options.sizeAdjust=1]
+ * IMSC styling options - adjust text size, scales the text size and line padding 
+ * @property {number} [imsc.options.lineHeightAdjust=1]
+ * IMSC styling options - scales the line height 
+ * @property {number} [imsc.options.backgroundOpacityScale=1]
+ * IMSC styling options - scales the backgroundColor opacity 
  * @property {object} [webvtt.customRenderingEnabled=false]
  * Enables the custom rendering for WebVTT captions. For details refer to the "Subtitles and Captions" sample section of dash.js.
  * Custom WebVTT rendering requires the external library vtt.js that can be found in the contrib folder.
@@ -1138,7 +1144,12 @@ function Settings() {
                 extendSegmentedCues: true,
                 imsc: {
                     displayForcedOnlyMode: false,
-                    enableRollUp: true
+                    enableRollUp: true,
+                    options: {
+                        sizeAdjust: 1,
+                        lineHeightAdjust: 1,
+                        backgroundOpacityScale: 1
+                    },
                 },
                 webvtt: {
                     customRenderingEnabled: false
