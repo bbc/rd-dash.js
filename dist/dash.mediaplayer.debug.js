@@ -44675,7 +44675,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _streaming_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../streaming/MediaPlayerEvents */ "./src/streaming/MediaPlayerEvents.js");
 /* harmony import */ var _core_FactoryMaker__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/FactoryMaker */ "./src/core/FactoryMaker.js");
 /* harmony import */ var _core_Debug__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../core/Debug */ "./src/core/Debug.js");
-/* harmony import */ var imsc__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! imsc */ "./node_modules/imsc/src/main/js/main.js");
+/* harmony import */ var imsc__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! imsc */ "./node_modules/imsc/dist/main/main.js");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -49092,7 +49092,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core_Debug__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/Debug */ "./src/core/Debug.js");
 /* harmony import */ var _core_EventBus__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/EventBus */ "./src/core/EventBus.js");
 /* harmony import */ var _core_events_Events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/events/Events */ "./src/core/events/Events.js");
-/* harmony import */ var imsc__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! imsc */ "./node_modules/imsc/src/main/js/main.js");
+/* harmony import */ var imsc__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! imsc */ "./node_modules/imsc/dist/main/main.js");
 /* harmony import */ var _MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../MediaPlayerEvents */ "./src/streaming/MediaPlayerEvents.js");
 /* harmony import */ var _constants_ConformanceViolationConstants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../constants/ConformanceViolationConstants */ "./src/streaming/constants/ConformanceViolationConstants.js");
 /**
@@ -58271,6952 +58271,10 @@ module.exports = function equal(a, b) {
 
 /***/ }),
 
-/***/ "./node_modules/imsc/src/main/js/doc.js":
-/*!**********************************************!*\
-  !*** ./node_modules/imsc/src/main/js/doc.js ***!
-  \**********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-/* 
- * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * @module imscDoc
- */
-
-;
-(function (imscDoc, sax, imscNames, imscStyles, imscUtils) {
-
-
-    /**
-     * Allows a client to provide callbacks to handle children of the <metadata> element
-     * @typedef {Object} MetadataHandler
-     * @property {?OpenTagCallBack} onOpenTag
-     * @property {?CloseTagCallBack} onCloseTag
-     * @property {?TextCallBack} onText
-     */
-
-    /**
-     * Called when the opening tag of an element node is encountered.
-     * @callback OpenTagCallBack
-     * @param {string} ns Namespace URI of the element
-     * @param {string} name Local name of the element
-     * @param {Object[]} attributes List of attributes, each consisting of a
-     *                              `uri`, `name` and `value`
-     */
-
-    /**
-     * Called when the closing tag of an element node is encountered.
-     * @callback CloseTagCallBack
-     */
-
-    /**
-     * Called when a text node is encountered.
-     * @callback TextCallBack
-     * @param {string} contents Contents of the text node
-     */
-
-    /**
-     * Parses an IMSC1 document into an opaque in-memory representation that exposes
-     * a single method <pre>getMediaTimeEvents()</pre> that returns a list of time
-     * offsets (in seconds) of the ISD, i.e. the points in time where the visual
-     * representation of the document change. `metadataHandler` allows the caller to
-     * be called back when nodes are present in <metadata> elements. 
-     * 
-     * @param {string} xmlstring XML document
-     * @param {?module:imscUtils.ErrorHandler} errorHandler Error callback
-     * @param {?MetadataHandler} metadataHandler Callback for <Metadata> elements
-     * @returns {Object} Opaque in-memory representation of an IMSC1 document
-     */
-
-    imscDoc.fromXML = function (xmlstring, errorHandler, metadataHandler) {
-        var p = sax.parser(true, {xmlns: true});
-        var estack = [];
-        var xmllangstack = [];
-        var xmlspacestack = [];
-        var metadata_depth = 0;
-        var doc = null;
-
-        p.onclosetag = function (node) {
-
-            
-            if (estack[0] instanceof Region) {
-
-                /* merge referenced styles */
-
-                if (doc.head !== null && doc.head.styling !== null) {
-                    mergeReferencedStyles(doc.head.styling, estack[0].styleRefs, estack[0].styleAttrs, errorHandler);
-                }
-
-                delete estack[0].styleRefs;
-
-            } else if (estack[0] instanceof Styling) {
-
-                /* flatten chained referential styling */
-
-                for (var sid in estack[0].styles) {
-
-                    if (! estack[0].styles.hasOwnProperty(sid)) continue;
-
-                    mergeChainedStyles(estack[0], estack[0].styles[sid], errorHandler);
-
-                }
-
-            } else if (estack[0] instanceof P || estack[0] instanceof Span) {
-
-                /* merge anonymous spans */
-
-                if (estack[0].contents.length > 1) {
-
-                    var cs = [estack[0].contents[0]];
-
-                    var c;
-
-                    for (c = 1; c < estack[0].contents.length; c++) {
-
-                        if (estack[0].contents[c] instanceof AnonymousSpan &&
-                                cs[cs.length - 1] instanceof AnonymousSpan) {
-
-                            cs[cs.length - 1].text += estack[0].contents[c].text;
-
-                        } else {
-
-                            cs.push(estack[0].contents[c]);
-
-                        }
-
-                    }
-
-                    estack[0].contents = cs;
-
-                }
-
-                // remove redundant nested anonymous spans (9.3.3(1)(c))
-
-                if (estack[0] instanceof Span &&
-                        estack[0].contents.length === 1 &&
-                        estack[0].contents[0] instanceof AnonymousSpan) {
-
-                    estack[0].text = estack[0].contents[0].text;
-                    delete estack[0].contents;
-
-                }
-
-            } else if (estack[0] instanceof ForeignElement) {
-
-                if (estack[0].node.uri === imscNames.ns_tt &&
-                        estack[0].node.local === 'metadata') {
-
-                    /* leave the metadata element */
-
-                    metadata_depth--;
-
-                } else if (metadata_depth > 0 &&
-                        metadataHandler &&
-                        'onCloseTag' in metadataHandler) {
-
-                    /* end of child of metadata element */
-
-                    metadataHandler.onCloseTag();
-
-                }
-
-            }
-
-            // TODO: delete stylerefs?
-
-            // maintain the xml:space stack
-
-            xmlspacestack.shift();
-
-            // maintain the xml:lang stack
-
-            xmllangstack.shift();
-
-            // prepare for the next element
-
-            estack.shift();
-        };
-
-        p.ontext = function (str) {
-
-            if (estack[0] === undefined) {
-
-                /* ignoring text outside of elements */
-
-            } else if (estack[0] instanceof Span || estack[0] instanceof P) {
-
-                /* ignore children text nodes in ruby container spans */
-
-                if (estack[0] instanceof Span) {
-
-                    var ruby = estack[0].styleAttrs[imscStyles.byName.ruby.qname];
-
-                    if (ruby === 'container' || ruby === 'textContainer' || ruby === 'baseContainer') {
-
-                        return;
-
-                    }
-
-                }
-
-                /* create an anonymous span */
-
-                var s = new AnonymousSpan();
-
-                s.initFromText(doc, estack[0], str, xmllangstack[0], xmlspacestack[0], errorHandler);
-
-                estack[0].contents.push(s);
-
-            } else if (estack[0] instanceof ForeignElement &&
-                    metadata_depth > 0 &&
-                    metadataHandler &&
-                    'onText' in metadataHandler) {
-
-                /* text node within a child of metadata element */
-
-                metadataHandler.onText(str);
-
-            }
-
-        };
-
-
-        p.onopentag = function (node) {
-
-            // maintain the xml:space stack
-
-            var xmlspace = node.attributes["xml:space"];
-
-            if (xmlspace) {
-
-                xmlspacestack.unshift(xmlspace.value);
-
-            } else {
-
-                if (xmlspacestack.length === 0) {
-
-                    xmlspacestack.unshift("default");
-
-                } else {
-
-                    xmlspacestack.unshift(xmlspacestack[0]);
-
-                }
-
-            }
-
-            /* maintain the xml:lang stack */
-
-
-            var xmllang = node.attributes["xml:lang"];
-
-            if (xmllang) {
-
-                xmllangstack.unshift(xmllang.value);
-
-            } else {
-
-                if (xmllangstack.length === 0) {
-
-                    xmllangstack.unshift("");
-
-                } else {
-
-                    xmllangstack.unshift(xmllangstack[0]);
-
-                }
-
-            }
-
-
-            /* process the element */
-
-            if (node.uri === imscNames.ns_tt) {
-
-                if (node.local === 'tt') {
-
-                    if (doc !== null) {
-
-                        reportFatal(errorHandler, "Two <tt> elements at (" + this.line + "," + this.column + ")");
-
-                    }
-
-                    doc = new TT();
-
-                    doc.initFromNode(node, xmllangstack[0], errorHandler);
-
-                    estack.unshift(doc);
-
-                } else if (node.local === 'head') {
-
-                    if (!(estack[0] instanceof TT)) {
-                        reportFatal(errorHandler, "Parent of <head> element is not <tt> at (" + this.line + "," + this.column + ")");
-                    }
-
-                    estack.unshift(doc.head);
-
-                } else if (node.local === 'styling') {
-
-                    if (!(estack[0] instanceof Head)) {
-                        reportFatal(errorHandler, "Parent of <styling> element is not <head> at (" + this.line + "," + this.column + ")");
-                    }
-
-                    estack.unshift(doc.head.styling);
-
-                } else if (node.local === 'style') {
-
-                    var s;
-
-                    if (estack[0] instanceof Styling) {
-
-                        s = new Style();
-
-                        s.initFromNode(node, errorHandler);
-
-                        /* ignore <style> element missing @id */
-
-                        if (!s.id) {
-
-                            reportError(errorHandler, "<style> element missing @id attribute");
-
-                        } else {
-
-                            doc.head.styling.styles[s.id] = s;
-
-                        }
-
-                        estack.unshift(s);
-
-                    } else if (estack[0] instanceof Region) {
-
-                        /* nested styles can be merged with specified styles
-                         * immediately, with lower priority
-                         * (see 8.4.4.2(3) at TTML1 )
-                         */
-
-                        s = new Style();
-
-                        s.initFromNode(node, errorHandler);
-
-                        mergeStylesIfNotPresent(s.styleAttrs, estack[0].styleAttrs);
-
-                        estack.unshift(s);
-
-                    } else {
-
-                        reportFatal(errorHandler, "Parent of <style> element is not <styling> or <region> at (" + this.line + "," + this.column + ")");
-
-                    }
-
-                }  else if (node.local === 'initial') {
-
-                    var ini;
-
-                    if (estack[0] instanceof Styling) {
-
-                        ini = new Initial();
-
-                        ini.initFromNode(node, errorHandler);
-                        
-                        for (var qn in ini.styleAttrs) {
-
-                            if (! ini.styleAttrs.hasOwnProperty(qn)) continue;
-                            
-                            doc.head.styling.initials[qn] = ini.styleAttrs[qn];
-                            
-                        }
-                        
-                        estack.unshift(ini);
-
-                    } else {
-
-                        reportFatal(errorHandler, "Parent of <initial> element is not <styling> at (" + this.line + "," + this.column + ")");
-
-                    }
-
-                } else if (node.local === 'layout') {
-
-                    if (!(estack[0] instanceof Head)) {
-
-                        reportFatal(errorHandler, "Parent of <layout> element is not <head> at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    estack.unshift(doc.head.layout);
-
-                } else if (node.local === 'region') {
-
-                    if (!(estack[0] instanceof Layout)) {
-                        reportFatal(errorHandler, "Parent of <region> element is not <layout> at " + this.line + "," + this.column + ")");
-                    }
-
-                    var r = new Region();
-
-                    r.initFromNode(doc, node, xmllangstack[0], errorHandler);
-
-                    if (!r.id || r.id in doc.head.layout.regions) {
-
-                        reportError(errorHandler, "Ignoring <region> with duplicate or missing @id at " + this.line + "," + this.column + ")");
-
-                    } else {
-
-                        doc.head.layout.regions[r.id] = r;
-
-                    }
-
-                    estack.unshift(r);
-
-                } else if (node.local === 'body') {
-
-                    if (!(estack[0] instanceof TT)) {
-
-                        reportFatal(errorHandler, "Parent of <body> element is not <tt> at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    if (doc.body !== null) {
-
-                        reportFatal(errorHandler, "Second <body> element at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    var b = new Body();
-
-                    b.initFromNode(doc, node, xmllangstack[0], errorHandler);
-
-                    doc.body = b;
-
-                    estack.unshift(b);
-
-                } else if (node.local === 'div') {
-
-                    if (!(estack[0] instanceof Div || estack[0] instanceof Body)) {
-
-                        reportFatal(errorHandler, "Parent of <div> element is not <body> or <div> at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    var d = new Div();
-
-                    d.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
-                    
-                    /* transform smpte:backgroundImage to TTML2 image element */
-                    
-                    var bi = d.styleAttrs[imscStyles.byName.backgroundImage.qname];
-                    
-                    if (bi) {
-                        d.contents.push(new Image(bi));
-                        delete d.styleAttrs[imscStyles.byName.backgroundImage.qname];                  
-                    }
-
-                    estack[0].contents.push(d);
-
-                    estack.unshift(d);
-
-                } else if (node.local === 'image') {
-
-                    if (!(estack[0] instanceof Div)) {
-
-                        reportFatal(errorHandler, "Parent of <image> element is not <div> at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    var img = new Image();
-                    
-                    img.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
-                    
-                    estack[0].contents.push(img);
-
-                    estack.unshift(img);
-
-                } else if (node.local === 'p') {
-
-                    if (!(estack[0] instanceof Div)) {
-
-                        reportFatal(errorHandler, "Parent of <p> element is not <div> at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    var p = new P();
-
-                    p.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
-
-                    estack[0].contents.push(p);
-
-                    estack.unshift(p);
-
-                } else if (node.local === 'span') {
-
-                    if (!(estack[0] instanceof Span || estack[0] instanceof P)) {
-
-                        reportFatal(errorHandler, "Parent of <span> element is not <span> or <p> at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    var ns = new Span();
-
-                    ns.initFromNode(doc, estack[0], node, xmllangstack[0], xmlspacestack[0], errorHandler);
-
-                    estack[0].contents.push(ns);
-
-                    estack.unshift(ns);
-
-                } else if (node.local === 'br') {
-
-                    if (!(estack[0] instanceof Span || estack[0] instanceof P)) {
-
-                        reportFatal(errorHandler, "Parent of <br> element is not <span> or <p> at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    var nb = new Br();
-
-                    nb.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
-
-                    estack[0].contents.push(nb);
-
-                    estack.unshift(nb);
-
-                } else if (node.local === 'set') {
-
-                    if (!(estack[0] instanceof Span ||
-                            estack[0] instanceof P ||
-                            estack[0] instanceof Div ||
-                            estack[0] instanceof Body ||
-                            estack[0] instanceof Region ||
-                            estack[0] instanceof Br)) {
-
-                        reportFatal(errorHandler, "Parent of <set> element is not a content element or a region at " + this.line + "," + this.column + ")");
-
-                    }
-
-                    var st = new Set();
-
-                    st.initFromNode(doc, estack[0], node, errorHandler);
-
-                    estack[0].sets.push(st);
-
-                    estack.unshift(st);
-
-                } else {
-
-                    /* element in the TT namespace, but not a content element */
-
-                    estack.unshift(new ForeignElement(node));
-                }
-
-            } else {
-
-                /* ignore elements not in the TTML namespace unless in metadata element */
-
-                estack.unshift(new ForeignElement(node));
-
-            }
-
-            /* handle metadata callbacks */
-
-            if (estack[0] instanceof ForeignElement) {
-
-                if (node.uri === imscNames.ns_tt &&
-                        node.local === 'metadata') {
-
-                    /* enter the metadata element */
-
-                    metadata_depth++;
-
-                } else if (
-                        metadata_depth > 0 &&
-                        metadataHandler &&
-                        'onOpenTag' in metadataHandler
-                        ) {
-
-                    /* start of child of metadata element */
-
-                    var attrs = [];
-
-                    for (var a in node.attributes) {
-                        attrs[node.attributes[a].uri + " " + node.attributes[a].local] =
-                                {
-                                    uri: node.attributes[a].uri,
-                                    local: node.attributes[a].local,
-                                    value: node.attributes[a].value
-                                };
-                    }
-
-                    metadataHandler.onOpenTag(node.uri, node.local, attrs);
-
-                }
-
-            }
-
-        };
-
-        // parse the document
-
-        p.write(xmlstring).close();
-
-        // all referential styling has been flatten, so delete styles
-
-        delete doc.head.styling.styles;
-       
-        // create default region if no regions specified
-
-        var hasRegions = false;
-
-        /* AFAIK the only way to determine whether an object has members */
-
-        for (var i in doc.head.layout.regions) {
-
-            if (doc.head.layout.regions.hasOwnProperty(i)) {
-                hasRegions = true;
-                break;
-            }
-
-        }
-
-        if (!hasRegions) {
-
-            /* create default region */
-
-            var dr = Region.prototype.createDefaultRegion(doc.lang);
-
-            doc.head.layout.regions[dr.id] = dr;
-
-        }
-
-        /* resolve desired timing for regions */
-
-        for (var region_i in doc.head.layout.regions) {
-
-            if (! doc.head.layout.regions.hasOwnProperty(region_i)) continue;
-
-            resolveTiming(doc, doc.head.layout.regions[region_i], null, null);
-
-        }
-
-        /* resolve desired timing for content elements */
-
-        if (doc.body) {
-            resolveTiming(doc, doc.body, null, null);
-        }
-
-        /* remove undefined spans in ruby containers */
-
-        if (doc.body) {
-            cleanRubyContainers(doc.body);
-        }
-
-        return doc;
-    };
-
-    function cleanRubyContainers(element) {
-        
-        if (! ('contents' in element)) return;
-
-        var rubyval = 'styleAttrs' in element ? element.styleAttrs[imscStyles.byName.ruby.qname] : null;
-
-        var isrubycontainer = (element.kind === 'span' && (rubyval === "container" || rubyval === "textContainer" || rubyval === "baseContainer"));
-
-        for (var i = element.contents.length - 1; i >= 0; i--) {
-
-            if (isrubycontainer && !('styleAttrs' in element.contents[i] && imscStyles.byName.ruby.qname in element.contents[i].styleAttrs)) {
-
-                /* prune undefined <span> in ruby containers */
-
-                delete element.contents[i];
-
-            } else {
-
-                cleanRubyContainers(element.contents[i]);
-
-            }
-
-        }
-
-    }
-
-    function resolveTiming(doc, element, prev_sibling, parent) {
-
-        /* are we in a seq container? */
-
-        var isinseq = parent && parent.timeContainer === "seq";
-
-        /* determine implicit begin */
-
-        var implicit_begin = 0; /* default */
-
-        if (parent) {
-
-            if (isinseq && prev_sibling) {
-
-                /*
-                 * if seq time container, offset from the previous sibling end
-                 */
-
-                implicit_begin = prev_sibling.end;
-
-
-            } else {
-
-                implicit_begin = parent.begin;
-
-            }
-
-        }
-
-        /* compute desired begin */
-
-        element.begin = element.explicit_begin ? element.explicit_begin + implicit_begin : implicit_begin;
-
-
-        /* determine implicit end */
-
-        var implicit_end = element.begin;
-
-        var s = null;
-
-        if ("sets" in element) {
-
-            for (var set_i = 0; set_i < element.sets.length; set_i++) {
-
-                resolveTiming(doc, element.sets[set_i], s, element);
-
-                if (element.timeContainer === "seq") {
-
-                    implicit_end = element.sets[set_i].end;
-
-                } else {
-
-                    implicit_end = Math.max(implicit_end, element.sets[set_i].end);
-
-                }
-
-                s = element.sets[set_i];
-
-            }
-
-        }
-
-        if (!('contents' in element)) {
-
-            /* anonymous spans and regions and <set> and <br>s and spans with only children text nodes */
-
-            if (isinseq) {
-
-                /* in seq container, implicit duration is zero */
-
-                implicit_end = element.begin;
-
-            } else {
-
-                /* in par container, implicit duration is indefinite */
-
-                implicit_end = Number.POSITIVE_INFINITY;
-
-            }
-
-        } else if ("contents" in element) {
- 
-            for (var content_i = 0; content_i < element.contents.length; content_i++) {
-
-                resolveTiming(doc, element.contents[content_i], s, element);
-
-                if (element.timeContainer === "seq") {
-
-                    implicit_end = element.contents[content_i].end;
-
-                } else {
-
-                    implicit_end = Math.max(implicit_end, element.contents[content_i].end);
-
-                }
-
-                s = element.contents[content_i];
-
-            }
-
-        }
-
-        /* determine desired end */
-        /* it is never made really clear in SMIL that the explicit end is offset by the implicit begin */
-
-        if (element.explicit_end !== null && element.explicit_dur !== null) {
-
-            element.end = Math.min(element.begin + element.explicit_dur, implicit_begin + element.explicit_end);
-
-        } else if (element.explicit_end === null && element.explicit_dur !== null) {
-
-            element.end = element.begin + element.explicit_dur;
-
-        } else if (element.explicit_end !== null && element.explicit_dur === null) {
-
-            element.end = implicit_begin + element.explicit_end;
-
-        } else {
-
-            element.end = implicit_end;
-        }
-
-        delete element.explicit_begin;
-        delete element.explicit_dur;
-        delete element.explicit_end;
-
-        doc._registerEvent(element);
-
-    }
-
-    function ForeignElement(node) {
-        this.node = node;
-    }
-
-    function TT() {
-        this.events = [];
-        this.head = new Head();
-        this.body = null;
-    }
-
-    TT.prototype.initFromNode = function (node, xmllang, errorHandler) {
-
-        /* compute cell resolution */
-
-        var cr = extractCellResolution(node, errorHandler);
-        
-        this.cellLength = {
-                'h': new imscUtils.ComputedLength(0, 1/cr.h),
-                'w': new imscUtils.ComputedLength(1/cr.w, 0)
-            };
-
-        /* extract frame rate and tick rate */
-
-        var frtr = extractFrameAndTickRate(node, errorHandler);
-
-        this.effectiveFrameRate = frtr.effectiveFrameRate;
-
-        this.tickRate = frtr.tickRate;
-
-        /* extract aspect ratio */
-
-        this.aspectRatio = extractAspectRatio(node, errorHandler);
-
-        /* check timebase */
-
-        var attr = findAttribute(node, imscNames.ns_ttp, "timeBase");
-
-        if (attr !== null && attr !== "media") {
-
-            reportFatal(errorHandler, "Unsupported time base");
-
-        }
-
-        /* retrieve extent */
-
-        var e = extractExtent(node, errorHandler);
-
-        if (e === null) {
-
-            this.pxLength = {
-                'h': null,
-                'w': null
-            };
-
-        } else {
-
-            if (e.h.unit !== "px" || e.w.unit !== "px") {
-                reportFatal(errorHandler, "Extent on TT must be in px or absent");
-            }
-
-            this.pxLength = {
-                'h': new imscUtils.ComputedLength(0, 1 / e.h.value),
-                'w': new imscUtils.ComputedLength(1 / e.w.value, 0)
-            };
-        }
-        
-        /** set root container dimensions to (1, 1) arbitrarily
-          * the root container is mapped to actual dimensions at rendering
-        **/
-        
-        this.dimensions = {
-                'h': new imscUtils.ComputedLength(0, 1),
-                'w': new imscUtils.ComputedLength(1, 0)
-
-        };
-
-        /* xml:lang */
-
-        this.lang = xmllang;
-
-    };
-
-    /* register a temporal events */
-    TT.prototype._registerEvent = function (elem) {
-
-        /* skip if begin is not < then end */
-
-        if (elem.end <= elem.begin)
-            return;
-
-        /* index the begin time of the event */
-
-        var b_i = indexOf(this.events, elem.begin);
-
-        if (!b_i.found) {
-            this.events.splice(b_i.index, 0, elem.begin);
-        }
-
-        /* index the end time of the event */
-
-        if (elem.end !== Number.POSITIVE_INFINITY) {
-
-            var e_i = indexOf(this.events, elem.end);
-
-            if (!e_i.found) {
-                this.events.splice(e_i.index, 0, elem.end);
-            }
-
-        }
-
-    };
-
-
-    /*
-     * Retrieves the range of ISD times covered by the document
-     * 
-     * @returns {Array} Array of two elements: min_begin_time and max_begin_time
-     * 
-     */
-    TT.prototype.getMediaTimeRange = function () {
-
-        return [this.events[0], this.events[this.events.length - 1]];
-    };
-
-    /*
-     * Returns list of ISD begin times  
-     * 
-     * @returns {Array}
-     */
-    TT.prototype.getMediaTimeEvents = function () {
-
-        return this.events;
-    };
-
-    /*
-     * Represents a TTML Head element
-     */
-
-    function Head() {
-        this.styling = new Styling();
-        this.layout = new Layout();
-    }
-
-    /*
-     * Represents a TTML Styling element
-     */
-
-    function Styling() {
-        this.styles = {};
-        this.initials = {};
-    }
-
-    /*
-     * Represents a TTML Style element
-     */
-
-    function Style() {
-        this.id = null;
-        this.styleAttrs = null;
-        this.styleRefs = null;
-    }
-
-    Style.prototype.initFromNode = function (node, errorHandler) {
-        this.id = elementGetXMLID(node);
-        this.styleAttrs = elementGetStyles(node, errorHandler);
-        this.styleRefs = elementGetStyleRefs(node);
-    };
-    
-    /*
-     * Represents a TTML initial element
-     */
-
-    function Initial() {
-        this.styleAttrs = null;
-    }
-
-    Initial.prototype.initFromNode = function (node, errorHandler) {
-        
-        this.styleAttrs = {};
-        
-        for (var i in node.attributes) {
-
-            if (node.attributes[i].uri === imscNames.ns_itts ||
-                node.attributes[i].uri === imscNames.ns_ebutts ||
-                node.attributes[i].uri === imscNames.ns_tts) {
-                
-                var qname = node.attributes[i].uri + " " + node.attributes[i].local;
-                
-                this.styleAttrs[qname] = node.attributes[i].value;
-
-            }
-        }
-        
-    };
-
-    /*
-     * Represents a TTML Layout element
-     * 
-     */
-
-    function Layout() {
-        this.regions = {};
-    }
-    
-    /*
-     * Represents a TTML image element
-     */
-
-    function Image(src, type) {
-        ContentElement.call(this, 'image');
-        this.src = src;
-        this.type = type;
-    }
-
-    Image.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
-        this.src = 'src' in node.attributes ? node.attributes.src.value : null;
-        
-        if (! this.src) {
-            reportError(errorHandler, "Invalid image@src attribute");
-        }
-        
-        this.type = 'type' in node.attributes ? node.attributes.type.value : null;
-        
-        if (! this.type) {
-            reportError(errorHandler, "Invalid image@type attribute");
-        }
-        
-        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-
-        this.lang = xmllang;
-    };
-
-    /*
-     * TTML element utility functions
-     * 
-     */
-
-    function ContentElement(kind) {
-        this.kind = kind;
-    }
-
-    function IdentifiedElement(id) {
-        this.id = id;
-    }
-
-    IdentifiedElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-        this.id = elementGetXMLID(node);
-    };
-
-    function LayoutElement(id) {
-        this.regionID = id;
-    }
-
-    LayoutElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-        this.regionID = elementGetRegionID(node);
-    };
-
-    function StyledElement(styleAttrs) {
-        this.styleAttrs = styleAttrs;
-    }
-
-    StyledElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-
-        this.styleAttrs = elementGetStyles(node, errorHandler);
-
-        if (doc.head !== null && doc.head.styling !== null) {
-            mergeReferencedStyles(doc.head.styling, elementGetStyleRefs(node), this.styleAttrs, errorHandler);
-        }
-
-    };
-
-    function AnimatedElement(sets) {
-        this.sets = sets;
-    }
-
-    AnimatedElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-        this.sets = [];
-    };
-
-    function ContainerElement(contents) {
-        this.contents = contents;
-    }
-
-    ContainerElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-        this.contents = [];
-    };
-
-    function TimedElement(explicit_begin, explicit_end, explicit_dur) {
-        this.explicit_begin = explicit_begin;
-        this.explicit_end = explicit_end;
-        this.explicit_dur = explicit_dur;
-    }
-
-    TimedElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-        var t = processTiming(doc, parent, node, errorHandler);
-        this.explicit_begin = t.explicit_begin;
-        this.explicit_end = t.explicit_end;
-        this.explicit_dur = t.explicit_dur;
-
-        this.timeContainer = elementGetTimeContainer(node, errorHandler);
-    };
-
-
-    /*
-     * Represents a TTML body element
-     */
-
-
-
-    function Body() {
-        ContentElement.call(this, 'body');
-    }
-
-
-    Body.prototype.initFromNode = function (doc, node, xmllang, errorHandler) {
-        StyledElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-        TimedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-        AnimatedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-        LayoutElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-        ContainerElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-
-        this.lang = xmllang;
-    };
-
-    /*
-     * Represents a TTML div element
-     */
-
-    function Div() {
-        ContentElement.call(this, 'div');
-    }
-
-    Div.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
-        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        ContainerElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-
-        this.lang = xmllang;
-    };
-
-    /*
-     * Represents a TTML p element
-     */
-
-    function P() {
-        ContentElement.call(this, 'p');
-    }
-
-    P.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
-        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        ContainerElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-
-        this.lang = xmllang;
-    };
-
-    /*
-     * Represents a TTML span element
-     */
-
-    function Span() {
-        ContentElement.call(this, 'span');
-    }
-
-    Span.prototype.initFromNode = function (doc, parent, node, xmllang, xmlspace, errorHandler) {
-        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        ContainerElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-
-        this.space = xmlspace;
-        this.lang = xmllang;
-    };
-
-    /*
-     * Represents a TTML anonymous span element
-     */
-
-    function AnonymousSpan() {
-        ContentElement.call(this, 'span');
-    }
-
-    AnonymousSpan.prototype.initFromText = function (doc, parent, text, xmllang, xmlspace, errorHandler) {
-        TimedElement.prototype.initFromNode.call(this, doc, parent, null, errorHandler);
-
-        this.text = text;
-        this.space = xmlspace;
-        this.lang = xmllang;
-    };
-
-    /*
-     * Represents a TTML br element
-     */
-
-    function Br() {
-        ContentElement.call(this, 'br');
-    }
-
-    Br.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
-        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-
-        this.lang = xmllang;
-    };
-
-    /*
-     * Represents a TTML Region element
-     * 
-     */
-
-    function Region() {
-    }
-
-    Region.prototype.createDefaultRegion = function (xmllang) {
-        var r = new Region();
-
-        IdentifiedElement.call(r, '');
-        StyledElement.call(r, {});
-        AnimatedElement.call(r, []);
-        TimedElement.call(r, 0, Number.POSITIVE_INFINITY, null);
-
-        this.lang = xmllang;
-
-        return r;
-    };
-
-    Region.prototype.initFromNode = function (doc, node, xmllang, errorHandler) {
-        IdentifiedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-        TimedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-        AnimatedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
-
-        /* add specified styles */
-
-        this.styleAttrs = elementGetStyles(node, errorHandler);
-
-        /* remember referential styles for merging after nested styling is processed*/
-
-        this.styleRefs = elementGetStyleRefs(node);
-
-        /* xml:lang */
-
-        this.lang = xmllang;
-    };
-
-    /*
-     * Represents a TTML Set element
-     * 
-     */
-
-    function Set() {
-    }
-
-    Set.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-
-        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
-
-        var styles = elementGetStyles(node, errorHandler);
-
-        this.qname = null;
-        this.value = null;
-
-        for (var qname in styles) {
-
-            if (! styles.hasOwnProperty(qname)) continue;
-
-            if (this.qname) {
-
-                reportError(errorHandler, "More than one style specified on set");
-                break;
-
-            }
-
-            this.qname = qname;
-            this.value = styles[qname];
-
-        }
-
-    };
-
-    /*
-     * Utility functions
-     * 
-     */
-
-
-    function elementGetXMLID(node) {
-        return node && 'xml:id' in node.attributes ? node.attributes['xml:id'].value || null : null;
-    }
-
-    function elementGetRegionID(node) {
-        return node && 'region' in node.attributes ? node.attributes.region.value : '';
-    }
-
-    function elementGetTimeContainer(node, errorHandler) {
-
-        var tc = node && 'timeContainer' in node.attributes ? node.attributes.timeContainer.value : null;
-
-        if ((!tc) || tc === "par") {
-
-            return "par";
-
-        } else if (tc === "seq") {
-
-            return "seq";
-
-        } else {
-
-            reportError(errorHandler, "Illegal value of timeContainer (assuming 'par')");
-
-            return "par";
-
-        }
-
-    }
-
-    function elementGetStyleRefs(node) {
-
-        return node && 'style' in node.attributes ? node.attributes.style.value.split(" ") : [];
-
-    }
-
-    function elementGetStyles(node, errorHandler) {
-
-        var s = {};
-
-        if (node !== null) {
-
-            for (var i in node.attributes) {
-
-                var qname = node.attributes[i].uri + " " + node.attributes[i].local;
-
-                var sa = imscStyles.byQName[qname];
-
-                if (sa !== undefined) {
-
-                    var val = sa.parse(node.attributes[i].value);
-
-                    if (val !== null) {
-
-                        s[qname] = val;
-
-                        /* TODO: consider refactoring errorHandler into parse and compute routines */
-
-                        if (sa === imscStyles.byName.zIndex) {
-                            reportWarning(errorHandler, "zIndex attribute present but not used by IMSC1 since regions do not overlap");
-                        }
-
-                    } else {
-
-                        reportError(errorHandler, "Cannot parse styling attribute " + qname + " --> " + node.attributes[i].value);
-
-                    }
-
-                }
-
-            }
-
-        }
-
-        return s;
-    }
-
-    function findAttribute(node, ns, name) {
-        for (var i in node.attributes) {
-
-            if (node.attributes[i].uri === ns &&
-                    node.attributes[i].local === name) {
-
-                return node.attributes[i].value;
-            }
-        }
-
-        return null;
-    }
-
-    function extractAspectRatio(node, errorHandler) {
-
-        var ar = findAttribute(node, imscNames.ns_ittp, "aspectRatio");
-
-        if (ar === null) {
-            
-            ar = findAttribute(node, imscNames.ns_ttp, "displayAspectRatio");
-            
-        }
-
-        var rslt = null;
-
-        if (ar !== null) {
-
-            var ASPECT_RATIO_RE = /(\d+)\s+(\d+)/;
-
-            var m = ASPECT_RATIO_RE.exec(ar);
-
-            if (m !== null) {
-
-                var w = parseInt(m[1]);
-
-                var h = parseInt(m[2]);
-
-                if (w !== 0 && h !== 0) {
-
-                    rslt = w / h;
-
-                } else {
-
-                    reportError(errorHandler, "Illegal aspectRatio values (ignoring)");
-                }
-
-            } else {
-
-                reportError(errorHandler, "Malformed aspectRatio attribute (ignoring)");
-            }
-
-        }
-
-        return rslt;
-
-    }
-
-    /*
-     * Returns the cellResolution attribute from a node
-     * 
-     */
-    function extractCellResolution(node, errorHandler) {
-
-        var cr = findAttribute(node, imscNames.ns_ttp, "cellResolution");
-
-        // initial value
-
-        var h = 15;
-        var w = 32;
-
-        if (cr !== null) {
-
-            var CELL_RESOLUTION_RE = /(\d+) (\d+)/;
-
-            var m = CELL_RESOLUTION_RE.exec(cr);
-
-            if (m !== null) {
-
-                w = parseInt(m[1]);
-
-                h = parseInt(m[2]);
-
-            } else {
-
-                reportWarning(errorHandler, "Malformed cellResolution value (using initial value instead)");
-
-            }
-
-        }
-
-        return {'w': w, 'h': h};
-
-    }
-
-
-    function extractFrameAndTickRate(node, errorHandler) {
-
-        // subFrameRate is ignored per IMSC1 specification
-
-        // extract frame rate
-
-        var fps_attr = findAttribute(node, imscNames.ns_ttp, "frameRate");
-
-        // initial value
-
-        var fps = 30;
-
-        // match variable
-
-        var m;
-
-        if (fps_attr !== null) {
-
-            var FRAME_RATE_RE = /(\d+)/;
-
-            m = FRAME_RATE_RE.exec(fps_attr);
-
-            if (m !== null) {
-
-                fps = parseInt(m[1]);
-
-            } else {
-
-                reportWarning(errorHandler, "Malformed frame rate attribute (using initial value instead)");
-            }
-
-        }
-
-        // extract frame rate multiplier
-
-        var frm_attr = findAttribute(node, imscNames.ns_ttp, "frameRateMultiplier");
-
-        // initial value
-
-        var frm = 1;
-
-        if (frm_attr !== null) {
-
-            var FRAME_RATE_MULT_RE = /(\d+) (\d+)/;
-
-            m = FRAME_RATE_MULT_RE.exec(frm_attr);
-
-            if (m !== null) {
-
-                frm = parseInt(m[1]) / parseInt(m[2]);
-
-            } else {
-
-                reportWarning(errorHandler, "Malformed frame rate multiplier attribute (using initial value instead)");
-            }
-
-        }
-
-        var efps = frm * fps;
-
-        // extract tick rate
-
-        var tr = 1;
-
-        var trattr = findAttribute(node, imscNames.ns_ttp, "tickRate");
-
-        if (trattr === null) {
-
-            if (fps_attr !== null)
-                tr = efps;
-
-        } else {
-
-            var TICK_RATE_RE = /(\d+)/;
-
-            m = TICK_RATE_RE.exec(trattr);
-
-            if (m !== null) {
-
-                tr = parseInt(m[1]);
-
-            } else {
-
-                reportWarning(errorHandler, "Malformed tick rate attribute (using initial value instead)");
-            }
-
-        }
-
-        return {effectiveFrameRate: efps, tickRate: tr};
-
-    }
-
-    function extractExtent(node, errorHandler) {
-
-        var attr = findAttribute(node, imscNames.ns_tts, "extent");
-
-        if (attr === null)
-            return null;
-
-        var s = attr.split(" ");
-
-        if (s.length !== 2) {
-
-            reportWarning(errorHandler, "Malformed extent (ignoring)");
-
-            return null;
-        }
-
-        var w = imscUtils.parseLength(s[0]);
-
-        var h = imscUtils.parseLength(s[1]);
-
-        if (!h || !w) {
-
-            reportWarning(errorHandler, "Malformed extent values (ignoring)");
-
-            return null;
-        }
-
-        return {'h': h, 'w': w};
-
-    }
-
-    function parseTimeExpression(tickRate, effectiveFrameRate, str) {
-
-        var CLOCK_TIME_FRACTION_RE = /^(\d{2,}):(\d\d):(\d\d(?:\.\d+)?)$/;
-        var CLOCK_TIME_FRAMES_RE = /^(\d{2,}):(\d\d):(\d\d)\:(\d{2,})$/;
-        var OFFSET_FRAME_RE = /^(\d+(?:\.\d+)?)f$/;
-        var OFFSET_TICK_RE = /^(\d+(?:\.\d+)?)t$/;
-        var OFFSET_MS_RE = /^(\d+(?:\.\d+)?)ms$/;
-        var OFFSET_S_RE = /^(\d+(?:\.\d+)?)s$/;
-        var OFFSET_H_RE = /^(\d+(?:\.\d+)?)h$/;
-        var OFFSET_M_RE = /^(\d+(?:\.\d+)?)m$/;
-        var m;
-        var r = null;
-        if ((m = OFFSET_FRAME_RE.exec(str)) !== null) {
-
-            if (effectiveFrameRate !== null) {
-
-                r = parseFloat(m[1]) / effectiveFrameRate;
-            }
-
-        } else if ((m = OFFSET_TICK_RE.exec(str)) !== null) {
-
-            if (tickRate !== null) {
-
-                r = parseFloat(m[1]) / tickRate;
-            }
-
-        } else if ((m = OFFSET_MS_RE.exec(str)) !== null) {
-
-            r = parseFloat(m[1]) / 1000.0;
-
-        } else if ((m = OFFSET_S_RE.exec(str)) !== null) {
-
-            r = parseFloat(m[1]);
-
-        } else if ((m = OFFSET_H_RE.exec(str)) !== null) {
-
-            r = parseFloat(m[1]) * 3600.0;
-
-        } else if ((m = OFFSET_M_RE.exec(str)) !== null) {
-
-            r = parseFloat(m[1]) * 60.0;
-
-        } else if ((m = CLOCK_TIME_FRACTION_RE.exec(str)) !== null) {
-
-            r = parseInt(m[1]) * 3600 +
-                    parseInt(m[2]) * 60 +
-                    parseFloat(m[3]);
-
-        } else if ((m = CLOCK_TIME_FRAMES_RE.exec(str)) !== null) {
-
-            /* this assumes that HH:MM:SS is a clock-time-with-fraction */
-
-            if (effectiveFrameRate !== null) {
-
-                r = parseInt(m[1]) * 3600 +
-                        parseInt(m[2]) * 60 +
-                        parseInt(m[3]) +
-                        (m[4] === null ? 0 : parseInt(m[4]) / effectiveFrameRate);
-            }
-
-        }
-
-        return r;
-    }
-
-    function processTiming(doc, parent, node, errorHandler) {
-
-        /* determine explicit begin */
-
-        var explicit_begin = null;
-
-        if (node && 'begin' in node.attributes) {
-
-            explicit_begin = parseTimeExpression(doc.tickRate, doc.effectiveFrameRate, node.attributes.begin.value);
-
-            if (explicit_begin === null) {
-
-                reportWarning(errorHandler, "Malformed begin value " + node.attributes.begin.value + " (using 0)");
-
-            }
-
-        }
-
-        /* determine explicit duration */
-
-        var explicit_dur = null;
-
-        if (node && 'dur' in node.attributes) {
-
-            explicit_dur = parseTimeExpression(doc.tickRate, doc.effectiveFrameRate, node.attributes.dur.value);
-
-            if (explicit_dur === null) {
-
-                reportWarning(errorHandler, "Malformed dur value " + node.attributes.dur.value + " (ignoring)");
-
-            }
-
-        }
-
-        /* determine explicit end */
-
-        var explicit_end = null;
-
-        if (node && 'end' in node.attributes) {
-
-            explicit_end = parseTimeExpression(doc.tickRate, doc.effectiveFrameRate, node.attributes.end.value);
-
-            if (explicit_end === null) {
-
-                reportWarning(errorHandler, "Malformed end value (ignoring)");
-
-            }
-
-        }
-
-        return {explicit_begin: explicit_begin,
-            explicit_end: explicit_end,
-            explicit_dur: explicit_dur};
-
-    }
-
-
-
-    function mergeChainedStyles(styling, style, errorHandler) {
-
-        while (style.styleRefs.length > 0) {
-
-            var sref = style.styleRefs.pop();
-
-            if (!(sref in styling.styles)) {
-                reportError(errorHandler, "Non-existant style id referenced");
-                continue;
-            }
-
-            mergeChainedStyles(styling, styling.styles[sref], errorHandler);
-
-            mergeStylesIfNotPresent(styling.styles[sref].styleAttrs, style.styleAttrs);
-
-        }
-
-    }
-
-    function mergeReferencedStyles(styling, stylerefs, styleattrs, errorHandler) {
-
-        for (var i = stylerefs.length - 1; i >= 0; i--) {
-
-            var sref = stylerefs[i];
-
-            if (!(sref in styling.styles)) {
-                reportError(errorHandler, "Non-existant style id referenced");
-                continue;
-            }
-
-            mergeStylesIfNotPresent(styling.styles[sref].styleAttrs, styleattrs);
-
-        }
-
-    }
-
-    function mergeStylesIfNotPresent(from_styles, into_styles) {
-
-        for (var sname in from_styles) {
-
-            if (! from_styles.hasOwnProperty(sname)) continue;
-
-            if (sname in into_styles)
-                continue;
-
-            into_styles[sname] = from_styles[sname];
-
-        }
-
-    }
-
-    /* TODO: validate style format at parsing */
-
-
-    /*
-     * ERROR HANDLING UTILITY FUNCTIONS
-     * 
-     */
-
-    function reportInfo(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.info && errorHandler.info(msg))
-            throw msg;
-
-    }
-
-    function reportWarning(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.warn && errorHandler.warn(msg))
-            throw msg;
-
-    }
-
-    function reportError(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.error && errorHandler.error(msg))
-            throw msg;
-
-    }
-
-    function reportFatal(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.fatal)
-            errorHandler.fatal(msg);
-
-        throw msg;
-
-    }
-
-    /*
-     * Binary search utility function
-     * 
-     * @typedef {Object} BinarySearchResult
-     * @property {boolean} found Was an exact match found?
-     * @property {number} index Position of the exact match or insert position
-     * 
-     * @returns {BinarySearchResult}
-     */
-
-    function indexOf(arr, searchval) {
-
-        var min = 0;
-        var max = arr.length - 1;
-        var cur;
-
-        while (min <= max) {
-
-            cur = Math.floor((min + max) / 2);
-
-            var curval = arr[cur];
-
-            if (curval < searchval) {
-
-                min = cur + 1;
-
-            } else if (curval > searchval) {
-
-                max = cur - 1;
-
-            } else {
-
-                return {found: true, index: cur};
-
-            }
-
-        }
-
-        return {found: false, index: min};
-    }
-
-
-})( false ? 0 : exports,
-        typeof sax === 'undefined' ? __webpack_require__(/*! sax */ "./node_modules/sax/lib/sax.js") : sax,
-        typeof imscNames === 'undefined' ? __webpack_require__(/*! ./names */ "./node_modules/imsc/src/main/js/names.js") : imscNames,
-        typeof imscStyles === 'undefined' ? __webpack_require__(/*! ./styles */ "./node_modules/imsc/src/main/js/styles.js") : imscStyles,
-        typeof imscUtils === 'undefined' ? __webpack_require__(/*! ./utils */ "./node_modules/imsc/src/main/js/utils.js") : imscUtils);
-
-
-/***/ }),
-
-/***/ "./node_modules/imsc/src/main/js/html.js":
-/*!***********************************************!*\
-  !*** ./node_modules/imsc/src/main/js/html.js ***!
-  \***********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-/* 
- * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * @module imscHTML
- */
-
-var browserIsFirefox = /firefox/i.test(navigator.userAgent);
-
-;
-(function (imscHTML, imscNames, imscStyles) {
-
-    /**
-     * Function that maps <pre>smpte:background</pre> URIs to URLs resolving to image resource
-     * @callback IMGResolver
-     * @param {string} <pre>smpte:background</pre> URI
-     * @return {string} PNG resource URL
-     */
-
-
-    /**
-     * Renders an ISD object (returned by <pre>generateISD()</pre>) into a 
-     * parent element, that must be attached to the DOM. The ISD will be rendered
-     * into a child <pre>div</pre>
-     * with heigh and width equal to the clientHeight and clientWidth of the element,
-     * unless explicitly specified otherwise by the caller. Images URIs specified 
-     * by <pre>smpte:background</pre> attributes are mapped to image resource URLs
-     * by an <pre>imgResolver</pre> function. The latter takes the value of <code>smpte:background</code>
-     * attribute and an <code>img</code> DOM element as input, and is expected to
-     * set the <code>src</code> attribute of the <code>img</code> to the absolute URI of the image.
-     * <pre>displayForcedOnlyMode</pre> sets the (boolean)
-     * value of the IMSC1 displayForcedOnlyMode parameter. The function returns
-     * an opaque object that should passed in <code>previousISDState</code> when this function
-     * is called for the next ISD, otherwise <code>previousISDState</code> should be set to 
-     * <code>null</code>.
-     * 
-     * @param {Object} isd ISD to be rendered
-     * @param {Object} element Element into which the ISD is rendered
-     * @param {?IMGResolver} imgResolver Resolve <pre>smpte:background</pre> URIs into URLs.
-     * @param {?number} eheight Height (in pixel) of the child <div>div</div> or null 
-     *                  to use clientHeight of the parent element
-     * @param {?number} ewidth Width (in pixel) of the child <div>div</div> or null
-     *                  to use clientWidth of the parent element
-     * @param {?boolean} displayForcedOnlyMode Value of the IMSC1 displayForcedOnlyMode parameter,
-     *                   or false if null         
-     * @param {?module:imscUtils.ErrorHandler} errorHandler Error callback
-     * @param {Object} previousISDState State saved during processing of the previous ISD, or null if initial call
-     * @param {?boolean} enableRollUp Enables roll-up animations (see CEA 708)
-     * @return {Object} ISD state to be provided when this funtion is called for the next ISD
-     */
-
-    imscHTML.render = function (isd,
-            element,
-            imgResolver,
-            eheight,
-            ewidth,
-            displayForcedOnlyMode,
-            errorHandler,
-            previousISDState,
-            enableRollUp
-            ) {
-
-        /* maintain aspect ratio if specified */
-
-        var height = eheight || element.clientHeight;
-        var width = ewidth || element.clientWidth;
-
-        if (isd.aspectRatio !== null) {
-
-            var twidth = height * isd.aspectRatio;
-
-            if (twidth > width) {
-
-                height = Math.round(width / isd.aspectRatio);
-
-            } else {
-
-                width = twidth;
-
-            }
-
-        }
-
-        var rootcontainer = document.createElement("div");
-
-        rootcontainer.style.position = "relative";
-        rootcontainer.style.width = width + "px";
-        rootcontainer.style.height = height + "px";
-        rootcontainer.style.margin = "auto";
-        rootcontainer.style.top = 0;
-        rootcontainer.style.bottom = 0;
-        rootcontainer.style.left = 0;
-        rootcontainer.style.right = 0;
-        rootcontainer.style.zIndex = 0;
-
-        var context = {
-            h: height,
-            w: width,
-            regionH: null,
-            regionW: null,
-            imgResolver: imgResolver,
-            displayForcedOnlyMode: displayForcedOnlyMode || false,
-            isd: isd,
-            errorHandler: errorHandler,
-            previousISDState: previousISDState,
-            enableRollUp: enableRollUp || false,
-            currentISDState: {},
-            flg: null, /* current fillLineGap value if active, null otherwise */
-            lp: null, /* current linePadding value if active, null otherwise */
-            mra: null, /* current multiRowAlign value if active, null otherwise */
-            ipd: null, /* inline progression direction (lr, rl, tb) */
-            bpd: null, /* block progression direction (lr, rl, tb) */
-            ruby: null, /* is ruby present in a <p> */
-            textEmphasis: null, /* is textEmphasis present in a <p> */
-            rubyReserve: null /* is rubyReserve applicable to a <p> */
-        };
-
-        element.appendChild(rootcontainer);
-
-        if ("contents" in isd) {
-
-            for (var i = 0; i < isd.contents.length; i++) {
-
-                processElement(context, rootcontainer, isd.contents[i], isd);
-
-            }
-
-        }
-
-        return context.currentISDState;
-
-    };
-
-    function processElement(context, dom_parent, isd_element, isd_parent) {
-
-        var e;
-
-        if (isd_element.kind === 'region') {
-
-            e = document.createElement("div");
-            e.style.position = "absolute";
-
-        } else if (isd_element.kind === 'body') {
-
-            e = document.createElement("div");
-
-        } else if (isd_element.kind === 'div') {
-
-            e = document.createElement("div");
-
-        } else if (isd_element.kind === 'image') {
-
-            e = document.createElement("img");
-
-            if (context.imgResolver !== null && isd_element.src !== null) {
-
-                var uri = context.imgResolver(isd_element.src, e);
-
-                if (uri)
-                    e.src = uri;
-
-                e.height = context.regionH;
-                e.width = context.regionW;
-
-            }
-
-        } else if (isd_element.kind === 'p') {
-
-            e = document.createElement("p");
-
-        } else if (isd_element.kind === 'span') {
-
-            if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "container") {
-
-                e = document.createElement("ruby");
-
-                context.ruby = true;
-
-            } else if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "base") {
-
-                e = document.createElement("span"); // rb element is deprecated in HTML
-
-            } else if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "text") {
-
-                e = document.createElement("rt");
-
-
-            } else if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "baseContainer") {
-
-                e = document.createElement("rbc");
-
-
-            } else if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "textContainer") {
-
-                e = document.createElement("rtc");
-
-
-            } else if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "delimiter") {
-
-                /* ignore rp */
-
-                return;
-
-            } else {
-
-                e = document.createElement("span");
-
-            }
-
-            //e.textContent = isd_element.text;
-
-        } else if (isd_element.kind === 'br') {
-
-            e = document.createElement("br");
-
-        }
-
-        if (!e) {
-
-            reportError(context.errorHandler, "Error processing ISD element kind: " + isd_element.kind);
-
-            return;
-
-        }
-
-        /* set language */
-
-        if (isd_element.lang) {
-
-            if (isd_element.kind === 'region' || isd_element.lang !== isd_parent.lang) {
-                e.lang = isd_element.lang;
-            }
-
-        }
-
-        /* add to parent */
-
-        dom_parent.appendChild(e);
-
-        /* override UA default margin */
-        /* TODO: should apply to <p> only */
-
-        e.style.margin = "0";
-
-        /* determine ipd and bpd */
-
-        if (isd_element.kind === "region") {
-
-            var wdir = isd_element.styleAttrs[imscStyles.byName.writingMode.qname];
-
-            if (wdir === "lrtb" || wdir === "lr") {
-
-                context.ipd = "lr";
-                context.bpd = "tb";
-
-            } else if (wdir === "rltb" || wdir === "rl") {
-
-                context.ipd = "rl";
-                context.bpd = "tb";
-
-            } else if (wdir === "tblr") {
-
-                context.ipd = "tb";
-                context.bpd = "lr";
-
-            } else if (wdir === "tbrl" || wdir === "tb") {
-
-                context.ipd = "tb";
-                context.bpd = "rl";
-
-            }
- 
-        } else if (isd_element.kind === "p" && context.bpd === "tb") {
-
-            var pdir = isd_element.styleAttrs[imscStyles.byName.direction.qname];
-
-            context.ipd = pdir === "ltr" ? "lr" : "rl"; 
- 
-        }
-
-        /* tranform TTML styles to CSS styles */
-
-        for (var i = 0; i < STYLING_MAP_DEFS.length; i++) {
-
-            var sm = STYLING_MAP_DEFS[i];
-
-            var attr = isd_element.styleAttrs[sm.qname];
-
-            if (attr !== undefined && sm.map !== null) {
-
-                sm.map(context, e, isd_element, attr);
-
-            }
-
-        }
-
-        var proc_e = e;
-
-        /* do we have linePadding ? */
-
-        var lp = isd_element.styleAttrs[imscStyles.byName.linePadding.qname];
-
-        if (lp && (! lp.isZero())) {
-
-            var plength = lp.toUsedLength(context.w, context.h);
-
-
-            if (plength > 0) {
-                
-                /* apply padding to the <p> so that line padding does not cause line wraps */
-
-                var padmeasure = Math.ceil(plength) + "px";
-
-                if (context.bpd === "tb") {
-
-                    proc_e.style.paddingLeft = padmeasure;
-                    proc_e.style.paddingRight = padmeasure;
-
-                } else {
-
-                    proc_e.style.paddingTop = padmeasure;
-                    proc_e.style.paddingBottom = padmeasure;
-
-                }
-
-                context.lp = lp;
-            }
-        }
-
-        // do we have multiRowAlign?
-
-        var mra = isd_element.styleAttrs[imscStyles.byName.multiRowAlign.qname];
-
-        if (mra && mra !== "auto") {
-
-            /* create inline block to handle multirowAlign */
-
-            var s = document.createElement("span");
-
-            s.style.display = "inline-block";
-
-            s.style.textAlign = mra;
-
-            e.appendChild(s);
-
-            proc_e = s;
-
-            context.mra = mra;
-
-        }
-
-        /* do we have rubyReserve? */
-
-        var rr = isd_element.styleAttrs[imscStyles.byName.rubyReserve.qname];
-
-        if (rr && rr[0] !== "none") {
-            context.rubyReserve = rr;
-        }
-
-
-        /* remember we are filling line gaps */
-
-        if (isd_element.styleAttrs[imscStyles.byName.fillLineGap.qname]) {
-            context.flg = true;
-        }
-
-
-        if (isd_element.kind === "span" && isd_element.text) {
-
-            var te = isd_element.styleAttrs[imscStyles.byName.textEmphasis.qname];
-
-            if (te && te.style !== "none") {
-
-                context.textEmphasis = true;
-
-            }
-
-            if (imscStyles.byName.textCombine.qname in isd_element.styleAttrs &&
-                    isd_element.styleAttrs[imscStyles.byName.textCombine.qname] === "all") {
-
-                /* ignore tate-chu-yoku since line break cannot happen within */
-                e.textContent = isd_element.text;
-                e._isd_element = isd_element;
-
-                if (te) {
-
-                    applyTextEmphasis(context, e, isd_element, te);
-
-                };
-
-            } else {
-
-                // wrap characters in spans to find the line wrap locations
-
-                var cbuf = '';
-
-                for (var j = 0; j < isd_element.text.length; j++) {
-
-                    cbuf += isd_element.text.charAt(j);
-
-                    var cc = isd_element.text.charCodeAt(j);
-
-                    if (cc < 0xD800 || cc > 0xDBFF || j === isd_element.text.length - 1) {
-
-                        /* wrap the character(s) in a span unless it is a high surrogate */
-
-                        var span = document.createElement("span");
-
-                        span.textContent = cbuf;
-
-                        /* apply textEmphasis */
-                        
-                        if (te) {
-
-                            applyTextEmphasis(context, span, isd_element, te);
-
-                        };
-    
-                        e.appendChild(span);
-
-                        cbuf = '';
-
-                        //For the sake of merging these back together, record what isd element generated it.
-                        span._isd_element = isd_element;
-                    }
-
-                }
-
-            }
-        }
-
-        /* process the children of the ISD element */
-
-        if ("contents" in isd_element) {
-
-            for (var k = 0; k < isd_element.contents.length; k++) {
-
-                processElement(context, proc_e, isd_element.contents[k], isd_element);
-
-            }
-
-        }
-
-        /* list of lines */
-
-        var linelist = [];
-
-
-        /* paragraph processing */
-        /* TODO: linePadding only supported for horizontal scripts */
-
-        if (isd_element.kind === "p") {
-
-            constructLineList(context, proc_e, linelist, null);
-
-            /* apply rubyReserve */
-
-            if (context.rubyReserve) {
-
-                applyRubyReserve(linelist, context);
-
-                context.rubyReserve = null;
-
-            }
-
-            /* apply tts:rubyPosition="outside" */
-
-            if (context.ruby || context.rubyReserve) {
-
-                applyRubyPosition(linelist, context);
-
-                context.ruby = null;
-
-            }
-
-            /* apply text emphasis "outside" position */
-
-            if (context.textEmphasis) {
-
-                applyTextEmphasisOutside(linelist, context);
-
-                context.textEmphasis = null;
-
-            }
-
-            /* insert line breaks for multirowalign */
-
-            if (context.mra) {
-
-                applyMultiRowAlign(linelist);
-
-                context.mra = null;
-
-            }
-
-            /* add linepadding */
-
-            if (context.lp) {
-
-                applyLinePadding(linelist, context.lp.toUsedLength(context.w, context.h), context);
-
-                context.lp = null;
-
-            }
-
-            mergeSpans(linelist, context); // The earlier we can do this the less processing there will be.
-
-            /* fill line gaps linepadding */
-
-            if (context.flg) {
-
-                var par_edges = rect2edges(proc_e.getBoundingClientRect(), context);
-
-                applyFillLineGap(linelist, par_edges.before, par_edges.after, context, proc_e);
-
-                context.flg = null;
-
-            }
-
-        }
-
-
-        /* region processing */
-
-        if (isd_element.kind === "region") {
-
-            /* perform roll up if needed */
-            if ((context.bpd === "tb") &&
-                    context.enableRollUp &&
-                    isd_element.contents.length > 0 &&
-                    isd_element.styleAttrs[imscStyles.byName.displayAlign.qname] === 'after') {
-
-                /* build line list */
-                constructLineList(context, proc_e, linelist, null);
-
-                /* horrible hack, perhaps default region id should be underscore everywhere? */
-
-                var rid = isd_element.id === '' ? '_' : isd_element.id;
-
-                var rb = new RegionPBuffer(rid, linelist);
-
-                context.currentISDState[rb.id] = rb;
-
-                if (context.previousISDState &&
-                        rb.id in context.previousISDState &&
-                        context.previousISDState[rb.id].plist.length > 0 &&
-                        rb.plist.length > 1 &&
-                        rb.plist[rb.plist.length - 2].text ===
-                        context.previousISDState[rb.id].plist[context.previousISDState[rb.id].plist.length - 1].text) {
-
-                    var body_elem = e.firstElementChild;
-
-                    var h = rb.plist[rb.plist.length - 1].after - rb.plist[rb.plist.length - 1].before;
-
-                    body_elem.style.bottom = "-" + h + "px";
-                    body_elem.style.transition = "transform 0.4s";
-                    body_elem.style.position = "relative";
-                    body_elem.style.transform = "translateY(-" + h + "px)";
-
-                }
-
-            }
-        }
-    }
-
-    function mergeSpans(lineList, context) {
-
-        for (var i = 0; i < lineList.length; i++) {
-
-            var line = lineList[i];
-
-            for (var j = 1; j < line.elements.length;) {
-
-                var previous = line.elements[j - 1];
-                var span = line.elements[j];
-
-                if (spanMerge(previous.node, span.node, context)) {
-
-                    //removed from DOM by spanMerge(), remove from the list too.
-                    line.elements.splice(j, 1);
-                    continue;
-
-                } else {
-
-                    j++;
-
-                }
-
-            }
-        }
-
-        // Copy backgroundColor to each span so that fillLineGap will apply padding to elements with the right background
-        var thisNode, ancestorBackgroundColor;
-        var clearTheseBackgrounds = [];
-
-        for (var l = 0; l < lineList.length; l++) {
-
-            for (var el = 0; el < lineList[l].elements.length; el++) {
-
-                thisNode = lineList[l].elements[el].node;
-                ancestorBackgroundColor = getSpanAncestorColor(thisNode, clearTheseBackgrounds, false);
-
-                if (ancestorBackgroundColor) {
-
-                    thisNode.style.backgroundColor = ancestorBackgroundColor;
-
-                }
-            }
-        }
-
-        for (var bi = 0; bi < clearTheseBackgrounds.length; bi++) {
-
-            clearTheseBackgrounds[bi].style.backgroundColor = "";
-
-        }
-    }
-
-    function getSpanAncestorColor(element, ancestorList, isAncestor) {
-
-        if (element.style.backgroundColor) {
-
-            if (isAncestor && !ancestorList.includes(element)) {
-
-                ancestorList.push(element);
-
-            }
-            return element.style.backgroundColor;
-
-        } else {
-
-            if (element.parentElement.nodeName === "SPAN" ||
-                element.parentElement.nodeName === "RUBY" ||
-                element.parentElement.nodeName === "RBC" ||
-                element.parentElement.nodeName === "RTC" ||
-                element.parentElement.nodeName === "RT") {
-
-                return getSpanAncestorColor(element.parentElement, ancestorList, true);
-
-            }
-
-        }
-
-        return undefined;
-    }
-
-    function spanMerge(first, second, context) {
-
-        if (first.tagName === "SPAN" &&
-            second.tagName === "SPAN" &&
-            first._isd_element === second._isd_element) {
-                if (! first._isd_element) {
-                    /* we should never get here since every span should have a source ISD element */
-                    reportError(context.errorHandler, "Internal error: HTML span is not linked to a source element; cannot merge spans.");
-                    return false;
-                }
-
-                first.textContent += second.textContent;
-
-                for (var i = 0; i < second.style.length; i++) {
-
-                    var styleName = second.style[i];
-                    if (styleName.indexOf("border") >= 0 || 
-                        styleName.indexOf("padding") >= 0 ||
-                        styleName.indexOf("margin") >= 0) {
-
-                        first.style[styleName] = second.style[styleName];
-
-                    }
-                }
-
-                second.parentElement.removeChild(second);
-
-                return true;
-            }
-
-        return false;
-    }
-
-    function applyLinePadding(lineList, lp, context) {
-
-        if (lineList === null) return;
-
-        for (var i = 0; i < lineList.length; i++) {
-
-            var l = lineList[i].elements.length;
-
-            var pospadpxlen = Math.ceil(lp) + "px";
-
-            var negpadpxlen = "-" + Math.ceil(lp) + "px";
-
-            if (l !== 0) {
-
-                var se = lineList[i].elements[lineList[i].start_elem];
-
-                var ee = lineList[i].elements[lineList[i].end_elem];
-
-                if (se === ee) {
-
-                    // Check to see if there's any background at all
-                    var elementBoundingRect = se.node.getBoundingClientRect();
-                    
-                    if (elementBoundingRect.width == 0 || elementBoundingRect.height == 0) {
-
-                        // There's no background on this line, move on.
-                        continue;
-
-                    }
-
-                }
-
-                // Start element
-                if (context.ipd === "lr") {
-
-                    se.node.style.marginLeft = negpadpxlen;
-                    se.node.style.paddingLeft = pospadpxlen;
-
-                } else if (context.ipd === "rl") {
-
-                    se.node.style.paddingRight = pospadpxlen;
-                    se.node.style.marginRight = negpadpxlen;
-
-                } else if (context.ipd === "tb") {
-
-                    se.node.style.paddingTop = pospadpxlen;
-                    se.node.style.marginTop = negpadpxlen;
-
-                }
-
-                // End element
-                if (context.ipd === "lr") {
-
-                    // Firefox has a problem with line-breaking when a negative margin is applied.
-                    // The positioning will be wrong but don't apply when on firefox.
-                    // https://bugzilla.mozilla.org/show_bug.cgi?id=1502610
-                    if (!browserIsFirefox) {
-                        ee.node.style.marginRight = negpadpxlen;
-                    }
-                    ee.node.style.paddingRight = pospadpxlen;
-
-                } else if (context.ipd === "rl") {
-
-                    ee.node.style.paddingLeft = pospadpxlen;
-                    if (!browserIsFirefox) {
-                        ee.node.style.marginLeft = negpadpxlen;
-                    }
-
-                } else if (context.ipd === "tb") {
-
-                    ee.node.style.paddingBottom = pospadpxlen;
-                    ee.node.style.marginBottom = negpadpxlen;
-
-                }
-
-            }
-
-        }
-
-    }
-
-    function applyMultiRowAlign(lineList) {
-
-        /* apply an explicit br to all but the last line */
-
-        for (var i = 0; i < lineList.length - 1; i++) {
-
-            var l = lineList[i].elements.length;
-
-            if (l !== 0 && lineList[i].br === false) {
-                var br = document.createElement("br");
-
-                var lastnode = lineList[i].elements[l - 1].node;
-
-                lastnode.parentElement.insertBefore(br, lastnode.nextSibling);
-            }
-
-        }
-
-    }
-
-    function applyTextEmphasisOutside(lineList, context) {
-
-        /* supports "outside" only */
-
-        for (var i = 0; i < lineList.length; i++) {
-
-            for (var j = 0; j < lineList[i].te.length; j++) {
-
-                /* skip if position already set */
-
-                if (lineList[i].te[j].style[TEXTEMPHASISPOSITION_PROP] &&
-                    lineList[i].te[j].style[TEXTEMPHASISPOSITION_PROP] !== "none")
-                    continue;
-
-                var pos;
-
-                if (context.bpd === "tb") {
-
-                    pos = (i === 0) ? "left over" : "left under";
-
-
-                } else {
-
-                    if (context.bpd === "rl") {
-
-                        pos = (i === 0) ? "right under" : "left under";
-
-                    } else {
-
-                        pos = (i === 0) ? "left under" : "right under";
-
-                    }
-
-                }
-
-                lineList[i].te[j].style[TEXTEMPHASISPOSITION_PROP] = pos;
-
-            }
-
-        }
-
-    }
-
-    function applyRubyPosition(lineList, context) {
-
-        for (var i = 0; i < lineList.length; i++) {
-
-            for (var j = 0; j < lineList[i].rbc.length; j++) {
-
-                /* skip if ruby-position already set */
-
-                if (lineList[i].rbc[j].style[RUBYPOSITION_PROP])
-                    continue;
-
-                var pos;
-
-                if (RUBYPOSITION_ISWK) {
-
-                    /* WebKit exception */
-
-                    pos = (i === 0) ? "before" : "after";
-
-                } else if (context.bpd === "tb") {
-
-                    pos = (i === 0) ? "over" : "under";
-
-
-                } else {
-
-                    if (context.bpd === "rl") {
-
-                        pos = (i === 0) ? "over" : "under";
-
-                    } else {
-
-                        pos = (i === 0) ? "under" : "over";
-
-                    }
-
-                }
-
-                lineList[i].rbc[j].style[RUBYPOSITION_PROP] = pos;
-
-            }
-
-        }
-
-    }
-
-    function applyRubyReserve(lineList, context) {
-
-        for (var i = 0; i < lineList.length; i++) {
-
-            var ruby = document.createElement("ruby");
-
-            var rb = document.createElement("span");  // rb element is deprecated in HTML
-            rb.textContent = "\u200B";
-
-            ruby.appendChild(rb);
-
-            var rt1;
-            var rt2;
-
-            var fs = context.rubyReserve[1].toUsedLength(context.w, context.h) + "px";
-
-            if (context.rubyReserve[0] === "both" || (context.rubyReserve[0] === "outside" && lineList.length == 1)) {
-
-                rt1 = document.createElement("rtc");
-                rt1.style[RUBYPOSITION_PROP] = RUBYPOSITION_ISWK ? "after" : "under";
-                rt1.textContent = "\u200B";
-                rt1.style.fontSize = fs;
-
-                rt2 = document.createElement("rtc");
-                rt2.style[RUBYPOSITION_PROP] = RUBYPOSITION_ISWK ? "before" : "over";
-                rt2.textContent = "\u200B";
-                rt2.style.fontSize = fs;
-
-                ruby.appendChild(rt1);
-                ruby.appendChild(rt2);
-
-            } else {
-
-                rt1 = document.createElement("rtc");
-                rt1.textContent = "\u200B";
-                rt1.style.fontSize = fs;
-
-                var pos;
-
-                if (context.rubyReserve[0] === "after" || (context.rubyReserve[0] === "outside" && i > 0)) {
-
-                    pos = RUBYPOSITION_ISWK ? "after" : ((context.bpd === "tb" || context.bpd === "rl") ? "under" : "over");
-
-                } else {
-
-                    pos = RUBYPOSITION_ISWK ? "before" : ((context.bpd === "tb" || context.bpd === "rl") ? "over" : "under");
-
-                }
-
-                rt1.style[RUBYPOSITION_PROP] = pos;
-
-                ruby.appendChild(rt1);
-
-            }
-
-            /* add in front of the first ruby element of the line, if it exists */
-
-            var sib = null;
-
-            for (var j = 0; j < lineList[i].rbc.length; j++) {
-
-                if (lineList[i].rbc[j].localName === 'ruby') {
-
-                    sib = lineList[i].rbc[j];
-
-                    /* copy specified style properties from the sibling ruby container */
-                    
-                    for (var k = 0; k < sib.style.length; k++) {
-
-                        ruby.style.setProperty(sib.style.item(k), sib.style.getPropertyValue(sib.style.item(k)));
-
-                    }
-
-                    break;
-                }
-
-            }
-
-            /* otherwise add before first span */
-
-            sib = sib || lineList[i].elements[0].node;
-
-            sib.parentElement.insertBefore(ruby, sib);
-
-        }
-
-    }
-
-    function applyFillLineGap(lineList, par_before, par_after, context, element) {
-
-        /* positive for BPD = lr and tb, negative for BPD = rl */
-        var s = Math.sign(par_after - par_before);
-
-        for (var i = 0; i <= lineList.length; i++) {
-
-            /* compute frontier between lines */
-
-            var frontier;
-
-            if (i === 0) {
-
-                frontier = Math.round(par_before);
-
-            } else if (i === lineList.length) {
-
-                frontier = Math.round(par_after);
-
-            } else {
-
-                frontier = Math.round((lineList[i - 1].after + lineList[i].before) / 2);
-
-            }
-
-            var padding;
-            var l,thisNode;
-
-            /* before line */
-            if (i > 0) {
-
-                if (lineList[i-1]) {
-
-                    for (l = 0; l < lineList[i - 1].elements.length; l++) {
-
-                        thisNode=lineList[i - 1].elements[l];
-                        padding = s*(frontier-thisNode.after) + "px";
-
-                        if (context.bpd === "lr") {
-
-                            thisNode.node.style.paddingRight = padding;
-
-                        } else if (context.bpd === "rl") {
-
-                            thisNode.node.style.paddingLeft = padding;
-
-                        } else if (context.bpd === "tb") {
-
-                            thisNode.node.style.paddingBottom = padding;
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-            /* after line */
-            if (i < lineList.length) {
-
-                for (l = 0; l < lineList[i].elements.length; l++) {
-
-                    thisNode = lineList[i].elements[l];
-                    padding = s * (thisNode.before - frontier) + "px";
-
-                    if (context.bpd === "lr") {
-
-                        thisNode.node.style.paddingLeft = padding;
-
-                    } else if (context.bpd === "rl") {
-
-                        thisNode.node.style.paddingRight = padding;
-
-                    } else if (context.bpd === "tb") {
-
-                        thisNode.node.style.paddingTop = padding;
-
-                    }
-                }
-
-            }
-
-        }
-
-    }
-
-    function RegionPBuffer(id, lineList) {
-
-        this.id = id;
-
-        this.plist = lineList;
-
-    }
-
-    function rect2edges(rect, context) {
-
-        var edges = {before: null, after: null, start: null, end: null};
-
-        if (context.bpd === "tb") {
-
-            edges.before = rect.top;
-            edges.after = rect.bottom;
-
-            if (context.ipd === "lr") {
-
-                edges.start = rect.left;
-                edges.end = rect.right;
-
-            } else {
-
-                edges.start = rect.right;
-                edges.end = rect.left;
-            }
-
-        } else if (context.bpd === "lr") {
-
-            edges.before = rect.left;
-            edges.after = rect.right;
-            edges.start = rect.top;
-            edges.end = rect.bottom;
-
-        } else if (context.bpd === "rl") {
-
-            edges.before = rect.right;
-            edges.after = rect.left;
-            edges.start = rect.top;
-            edges.end = rect.bottom;
-
-        }
-
-        return edges;
-
-    }
-
-    function constructLineList(context, element, llist, bgcolor) {
-
-        if (element.localName === "rt" || element.localName === "rtc") {
-
-            /* skip ruby annotations */
-
-            return;
-
-        }
-
-        var curbgcolor = element.style.backgroundColor || bgcolor;
-
-        if (element.childElementCount === 0) {
-
-            if (element.localName === 'span' || element.localName === 'rb') {
-
-                var r = element.getBoundingClientRect();
-
-                var edges = rect2edges(r, context);
-
-                if (llist.length === 0 ||
-                        (!isSameLine(edges.before, edges.after, llist[llist.length - 1].before, llist[llist.length - 1].after))
-                        ) {
-                    llist.push({
-                        before: edges.before,
-                        after: edges.after,
-                        start: edges.start,
-                        end: edges.end,
-                        start_elem: 0,
-                        end_elem: 0,
-                        elements: [],
-                        rbc: [],
-                        te: [],
-                        text: "",
-                        br: false
-                    });
-
-                } else {
-
-                    /* positive for BPD = lr and tb, negative for BPD = rl */
-                    var bpd_dir = Math.sign(edges.after - edges.before);
-
-                    /* positive for IPD = lr and tb, negative for IPD = rl */
-                    var ipd_dir = Math.sign(edges.end - edges.start);
-
-                    /* check if the line height has increased */
-
-                    if (bpd_dir * (edges.before - llist[llist.length - 1].before) < 0) {
-                        llist[llist.length - 1].before = edges.before;
-                    }
-
-                    if (bpd_dir * (edges.after - llist[llist.length - 1].after) > 0) {
-                        llist[llist.length - 1].after = edges.after;
-                    }
-
-                    if (ipd_dir * (edges.start - llist[llist.length - 1].start) < 0) {
-                        llist[llist.length - 1].start = edges.start;
-                        llist[llist.length - 1].start_elem = llist[llist.length - 1].elements.length;
-                    }
-
-                    if (ipd_dir * (edges.end - llist[llist.length - 1].end) > 0) {
-                        llist[llist.length - 1].end = edges.end;
-                        llist[llist.length - 1].end_elem = llist[llist.length - 1].elements.length;
-                    }
-
-                }
-
-                llist[llist.length - 1].text += element.textContent;
-
-                llist[llist.length - 1].elements.push(
-                        {
-                            node: element,
-                            bgcolor: curbgcolor,
-                            before: edges.before,
-                            after: edges.after
-                        }
-                );
-
-            } else if (element.localName === 'br' && llist.length !== 0) {
-
-                llist[llist.length - 1].br = true;
-
-            }
-
-        } else {
-
-            var child = element.firstChild;
-
-            while (child) {
-
-                if (child.nodeType === Node.ELEMENT_NODE) {
-
-                    constructLineList(context, child, llist, curbgcolor);
-
-                    if (child.localName === 'ruby' || child.localName === 'rtc') {
-
-                        /* remember non-empty ruby and rtc elements so that tts:rubyPosition can be applied */
-
-                        if (llist.length > 0) {
-
-                            llist[llist.length - 1].rbc.push(child);
-
-                        }
-
-                    } else if (child.localName === 'span' &&
-                            child.style[TEXTEMPHASISSTYLE_PROP] &&
-                            child.style[TEXTEMPHASISSTYLE_PROP] !== "none") {
-
-                        /* remember non-empty span elements with textEmphasis */
-
-                        if (llist.length > 0) {
-
-                            llist[llist.length - 1].te.push(child);
-
-                        }
-
-                    }
-                    
-
-                }
-
-                child = child.nextSibling;
-            }
-        }
-
-    }
-
-    function isSameLine(before1, after1, before2, after2) {
-
-        return ((after1 < after2) && (before1 > before2)) || ((after2 <= after1) && (before2 >= before1));
-
-    }
-
-    function applyTextEmphasis(context, dom_element, isd_element, attr) {
-
-        /* ignore color (not used in IMSC 1.1) */
-
-        if (attr.style === "none") {
-
-            /* text-emphasis is not inherited and the default is none, so nothing to do */
-            
-            return;
-        
-        } else if (attr.style === "auto") {
-
-            dom_element.style[TEXTEMPHASISSTYLE_PROP] = "filled";
-        
-        } else {
-
-            dom_element.style[TEXTEMPHASISSTYLE_PROP] =  attr.style + " " + attr.symbol;
-        }
-
-        /* ignore "outside" position (set in postprocessing) */
-
-        if (attr.position === "before" || attr.position === "after") {
-
-            var pos;
-
-            if (context.bpd === "tb") {
-
-                pos = (attr.position === "before") ? "left over" : "left under";
-
-
-            } else {
-
-                if (context.bpd === "rl") {
-
-                    pos = (attr.position === "before") ? "right under" : "left under";
-
-                } else {
-
-                    pos = (attr.position === "before") ? "left under" : "right under";
-
-                }
-
-            }
-
-            dom_element.style[TEXTEMPHASISPOSITION_PROP] = pos;
-        }
-    }
-
-    function HTMLStylingMapDefinition(qName, mapFunc) {
-        this.qname = qName;
-        this.map = mapFunc;
-    }
-
-    var STYLING_MAP_DEFS = [
-
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling backgroundColor",
-                function (context, dom_element, isd_element, attr) {
-
-                    /* skip if transparent */
-                    if (attr[3] === 0)
-                        return;
-
-                    dom_element.style.backgroundColor = "rgba(" +
-                            attr[0].toString() + "," +
-                            attr[1].toString() + "," +
-                            attr[2].toString() + "," +
-                            (attr[3] / 255).toString() +
-                            ")";
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling color",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.color = "rgba(" +
-                            attr[0].toString() + "," +
-                            attr[1].toString() + "," +
-                            attr[2].toString() + "," +
-                            (attr[3] / 255).toString() +
-                            ")";
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling direction",
-                function (context, dom_element, isd_element, attr) {
-
-                    dom_element.style.direction = attr;
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling display",
-                function (context, dom_element, isd_element, attr) {}
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling displayAlign",
-                function (context, dom_element, isd_element, attr) {
-
-                    /* see https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
-
-                    /* TODO: is this affected by writing direction? */
-
-                    dom_element.style.display = "flex";
-                    dom_element.style.flexDirection = "column";
-
-
-                    if (attr === "before") {
-
-                        dom_element.style.justifyContent = "flex-start";
-
-                    } else if (attr === "center") {
-
-                        dom_element.style.justifyContent = "center";
-
-                    } else if (attr === "after") {
-
-                        dom_element.style.justifyContent = "flex-end";
-                    }
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling extent",
-                function (context, dom_element, isd_element, attr) {
-                    /* TODO: this is super ugly */
-
-                    context.regionH = attr.h.toUsedLength(context.w, context.h);
-                    context.regionW = attr.w.toUsedLength(context.w, context.h);
-
-                    /* 
-                     * CSS height/width are measured against the content rectangle,
-                     * whereas TTML height/width include padding
-                     */
-
-                    var hdelta = 0;
-                    var wdelta = 0;
-
-                    var p = isd_element.styleAttrs["http://www.w3.org/ns/ttml#styling padding"];
-
-                    if (!p) {
-
-                        /* error */
-
-                    } else {
-
-                        hdelta = p[0].toUsedLength(context.w, context.h) + p[2].toUsedLength(context.w, context.h);
-                        wdelta = p[1].toUsedLength(context.w, context.h) + p[3].toUsedLength(context.w, context.h);
-
-                    }
-
-                    dom_element.style.height = (context.regionH - hdelta) + "px";
-                    dom_element.style.width = (context.regionW - wdelta) + "px";
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling fontFamily",
-                function (context, dom_element, isd_element, attr) {
-
-                    var rslt = [];
-
-                    /* per IMSC1 */
-
-                    for (var i = 0; i < attr.length; i++) {
-                        attr[i] = attr[i].trim();
-
-                        if (attr[i] === "monospaceSerif") {
-
-                            rslt.push("Courier New");
-                            rslt.push('"Liberation Mono"');
-                            rslt.push("Courier");
-                            rslt.push("monospace");
-
-                        } else if (attr[i] === "proportionalSansSerif") {
-
-                            rslt.push("Arial");
-                            rslt.push("Helvetica");
-                            rslt.push('"Liberation Sans"');
-                            rslt.push("sans-serif");
-
-                        } else if (attr[i] === "monospace") {
-
-                            rslt.push("monospace");
-
-                        } else if (attr[i] === "sansSerif") {
-
-                            rslt.push("sans-serif");
-
-                        } else if (attr[i] === "serif") {
-
-                            rslt.push("serif");
-
-                        } else if (attr[i] === "monospaceSansSerif") {
-
-                            rslt.push("Consolas");
-                            rslt.push("monospace");
-
-                        } else if (attr[i] === "proportionalSerif") {
-
-                            rslt.push("serif");
-
-                        } else {
-
-                            rslt.push(attr[i]);
-
-                        }
-
-                    }
-
-                    // prune later duplicates we may have inserted 
-                    if (rslt.length > 0) {
-
-                        var unique=[rslt[0]];
-
-                        for (var fi = 1; fi < rslt.length; fi++) {
-
-                            if (unique.indexOf(rslt[fi]) == -1) {
-
-                                unique.push(rslt[fi]);
-
-                            }
-                        }
-
-                        rslt = unique;
-                    }
-
-                    dom_element.style.fontFamily = rslt.join(",");
-                }
-        ),
-
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling shear",
-                function (context, dom_element, isd_element, attr) {
-
-                    /* return immediately if tts:shear is 0% since CSS transforms are not inherited*/
-
-                    if (attr === 0)
-                        return;
-
-                    var angle = attr * -0.9;
-
-                    /* context.bpd is needed since writing mode is not inherited and sets the inline progression */
-
-                    if (context.bpd === "tb") {
-
-                        dom_element.style.transform = "skewX(" + angle + "deg)";
-
-                    } else {
-
-                        dom_element.style.transform = "skewY(" + angle + "deg)";
-
-                    }
-
-                }
-        ),
-
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling fontSize",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.fontSize = attr.toUsedLength(context.w, context.h) + "px";
-                }
-        ),
-
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling fontStyle",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.fontStyle = attr;
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling fontWeight",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.fontWeight = attr;
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling lineHeight",
-                function (context, dom_element, isd_element, attr) {
-                    if (attr === "normal") {
-
-                        dom_element.style.lineHeight = "normal";
-
-                    } else {
-
-                        dom_element.style.lineHeight = attr.toUsedLength(context.w, context.h) + "px";
-                    }
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling opacity",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.opacity = attr;
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling origin",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.top = attr.h.toUsedLength(context.w, context.h) + "px";
-                    dom_element.style.left = attr.w.toUsedLength(context.w, context.h) + "px";
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling overflow",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.overflow = attr;
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling padding",
-                function (context, dom_element, isd_element, attr) {
-
-                    /* attr: top,left,bottom,right*/
-
-                    /* style: top right bottom left*/
-
-                    var rslt = [];
-
-                    rslt[0] = attr[0].toUsedLength(context.w, context.h) + "px";
-                    rslt[1] = attr[3].toUsedLength(context.w, context.h) + "px";
-                    rslt[2] = attr[2].toUsedLength(context.w, context.h) + "px";
-                    rslt[3] = attr[1].toUsedLength(context.w, context.h) + "px";
-
-                    dom_element.style.padding = rslt.join(" ");
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling position",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.top = attr.h.toUsedLength(context.w, context.h) + "px";
-                    dom_element.style.left = attr.w.toUsedLength(context.w, context.h) + "px";
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling rubyAlign",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.rubyAlign = attr === "spaceAround" ? "space-around" : "center";
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling rubyPosition",
-                function (context, dom_element, isd_element, attr) {
-
-                    /* skip if "outside", which is handled by applyRubyPosition() */
-
-                    if (attr === "before" || attr === "after") {
-
-                        var pos;
-
-                        if (RUBYPOSITION_ISWK) {
-
-                            /* WebKit exception */
-        
-                            pos = attr;
-        
-                        } else if (context.bpd === "tb") {
-
-                            pos = (attr === "before") ? "over" : "under";
-
-
-                        } else {
-
-                            if (context.bpd === "rl") {
-
-                                pos = (attr === "before") ? "over" : "under";
-
-                            } else {
-
-                                pos = (attr === "before") ? "under" : "over";
-
-                            }
-
-                        }
-
-                        /* apply position to the parent dom_element, i.e. ruby or rtc */
-
-                        dom_element.parentElement.style[RUBYPOSITION_PROP] = pos;
-                    }
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling showBackground",
-                null
-                ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling textAlign",
-                function (context, dom_element, isd_element, attr) {
-
-                    var ta;
-
-                    /* handle UAs that do not understand start or end */
-
-                    if (attr === "start") {
-
-                        ta = (context.ipd === "rl") ? "right" : "left";
-
-                    } else if (attr === "end") {
-
-                        ta = (context.ipd === "rl") ? "left" : "right";
-
-                    } else {
-
-                        ta = attr;
-
-                    }
-
-                    dom_element.style.textAlign = ta;
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling textDecoration",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.textDecoration = attr.join(" ").replace("lineThrough", "line-through");
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling textOutline",
-                function (context, dom_element, isd_element, attr) {
-
-                    /* defer to tts:textShadow */
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling textShadow",
-                function (context, dom_element, isd_element, attr) {
-
-                    var txto = isd_element.styleAttrs[imscStyles.byName.textOutline.qname];
-
-                    if (attr === "none" && txto === "none") {
-
-                        dom_element.style.textShadow = "";
-
-                    } else {
-
-                        var s = [];
-
-                        if (txto !== "none") {
-
-                            /* emulate text outline */
-
-                            var to_color = "rgba(" +
-                                                txto.color[0].toString() + "," +
-                                                txto.color[1].toString() + "," +
-                                                txto.color[2].toString() + "," +
-                                                (txto.color[3] / 255).toString() +
-                                                ")";
-
-                            s.push(  "1px 1px 1px " + to_color);
-                            s.push(  "-1px 1px 1px " + to_color);
-                            s.push(  "1px -1px 1px " + to_color);
-                            s.push(  "-1px -1px 1px " + to_color);
-
-                        }
-
-                        /* add text shadow */
-
-                        if (attr !== "none") {
-
-                            for (var i = 0; i < attr.length; i++) {
-
-
-                                s.push(attr[i].x_off.toUsedLength(context.w, context.h) + "px " +
-                                        attr[i].y_off.toUsedLength(context.w, context.h) + "px " +
-                                        attr[i].b_radius.toUsedLength(context.w, context.h) + "px " +
-                                        "rgba(" +
-                                        attr[i].color[0].toString() + "," +
-                                        attr[i].color[1].toString() + "," +
-                                        attr[i].color[2].toString() + "," +
-                                        (attr[i].color[3] / 255).toString() +
-                                        ")"
-                                        );
-
-                            }
-
-                        }
-
-                        dom_element.style.textShadow = s.join(",");
-
-                    }
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling textCombine",
-                function (context, dom_element, isd_element, attr) {
-
-                    dom_element.style.textCombineUpright = attr;
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling textEmphasis",
-                function (context, dom_element, isd_element, attr) {
-
-                    /* applied as part of HTML document construction */
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling unicodeBidi",
-                function (context, dom_element, isd_element, attr) {
-
-                    var ub;
-
-                    if (attr === 'bidiOverride') {
-                        ub = "bidi-override";
-                    } else {
-                        ub = attr;
-                    }
-
-                    dom_element.style.unicodeBidi = ub;
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling visibility",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.visibility = attr;
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling wrapOption",
-                function (context, dom_element, isd_element, attr) {
-
-                    if (attr === "wrap") {
-
-                        if (isd_element.space === "preserve") {
-                            dom_element.style.whiteSpace = "pre-wrap";
-                        } else {
-                            dom_element.style.whiteSpace = "normal";
-                        }
-
-                    } else {
-
-                        if (isd_element.space === "preserve") {
-
-                            dom_element.style.whiteSpace = "pre";
-
-                        } else {
-                            dom_element.style.whiteSpace = "noWrap";
-                        }
-
-                    }
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling writingMode",
-                function (context, dom_element, isd_element, attr) {
-
-                    var wm;
-
-                    if (attr === "lrtb" || attr === "lr") {
-
-                        dom_element.style.writingMode = "horizontal-tb";
-
-                    } else if (attr === "rltb" || attr === "rl") {
-
-                        dom_element.style.writingMode = "horizontal-tb";
-
-                    } else if (attr === "tblr") {
-
-                        dom_element.style.writingMode = "vertical-lr";
-
-                    } else if (attr === "tbrl" || attr === "tb") {
-
-                        dom_element.style.writingMode = "vertical-rl";
-
-                    }
-
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml#styling zIndex",
-                function (context, dom_element, isd_element, attr) {
-                    dom_element.style.zIndex = attr;
-                }
-        ),
-        new HTMLStylingMapDefinition(
-                "http://www.w3.org/ns/ttml/profile/imsc1#styling forcedDisplay",
-                function (context, dom_element, isd_element, attr) {
-
-                    if (context.displayForcedOnlyMode && attr === false) {
-                        dom_element.style.visibility = "hidden";
-                    }
-
-                }
-        )
-    ];
-
-    var STYLMAP_BY_QNAME = {};
-
-    for (var i = 0; i < STYLING_MAP_DEFS.length; i++) {
-
-        STYLMAP_BY_QNAME[STYLING_MAP_DEFS[i].qname] = STYLING_MAP_DEFS[i];
-    }
-
-    /* CSS property names */
-
-    var RUBYPOSITION_ISWK = "webkitRubyPosition" in window.getComputedStyle(document.documentElement);
-
-    var RUBYPOSITION_PROP = RUBYPOSITION_ISWK ? "webkitRubyPosition" : "rubyPosition";
-
-    var TEXTEMPHASISSTYLE_PROP = "webkitTextEmphasisStyle" in window.getComputedStyle(document.documentElement) ? "webkitTextEmphasisStyle" : "textEmphasisStyle";
-
-    var TEXTEMPHASISPOSITION_PROP = "webkitTextEmphasisPosition" in window.getComputedStyle(document.documentElement) ? "webkitTextEmphasisPosition" : "textEmphasisPosition";
-
-    /* error utilities */
-
-    function reportError(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.error && errorHandler.error(msg))
-            throw msg;
-
-    }
-
-})( false ? 0 : exports,
-        typeof imscNames === 'undefined' ? __webpack_require__(/*! ./names */ "./node_modules/imsc/src/main/js/names.js") : imscNames,
-        typeof imscStyles === 'undefined' ? __webpack_require__(/*! ./styles */ "./node_modules/imsc/src/main/js/styles.js") : imscStyles,
-        typeof imscUtils === 'undefined' ? __webpack_require__(/*! ./utils */ "./node_modules/imsc/src/main/js/utils.js") : imscUtils);
-
-
-/***/ }),
-
-/***/ "./node_modules/imsc/src/main/js/isd.js":
-/*!**********************************************!*\
-  !*** ./node_modules/imsc/src/main/js/isd.js ***!
-  \**********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-/* 
- * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * @module imscISD
- */
-
-
-;
-(function (imscISD, imscNames, imscStyles, imscUtils) { // wrapper for non-node envs
-
-    /** 
-     * Creates a canonical representation of an IMSC1 document returned by <pre>imscDoc.fromXML()</pre>
-     * at a given absolute offset in seconds. This offset does not have to be one of the values returned
-     * by <pre>getMediaTimeEvents()</pre>.
-     * 
-     * @param {Object} tt IMSC1 document
-     * @param {number} offset Absolute offset (in seconds)
-     * @param {?module:imscUtils.ErrorHandler} errorHandler Error callback
-     * @returns {Object} Opaque in-memory representation of an ISD
-     */
-
-    imscISD.generateISD = function (tt, offset, errorHandler) {
-
-        /* TODO check for tt and offset validity */
-
-        /* create the ISD object from the IMSC1 doc */
-
-        var isd = new ISD(tt);
-
-        /* context */
-
-        var context = {
-
-            /*rubyfs: []*/ /* font size of the nearest textContainer or container */
-
-        };
-
-        /* Filter body contents - Only process what we need within the offset and discard regions not applicable to the content */
-        var body = {};
-        var activeRegions = {};
-
-        /* gather any regions that might have showBackground="always" and show a background */
-        var initialShowBackground = tt.head.styling.initials[imscStyles.byName.showBackground.qname];
-        var initialbackgroundColor = tt.head.styling.initials[imscStyles.byName.backgroundColor.qname];
-        for (var layout_child in tt.head.layout.regions)
-        {
-            if (tt.head.layout.regions.hasOwnProperty(layout_child)) {
-                var region = tt.head.layout.regions[layout_child];
-                var showBackground = region.styleAttrs[imscStyles.byName.showBackground.qname] || initialShowBackground;
-                var backgroundColor = region.styleAttrs[imscStyles.byName.backgroundColor.qname] || initialbackgroundColor;
-                activeRegions[region.id] = (
-                    (showBackground === 'always' || showBackground === undefined) &&
-                    backgroundColor !== undefined &&
-                    !(offset < region.begin || offset >= region.end)
-                    );
-            }
-        }
-
-        /* If the body specifies a region, catch it, since no filtered content will */
-        /* likely specify the region. */
-        if (tt.body && tt.body.regionID) {
-            activeRegions[tt.body.regionID] = true;
-        }
-
-        function filter(offset, element) {
-            function offsetFilter(element) {
-                return !(offset < element.begin || offset >= element.end);    
-            }    
-        
-            if (element.contents) {
-                var clone = {};
-                for (var prop in element) {
-                    if (element.hasOwnProperty(prop)) {
-                        clone[prop] = element[prop];
-                    }
-                }
-                clone.contents = [];
-
-                element.contents.filter(offsetFilter).forEach(function (el) {
-                    var filteredElement = filter(offset, el);
-                    if (filteredElement.regionID) {
-                        activeRegions[filteredElement.regionID] = true;
-                    }
-        
-                    if (filteredElement !== null) {
-                        clone.contents.push(filteredElement);
-                    }
-                });
-                return clone;
-            } else {
-                return element;
-            }
-        }
-
-        if (tt.body !== null) {
-            body = filter(offset, tt.body);
-        } else {
-            body = null;
-        }
-
-        /* rewritten TTML will always have a default - this covers it. because the region is defaulted to "" */
-        if (activeRegions[""] !== undefined) {
-            activeRegions[""] = true;
-        }
-
-        /* process regions */      
-        for (var regionID in activeRegions) {
-            if (activeRegions[regionID]) {
-                /* post-order traversal of the body tree per [construct intermediate document] */
-
-                var c = isdProcessContentElement(tt, offset, tt.head.layout.regions[regionID], body, null, '', tt.head.layout.regions[regionID], errorHandler, context);
-
-                if (c !== null) {
-
-                    /* add the region to the ISD */
-
-                    isd.contents.push(c.element);
-                }
-            }
-        }
-
-        return isd;
-    };
-
-    /* set of styles not applicable to ruby container spans */
-
-    var _rcs_na_styles = [
-        imscStyles.byName.color.qname,
-        imscStyles.byName.textCombine.qname,
-        imscStyles.byName.textDecoration.qname,
-        imscStyles.byName.textEmphasis.qname,
-        imscStyles.byName.textOutline.qname,
-        imscStyles.byName.textShadow.qname
-    ];
-
-    function isdProcessContentElement(doc, offset, region, body, parent, inherited_region_id, elem, errorHandler, context) {
-
-        /* prune if temporally inactive */
-
-        if (offset < elem.begin || offset >= elem.end) {
-            return null;
-        }
-
-        /* 
-         * set the associated region as specified by the regionID attribute, or the 
-         * inherited associated region otherwise
-         */
-
-        var associated_region_id = 'regionID' in elem && elem.regionID !== '' ? elem.regionID : inherited_region_id;
-
-        /* prune the element if either:
-         * - the element is not terminal and the associated region is neither the default
-         *   region nor the parent region (this allows children to be associated with a 
-         *   region later on)
-         * - the element is terminal and the associated region is not the parent region
-         */
-
-        /* TODO: improve detection of terminal elements since <region> has no contents */
-
-        if (parent !== null /* are we in the region element */ &&
-            associated_region_id !== region.id &&
-            (
-                (!('contents' in elem)) ||
-                ('contents' in elem && elem.contents.length === 0) ||
-                associated_region_id !== ''
-                )
-            )
-            return null;
-
-        /* create an ISD element, including applying specified styles */
-
-        var isd_element = new ISDContentElement(elem);
-
-        /* apply set (animation) styling */
-
-        if ("sets" in elem) {
-            for (var i = 0; i < elem.sets.length; i++) {
-
-                if (offset < elem.sets[i].begin || offset >= elem.sets[i].end)
-                    continue;
-
-                isd_element.styleAttrs[elem.sets[i].qname] = elem.sets[i].value;
-
-            }
-        }
-
-        /* 
-         * keep track of specified styling attributes so that we
-         * can compute them later
-         */
-
-        var spec_attr = {};
-
-        for (var qname in isd_element.styleAttrs) {
-
-            if (! isd_element.styleAttrs.hasOwnProperty(qname)) continue;
-
-            spec_attr[qname] = true;
-
-            /* special rule for tts:writingMode (section 7.29.1 of XSL)
-             * direction is set consistently with writingMode only
-             * if writingMode sets inline-direction to LTR or RTL  
-             */
-
-            if (isd_element.kind === 'region' &&
-                qname === imscStyles.byName.writingMode.qname &&
-                !(imscStyles.byName.direction.qname in isd_element.styleAttrs)) {
-
-                var wm = isd_element.styleAttrs[qname];
-
-                if (wm === "lrtb" || wm === "lr") {
-
-                    isd_element.styleAttrs[imscStyles.byName.direction.qname] = "ltr";
-
-                } else if (wm === "rltb" || wm === "rl") {
-
-                    isd_element.styleAttrs[imscStyles.byName.direction.qname] = "rtl";
-
-                }
-
-            }
-        }
-
-        /* inherited styling */
-
-        if (parent !== null) {
-
-            for (var j = 0; j < imscStyles.all.length; j++) {
-
-                var sa = imscStyles.all[j];
-
-                /* textDecoration has special inheritance rules */
-
-                if (sa.qname === imscStyles.byName.textDecoration.qname) {
-
-                    /* handle both textDecoration inheritance and specification */
-
-                    var ps = parent.styleAttrs[sa.qname];
-                    var es = isd_element.styleAttrs[sa.qname];
-                    var outs = [];
-
-                    if (es === undefined) {
-
-                        outs = ps;
-
-                    } else if (es.indexOf("none") === -1) {
-
-                        if ((es.indexOf("noUnderline") === -1 &&
-                            ps.indexOf("underline") !== -1) ||
-                            es.indexOf("underline") !== -1) {
-
-                            outs.push("underline");
-
-                        }
-
-                        if ((es.indexOf("noLineThrough") === -1 &&
-                            ps.indexOf("lineThrough") !== -1) ||
-                            es.indexOf("lineThrough") !== -1) {
-
-                            outs.push("lineThrough");
-
-                        }
-
-                        if ((es.indexOf("noOverline") === -1 &&
-                            ps.indexOf("overline") !== -1) ||
-                            es.indexOf("overline") !== -1) {
-
-                            outs.push("overline");
-
-                        }
-
-                    } else {
-
-                        outs.push("none");
-
-                    }
-
-                    isd_element.styleAttrs[sa.qname] = outs;
-
-                } else if (sa.qname === imscStyles.byName.fontSize.qname &&
-                    !(sa.qname in isd_element.styleAttrs) &&
-                    isd_element.kind === 'span' &&
-                    isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "textContainer") {
-                    
-                    /* special inheritance rule for ruby text container font size */
-                    
-                    var ruby_fs = parent.styleAttrs[imscStyles.byName.fontSize.qname];
-
-                    isd_element.styleAttrs[sa.qname] = new imscUtils.ComputedLength(
-                        0.5 * ruby_fs.rw,
-                        0.5 * ruby_fs.rh);
-
-                } else if (sa.qname === imscStyles.byName.fontSize.qname &&
-                    !(sa.qname in isd_element.styleAttrs) &&
-                    isd_element.kind === 'span' &&
-                    isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "text") {
-                    
-                    /* special inheritance rule for ruby text font size */
-                    
-                    var parent_fs = parent.styleAttrs[imscStyles.byName.fontSize.qname];
-                    
-                    if (parent.styleAttrs[imscStyles.byName.ruby.qname] === "textContainer") {
-                        
-                        isd_element.styleAttrs[sa.qname] = parent_fs;
-                        
-                    } else {
-                        
-                        isd_element.styleAttrs[sa.qname] = new imscUtils.ComputedLength(
-                            0.5 * parent_fs.rw,
-                            0.5 * parent_fs.rh);
-                    }
-                    
-                } else if (sa.inherit &&
-                    (sa.qname in parent.styleAttrs) &&
-                    !(sa.qname in isd_element.styleAttrs)) {
-
-                    isd_element.styleAttrs[sa.qname] = parent.styleAttrs[sa.qname];
-
-                }
-
-            }
-
-        }
-
-        /* initial value styling */
-
-        for (var k = 0; k < imscStyles.all.length; k++) {
-            
-            var ivs = imscStyles.all[k];
-
-            /* skip if value is already specified */
-
-            if (ivs.qname in isd_element.styleAttrs) continue;
-
-            /* skip tts:position if tts:origin is specified */
-
-            if (ivs.qname === imscStyles.byName.position.qname &&
-                imscStyles.byName.origin.qname in isd_element.styleAttrs)
-                continue;
-
-            /* skip tts:origin if tts:position is specified */
-
-            if (ivs.qname === imscStyles.byName.origin.qname &&
-                imscStyles.byName.position.qname in isd_element.styleAttrs)
-                continue;
-            
-            /* determine initial value */
-            
-            var iv = doc.head.styling.initials[ivs.qname] || ivs.initial;
-
-            if (iv === null) {
-                /* skip processing if no initial value defined */
-
-                continue;
-            }
-
-            /* apply initial value to elements other than region only if non-inherited */
-
-            if (isd_element.kind === 'region' || (ivs.inherit === false && iv !== null)) {
-
-                var piv = ivs.parse(iv);
-
-                if (piv !== null) {
-
-                    isd_element.styleAttrs[ivs.qname] = piv;
-
-                    /* keep track of the style as specified */
-
-                    spec_attr[ivs.qname] = true;
-
-                } else {
-
-                    reportError(errorHandler, "Invalid initial value for '" + ivs.qname + "' on element '" + isd_element.kind);
-
-                }
-
-            }
-
-        }
-
-        /* compute styles (only for non-inherited styles) */
-        /* TODO: get rid of spec_attr */
-
-        for (var z = 0; z < imscStyles.all.length; z++) {
-            
-            var cs = imscStyles.all[z];
-
-            if (!(cs.qname in spec_attr)) continue;
-
-            if (cs.compute !== null) {
-
-                var cstyle = cs.compute(
-                    /*doc, parent, element, attr, context*/
-                    doc,
-                    parent,
-                    isd_element,
-                    isd_element.styleAttrs[cs.qname],
-                    context
-                    );
-
-                if (cstyle !== null) {
-
-                    isd_element.styleAttrs[cs.qname] = cstyle;
-                    
-                } else {
-                    /* if the style cannot be computed, replace it by its initial value */
-
-                    isd_element.styleAttrs[cs.qname] = cs.compute(
-                        /*doc, parent, element, attr, context*/
-                        doc,
-                        parent,
-                        isd_element,
-                        cs.parse(cs.initial),
-                        context
-                    );
-
-                    reportError(errorHandler, "Style '" + cs.qname + "' on element '" + isd_element.kind + "' cannot be computed");
-                }
-            }
-
-        }
-
-        /* prune if tts:display is none */
-
-        if (isd_element.styleAttrs[imscStyles.byName.display.qname] === "none")
-            return null;
-
-        /* process contents of the element */
-
-        var contents = null;
-
-        if (parent === null) {
-
-            /* we are processing the region */
-
-            if (body === null) {
-
-                /* if there is no body, still process the region but with empty content */
-
-                contents = [];
-
-            } else {
-
-                /*use the body element as contents */
-
-                contents = [body];
-
-            }
-
-        } else if ('contents' in elem) {
-
-            contents = elem.contents;
-
-        }
-
-        for (var x = 0; contents !== null && x < contents.length; x++) {
-
-            var c = isdProcessContentElement(doc, offset, region, body, isd_element, associated_region_id, contents[x], errorHandler, context);
-
-            /* 
-             * keep child element only if they are non-null and their region match 
-             * the region of this element
-             */
-
-            if (c !== null) {
-
-                isd_element.contents.push(c.element);
-
-            }
-
-        }
-
-        /* remove styles that are not applicable */
-
-        for (var qnameb in isd_element.styleAttrs) {
-            if (!isd_element.styleAttrs.hasOwnProperty(qnameb)) continue;
-
-            /* true if not applicable */
-
-            var na = false;
-
-            /* special applicability of certain style properties to ruby container spans */
-            /* TODO: in the future ruby elements should be translated to elements instead of kept as spans */
-
-            if (isd_element.kind === 'span') {
-
-                var rsp = isd_element.styleAttrs[imscStyles.byName.ruby.qname];
-
-                na = ( rsp === 'container' || rsp === 'textContainer' || rsp === 'baseContainer' ) && 
-                    _rcs_na_styles.indexOf(qnameb) !== -1;
-
-                if (! na) {
-
-                    na = rsp !== 'container' &&
-                        qnameb === imscStyles.byName.rubyAlign.qname;
-
-                }
-
-                if (! na) {
-
-                    na =  (! (rsp === 'textContainer' || rsp === 'text')) &&
-                        qnameb === imscStyles.byName.rubyPosition.qname;
-
-                }
-
-            }
-
-            /* normal applicability */
-            
-            if (! na) {
-
-                var da = imscStyles.byQName[qnameb];
-
-                if ("applies" in da){
-
-                    na = da.applies.indexOf(isd_element.kind) === -1;
-
-                }
-
-            }
-
-
-            if (na) {
-                delete isd_element.styleAttrs[qnameb];
-            }
-
-        }
-
-        /* trim whitespace around explicit line breaks */
-
-        var ruby = isd_element.styleAttrs[imscStyles.byName.ruby.qname];
-
-        if (isd_element.kind === 'p' ||
-            (isd_element.kind === 'span' && (ruby === "textContainer" || ruby === "text"))
-            ) {
-
-            var elist = [];
-
-            constructSpanList(isd_element, elist);
-
-            collapseLWSP(elist);
-
-            pruneEmptySpans(isd_element);
-
-        }
-
-        /* keep element if:
-         * * contains a background image
-         * * <br/>
-         * * if there are children
-         * * if it is an image
-         * * if <span> and has text
-         * * if region and showBackground = always
-         */
-
-        if ((isd_element.kind === 'div' && imscStyles.byName.backgroundImage.qname in isd_element.styleAttrs) ||
-            isd_element.kind === 'br' ||
-            isd_element.kind === 'image' ||
-            ('contents' in isd_element && isd_element.contents.length > 0) ||
-            (isd_element.kind === 'span' && isd_element.text !== null) ||
-            (isd_element.kind === 'region' &&
-                isd_element.styleAttrs[imscStyles.byName.showBackground.qname] === 'always')) {
-
-            return {
-                region_id: associated_region_id,
-                element: isd_element
-            };
-        }
-
-        return null;
-    }
-
-    function collapseLWSP(elist) {
-
-        function isPrevCharLWSP(prev_element) {
-            return prev_element.kind === 'br' || /[\r\n\t ]$/.test(prev_element.text);
-        }
-
-        function isNextCharLWSP(next_element) {
-            return next_element.kind === 'br' || (next_element.space === "preserve" && /^[\r\n]/.test(next_element.text));
-        }
-
-        /* collapse spaces and remove leading LWSPs */
-
-        var element;
-
-        for (var i = 0; i < elist.length;) {
-
-            element = elist[i];
-
-            if (element.kind === "br" || element.space === "preserve") {
-                i++;
-                continue;
-            }
-
-            var trimmed_text = element.text.replace(/[\t\r\n ]+/g, ' ');
-
-            if (/^[ ]/.test(trimmed_text)) {
-
-                if (i === 0 || isPrevCharLWSP(elist[i - 1])) {
-                    trimmed_text = trimmed_text.substring(1);
-                }
-
-            }
-
-            element.text = trimmed_text;
-
-            if (trimmed_text.length === 0) {
-                elist.splice(i, 1);
-            } else {
-                i++;
-            }
-
-        }
-
-        /* remove trailing LWSPs */
-
-        for (i = 0; i < elist.length; i++) {
-
-            element = elist[i];
-
-            if (element.kind === "br" || element.space === "preserve") {
-                i++;
-                continue;
-            }
-
-            if (/[ ]$/.test(element.text)) {
-
-                if (i === (elist.length - 1) || isNextCharLWSP(elist[i + 1])) {
-                    element.text = element.text.slice(0, -1);
-                }
-
-            }
-
-        }
-
-    }
-
-    function constructSpanList(element, elist) {
-
-        if (! ("contents" in element)) {
-            return;
-        }
-
-        for (var i = 0; i < element.contents.length; i++) {
-
-            var child = element.contents[i];
-            var ruby = child.styleAttrs[imscStyles.byName.ruby.qname];
-
-            if (child.kind === 'span' && (ruby === "textContainer" || ruby === "text")) {
-
-                /* skip ruby text and text containers, which are handled on their own */
-            
-                continue;
-
-            } else if ('contents' in child) {
-    
-                constructSpanList(child, elist);
-    
-            } else if ((child.kind === 'span' && child.text.length !== 0) || child.kind === 'br') {
-
-                /* skip empty spans */
-
-                elist.push(child);
-
-            }
-
-        }
-
-    }
-
-    function pruneEmptySpans(element) {
-
-        if (element.kind === 'br') {
-
-            return false;
-
-        } else if ('text' in element) {
-
-            return  element.text.length === 0;
-
-        } else if ('contents' in element) {
-
-            var i = element.contents.length;
-
-            while (i--) {
-
-                if (pruneEmptySpans(element.contents[i])) {
-                    element.contents.splice(i, 1);
-                }
-
-            }
-
-            return element.contents.length === 0;
-
-        }
-    }
-
-    function ISD(tt) {
-        this.contents = [];
-        this.aspectRatio = tt.aspectRatio;
-        this.lang = tt.lang;
-    }
-
-    function ISDContentElement(ttelem) {
-
-        /* assume the element is a region if it does not have a kind */
-
-        this.kind = ttelem.kind || 'region';
-
-        /* copy lang */
-
-        this.lang = ttelem.lang;
-
-        /* copy id */
-
-        if (ttelem.id) {
-            this.id = ttelem.id;
-        }
-
-        /* deep copy of style attributes */
-        this.styleAttrs = {};
-
-        for (var sname in ttelem.styleAttrs) {
-
-            if (! ttelem.styleAttrs.hasOwnProperty(sname)) continue;
-
-            this.styleAttrs[sname] =
-                ttelem.styleAttrs[sname];
-        }
-        
-        /* copy src and type if image */
-        
-        if ('src' in ttelem) {
-            
-            this.src = ttelem.src;
-            
-        }
-        
-         if ('type' in ttelem) {
-            
-            this.type = ttelem.type;
-            
-        }
-
-        /* TODO: clean this! 
-         * TODO: ISDElement and document element should be better tied together */
-
-        if ('text' in ttelem) {
-
-            this.text = ttelem.text;
-
-        } else if (this.kind === 'region' || 'contents' in ttelem) {
-
-            this.contents = [];
-        }
-
-        if ('space' in ttelem) {
-
-            this.space = ttelem.space;
-        }
-    }
-
-
-    /*
-     * ERROR HANDLING UTILITY FUNCTIONS
-     * 
-     */
-
-    function reportInfo(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.info && errorHandler.info(msg))
-            throw msg;
-
-    }
-
-    function reportWarning(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.warn && errorHandler.warn(msg))
-            throw msg;
-
-    }
-
-    function reportError(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.error && errorHandler.error(msg))
-            throw msg;
-
-    }
-
-    function reportFatal(errorHandler, msg) {
-
-        if (errorHandler && errorHandler.fatal)
-            errorHandler.fatal(msg);
-
-        throw msg;
-
-    }
-
-
-})( false ? 0 : exports,
-    typeof imscNames === 'undefined' ? __webpack_require__(/*! ./names */ "./node_modules/imsc/src/main/js/names.js") : imscNames,
-    typeof imscStyles === 'undefined' ? __webpack_require__(/*! ./styles */ "./node_modules/imsc/src/main/js/styles.js") : imscStyles,
-    typeof imscUtils === 'undefined' ? __webpack_require__(/*! ./utils */ "./node_modules/imsc/src/main/js/utils.js") : imscUtils
-    );
-
-
-/***/ }),
-
-/***/ "./node_modules/imsc/src/main/js/main.js":
-/*!***********************************************!*\
-  !*** ./node_modules/imsc/src/main/js/main.js ***!
-  \***********************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-/* 
- * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-exports.generateISD = __webpack_require__(/*! ./isd */ "./node_modules/imsc/src/main/js/isd.js").generateISD;
-exports.fromXML = __webpack_require__(/*! ./doc */ "./node_modules/imsc/src/main/js/doc.js").fromXML;
-exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/main/js/html.js").render;
-
-/***/ }),
-
-/***/ "./node_modules/imsc/src/main/js/names.js":
-/*!************************************************!*\
-  !*** ./node_modules/imsc/src/main/js/names.js ***!
-  \************************************************/
-/***/ (function(__unused_webpack_module, exports) {
-
-/* 
- * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * @module imscNames
- */
-
-;
-(function (imscNames) { // wrapper for non-node envs
-
-    imscNames.ns_tt = "http://www.w3.org/ns/ttml";
-    imscNames.ns_tts = "http://www.w3.org/ns/ttml#styling";
-    imscNames.ns_ttp = "http://www.w3.org/ns/ttml#parameter";
-    imscNames.ns_xml = "http://www.w3.org/XML/1998/namespace";
-    imscNames.ns_itts = "http://www.w3.org/ns/ttml/profile/imsc1#styling";
-    imscNames.ns_ittp = "http://www.w3.org/ns/ttml/profile/imsc1#parameter";
-    imscNames.ns_smpte = "http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt";
-    imscNames.ns_ebutts = "urn:ebu:tt:style";
-    
-})( false ? 0 : exports);
-
-
-
-
-
-
-/***/ }),
-
-/***/ "./node_modules/imsc/src/main/js/styles.js":
-/*!*************************************************!*\
-  !*** ./node_modules/imsc/src/main/js/styles.js ***!
-  \*************************************************/
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
-
-/* 
- * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * @module imscStyles
- */
-
-;
-(function (imscStyles, imscNames, imscUtils) { // wrapper for non-node envs
-
-    function StylingAttributeDefinition(ns, name, initialValue, appliesTo, isInherit, isAnimatable, parseFunc, computeFunc) {
-        this.name = name;
-        this.ns = ns;
-        this.qname = ns + " " + name;
-        this.inherit = isInherit;
-        this.animatable = isAnimatable;
-        this.initial = initialValue;
-        this.applies = appliesTo;
-        this.parse = parseFunc;
-        this.compute = computeFunc;
-    }
-
-    imscStyles.all = [
-
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "backgroundColor",
-            "transparent",
-            ['body', 'div', 'p', 'region', 'span'],
-            false,
-            true,
-            imscUtils.parseColor,
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "color",
-            "white",
-            ['span'],
-            true,
-            true,
-            imscUtils.parseColor,
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "direction",
-            "ltr",
-            ['p', 'span'],
-            true,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "display",
-            "auto",
-            ['body', 'div', 'p', 'region', 'span'],
-            false,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "displayAlign",
-            "before",
-            ['region'],
-            false,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "extent",
-            "auto",
-            ['tt', 'region'],
-            false,
-            true,
-            function (str) {
-
-                if (str === "auto") {
-
-                    return str;
-
-                } else {
-
-                    var s = str.split(" ");
-                    if (s.length !== 2)
-                        return null;
-                    var w = imscUtils.parseLength(s[0]);
-                    var h = imscUtils.parseLength(s[1]);
-                    if (!h || !w)
-                        return null;
-                    return {'h': h, 'w': w};
-                }
-
-            },
-            function (doc, parent, element, attr, context) {
-
-                var h;
-                var w;
-
-                if (attr === "auto") {
-
-                    h = new imscUtils.ComputedLength(0, 1);
-
-                } else {
-
-                    h = imscUtils.toComputedLength(
-                        attr.h.value,
-                        attr.h.unit,
-                        null,
-                        doc.dimensions.h,
-                        null,
-                        doc.pxLength.h
-                        );
-
-
-                    if (h === null) {
-
-                        return null;
-
-                    }
-                }
-
-                if (attr === "auto") {
-
-                    w = new imscUtils.ComputedLength(1, 0);
-
-                } else {
-
-                    w = imscUtils.toComputedLength(
-                        attr.w.value,
-                        attr.w.unit,
-                        null,
-                        doc.dimensions.w,
-                        null,
-                        doc.pxLength.w
-                        );
-
-                    if (w === null) {
-
-                        return null;
-
-                    }
-
-                }
-
-                return {'h': h, 'w': w};
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "fontFamily",
-            "default",
-            ['span', 'p'],
-            true,
-            true,
-            function (str) {
-                var ffs = str.split(",");
-                var rslt = [];
-
-                for (var i = 0; i < ffs.length; i++) {
-                    ffs[i] = ffs[i].trim();
-
-                    if (ffs[i].charAt(0) !== "'" && ffs[i].charAt(0) !== '"') {
-
-                        if (ffs[i] === "default") {
-
-                            /* per IMSC1 */
-
-                            rslt.push("monospaceSerif");
-
-                        } else {
-
-                            rslt.push(ffs[i]);
-
-                        }
-
-                    } else {
-
-                        rslt.push(ffs[i]);
-
-                    }
-
-                }
-
-                return rslt;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "shear",
-            "0%",
-            ['p'],
-            true,
-            true,
-            imscUtils.parseLength,
-            function (doc, parent, element, attr) {
-
-                var fs;
-
-                if (attr.unit === "%") {
-
-                    fs = Math.abs(attr.value) > 100 ? Math.sign(attr.value) * 100 : attr.value;
-
-                } else {
-
-                    return null;
-
-                }
-
-                return fs;
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "fontSize",
-            "1c",
-            ['span', 'p'],
-            true,
-            true,
-            imscUtils.parseLength,
-            function (doc, parent, element, attr, context) {
-
-                var fs;
-
-                fs = imscUtils.toComputedLength(
-                    attr.value,
-                    attr.unit,
-                    parent !== null ? parent.styleAttrs[imscStyles.byName.fontSize.qname] : doc.cellLength.h,
-                    parent !== null ? parent.styleAttrs[imscStyles.byName.fontSize.qname] : doc.cellLength.h,
-                    doc.cellLength.h,
-                    doc.pxLength.h
-                    );
-
-                return fs;
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "fontStyle",
-            "normal",
-            ['span', 'p'],
-            true,
-            true,
-            function (str) {
-                /* TODO: handle font style */
-
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "fontWeight",
-            "normal",
-            ['span', 'p'],
-            true,
-            true,
-            function (str) {
-                /* TODO: handle font weight */
-
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "lineHeight",
-            "normal",
-            ['p'],
-            true,
-            true,
-            function (str) {
-                if (str === "normal") {
-                    return str;
-                } else {
-                    return imscUtils.parseLength(str);
-                }
-            },
-            function (doc, parent, element, attr, context) {
-
-                var lh;
-
-                if (attr === "normal") {
-
-                    /* inherit normal per https://github.com/w3c/ttml1/issues/220 */
-
-                    lh = attr;
-
-                } else {
-
-                    lh = imscUtils.toComputedLength(
-                        attr.value,
-                        attr.unit,
-                        element.styleAttrs[imscStyles.byName.fontSize.qname],
-                        element.styleAttrs[imscStyles.byName.fontSize.qname],
-                        doc.cellLength.h,
-                        doc.pxLength.h
-                        );
-
-                    if (lh === null) {
-
-                        return null;
-
-                    }
-
-                }
-
-                /* TODO: create a Length constructor */
-
-                return lh;
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "opacity",
-            1.0,
-            ['region'],
-            false,
-            true,
-            parseFloat,
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "origin",
-            "auto",
-            ['region'],
-            false,
-            true,
-            function (str) {
-
-                if (str === "auto") {
-
-                    return str;
-
-                } else {
-
-                    var s = str.split(" ");
-                    if (s.length !== 2)
-                        return null;
-                    var w = imscUtils.parseLength(s[0]);
-                    var h = imscUtils.parseLength(s[1]);
-                    if (!h || !w)
-                        return null;
-                    return {'h': h, 'w': w};
-                }
-
-            },
-            function (doc, parent, element, attr, context) {
-
-                var h;
-                var w;
-
-                if (attr === "auto") {
-
-                    h = new imscUtils.ComputedLength(0,0);
-
-                } else {
-
-                    h = imscUtils.toComputedLength(
-                        attr.h.value,
-                        attr.h.unit,
-                        null,
-                        doc.dimensions.h,
-                        null,
-                        doc.pxLength.h
-                        );
-
-                    if (h === null) {
-
-                        return null;
-
-                    }
-
-                }
-
-                if (attr === "auto") {
-
-                    w = new imscUtils.ComputedLength(0,0);
-
-                } else {
-
-                    w = imscUtils.toComputedLength(
-                        attr.w.value,
-                        attr.w.unit,
-                        null,
-                        doc.dimensions.w,
-                        null,
-                        doc.pxLength.w
-                        );
-
-                    if (w === null) {
-
-                        return null;
-
-                    }
-
-                }
-
-                return {'h': h, 'w': w};
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "overflow",
-            "hidden",
-            ['region'],
-            false,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "padding",
-            "0px",
-            ['region'],
-            false,
-            true,
-            function (str) {
-
-                var s = str.split(" ");
-                if (s.length > 4)
-                    return null;
-                var r = [];
-                for (var i = 0; i < s.length; i++) {
-
-                    var l = imscUtils.parseLength(s[i]);
-                    if (!l)
-                        return null;
-                    r.push(l);
-                }
-
-                return r;
-            },
-            function (doc, parent, element, attr, context) {
-
-                var padding;
-
-                /* TODO: make sure we are in region */
-
-                /*
-                 * expand padding shortcuts to 
-                 * [before, end, after, start]
-                 * 
-                 */
-
-                if (attr.length === 1) {
-
-                    padding = [attr[0], attr[0], attr[0], attr[0]];
-
-                } else if (attr.length === 2) {
-
-                    padding = [attr[0], attr[1], attr[0], attr[1]];
-
-                } else if (attr.length === 3) {
-
-                    padding = [attr[0], attr[1], attr[2], attr[1]];
-
-                } else if (attr.length === 4) {
-
-                    padding = [attr[0], attr[1], attr[2], attr[3]];
-
-                } else {
-
-                    return null;
-
-                }
-
-                /* TODO: take into account tts:direction */
-
-                /* 
-                 * transform [before, end, after, start] according to writingMode to 
-                 * [top,left,bottom,right]
-                 * 
-                 */
-
-                var dir = element.styleAttrs[imscStyles.byName.writingMode.qname];
-
-                if (dir === "lrtb" || dir === "lr") {
-
-                    padding = [padding[0], padding[3], padding[2], padding[1]];
-
-                } else if (dir === "rltb" || dir === "rl") {
-
-                    padding = [padding[0], padding[1], padding[2], padding[3]];
-
-                } else if (dir === "tblr") {
-
-                    padding = [padding[3], padding[0], padding[1], padding[2]];
-
-                } else if (dir === "tbrl" || dir === "tb") {
-
-                    padding = [padding[3], padding[2], padding[1], padding[0]];
-
-                } else {
-
-                    return null;
-
-                }
-
-                var out = [];
-
-                for (var i = 0 ; i < padding.length; i++) {
-
-                    if (padding[i].value === 0) {
-
-                        out[i] = new imscUtils.ComputedLength(0,0);
-
-                    } else {
-
-                        out[i] = imscUtils.toComputedLength(
-                            padding[i].value,
-                            padding[i].unit,
-                            element.styleAttrs[imscStyles.byName.fontSize.qname],
-                            i === 0 || i === 2 ? element.styleAttrs[imscStyles.byName.extent.qname].h : element.styleAttrs[imscStyles.byName.extent.qname].w,
-                            i === 0 || i === 2 ? doc.cellLength.h : doc.cellLength.w,
-                            i === 0 || i === 2 ? doc.pxLength.h: doc.pxLength.w
-                            );
-
-                        if (out[i] === null) return null;
-
-                    }
-                }
-
-
-                return out;
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "position",
-            "top left",
-            ['region'],
-            false,
-            true,
-            function (str) {
-
-                return imscUtils.parsePosition(str);
-
-            },
-            function (doc, parent, element, attr) {
-                var h;
-                var w;
-                
-                h = imscUtils.toComputedLength(
-                    attr.v.offset.value,
-                    attr.v.offset.unit,
-                    null,
-                    new imscUtils.ComputedLength(
-                        - element.styleAttrs[imscStyles.byName.extent.qname].h.rw,
-                        doc.dimensions.h.rh - element.styleAttrs[imscStyles.byName.extent.qname].h.rh 
-                    ),
-                    null,
-                    doc.pxLength.h
-                    );
-
-                if (h === null) return null;
-
-
-                if (attr.v.edge === "bottom") {
-
-                    h = new imscUtils.ComputedLength(
-                        - h.rw - element.styleAttrs[imscStyles.byName.extent.qname].h.rw,
-                        doc.dimensions.h.rh - h.rh - element.styleAttrs[imscStyles.byName.extent.qname].h.rh
-                    );
-            
-                }
-
-                w = imscUtils.toComputedLength(
-                    attr.h.offset.value,
-                    attr.h.offset.unit,
-                    null,
-                    new imscUtils.ComputedLength(
-                        doc.dimensions.w.rw - element.styleAttrs[imscStyles.byName.extent.qname].w.rw,
-                        - element.styleAttrs[imscStyles.byName.extent.qname].w.rh
-                    ),
-                    null,
-                    doc.pxLength.w
-                    );
-
-                if (h === null) return null;
-
-                if (attr.h.edge === "right") {
-                    
-                    w = new imscUtils.ComputedLength(
-                        doc.dimensions.w.rw - w.rw - element.styleAttrs[imscStyles.byName.extent.qname].w.rw,
-                        - w.rh - element.styleAttrs[imscStyles.byName.extent.qname].w.rh
-                    );
-
-                }
-
-                return {'h': h, 'w': w};
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "ruby",
-            "none",
-            ['span'],
-            false,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "rubyAlign",
-            "center",
-            ['span'],
-            true,
-            true,
-            function (str) {
-                
-                if (! (str === "center" || str === "spaceAround")) {
-                    return null;
-                }
-                
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "rubyPosition",
-            "outside",
-            ['span'],
-            true,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "rubyReserve",
-            "none",
-            ['p'],
-            true,
-            true,
-            function (str) {
-                var s = str.split(" ");
-
-                var r = [null, null];
-
-                if (s.length === 0 || s.length > 2)
-                    return null;
-
-                if (s[0] === "none" ||
-                    s[0] === "both" ||
-                    s[0] === "after" ||
-                    s[0] === "before" ||
-                    s[0] === "outside") {
-
-                    r[0] = s[0];
-
-                } else {
-
-                    return null;
-
-                }
-
-                if (s.length === 2 && s[0] !== "none") {
-
-                    var l = imscUtils.parseLength(s[1]);
-
-                    if (l) {
-
-                        r[1] = l;
-
-                    } else {
-
-                        return null;
-
-                    }
-
-                }
-
-
-                return r;
-            },
-            function (doc, parent, element, attr, context) {
-
-                if (attr[0] === "none") {
-
-                    return attr;
-
-                }
-
-                var fs = null;
-
-                if (attr[1] === null) {
-
-                    fs = new imscUtils.ComputedLength(
-                            element.styleAttrs[imscStyles.byName.fontSize.qname].rw * 0.5,
-                            element.styleAttrs[imscStyles.byName.fontSize.qname].rh * 0.5
-                    );
-
-                } else {
-
-                    fs = imscUtils.toComputedLength(attr[1].value,
-                        attr[1].unit,
-                        element.styleAttrs[imscStyles.byName.fontSize.qname],
-                        element.styleAttrs[imscStyles.byName.fontSize.qname],
-                        doc.cellLength.h,
-                        doc.pxLength.h
-                        );
-                
-                }
-
-                if (fs === null) return null;
-
-                return [attr[0], fs];
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "showBackground",
-            "always",
-            ['region'],
-            false,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "textAlign",
-            "start",
-            ['p'],
-            true,
-            true,
-            function (str) {
-                return str;
-            },
-            function (doc, parent, element, attr, context) {
-                /* Section 7.16.9 of XSL */
-
-                if (attr === "left") {
-
-                    return "start";
-
-                } else if (attr === "right") {
-
-                    return "end";
-
-                } else {
-
-                    return attr;
-
-                }
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "textCombine",
-            "none",
-            ['span'],
-            true,
-            true,
-            function (str) {
-                if (str === "none" || str === "all") {
-
-                    return str;
-                }
-
-                return null;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "textDecoration",
-            "none",
-            ['span'],
-            true,
-            true,
-            function (str) {
-                return str.split(" ");
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "textEmphasis",
-            "none",
-            ['span'],
-            true,
-            true,
-            function (str) {
-                var e = str.split(" ");
-
-                var rslt = {style: null, symbol: null, color: null, position: null};
-
-                for (var i = 0; i < e.length; i++) {
-
-                    if (e[i] === "none" || e[i] === "auto") {
-
-                        rslt.style = e[i];
-
-                    } else if (e[i] === "filled" ||
-                        e[i] === "open") {
-
-                        rslt.style = e[i];
-
-                    } else if (e[i] === "circle" ||
-                        e[i] === "dot" ||
-                        e[i] === "sesame") {
-
-                        rslt.symbol = e[i];
-
-                    } else if (e[i] === "current") {
-
-                        rslt.color = e[i];
-
-                    } else if (e[i] === "outside" || e[i] === "before" || e[i] === "after") {
-
-                        rslt.position = e[i];
-
-                    } else {
-
-                        rslt.color = imscUtils.parseColor(e[i]);
-
-                        if (rslt.color === null)
-                            return null;
-
-                    }
-                }
-
-                if (rslt.style == null && rslt.symbol == null) {
-
-                    rslt.style = "auto";
-
-                } else {
-
-                    rslt.symbol = rslt.symbol || "circle";
-                    rslt.style = rslt.style || "filled";
-
-                }
-
-                rslt.position = rslt.position || "outside";
-                rslt.color = rslt.color || "current";
-
-                return rslt;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "textOutline",
-            "none",
-            ['span'],
-            true,
-            true,
-            function (str) {
-
-                /*
-                 * returns {c: <color>?, thichness: <length>} | "none"
-                 * 
-                 */
-
-                if (str === "none") {
-
-                    return str;
-
-                } else {
-
-                    var r = {};
-                    var s = str.split(" ");
-                    if (s.length === 0 || s.length > 2)
-                        return null;
-                    var c = imscUtils.parseColor(s[0]);
-
-                    r.color = c;
-
-                    if (c !== null)
-                        s.shift();
-
-                    if (s.length !== 1)
-                        return null;
-
-                    var l = imscUtils.parseLength(s[0]);
-
-                    if (!l)
-                        return null;
-
-                    r.thickness = l;
-
-                    return r;
-                }
-
-            },
-            function (doc, parent, element, attr, context) {
-
-                /*
-                 * returns {color: <color>, thickness: <norm length>}
-                 * 
-                 */
-
-                if (attr === "none")
-                    return attr;
-
-                var rslt = {};
-
-                if (attr.color === null) {
-
-                    rslt.color = element.styleAttrs[imscStyles.byName.color.qname];
-
-                } else {
-
-                    rslt.color = attr.color;
-
-                }
-
-                rslt.thickness = imscUtils.toComputedLength(
-                    attr.thickness.value,
-                    attr.thickness.unit,
-                    element.styleAttrs[imscStyles.byName.fontSize.qname],
-                    element.styleAttrs[imscStyles.byName.fontSize.qname],
-                    doc.cellLength.h,
-                    doc.pxLength.h
-                    );
-
-                if (rslt.thickness === null)
-                    return null;
-
-                return rslt;
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "textShadow",
-            "none",
-            ['span'],
-            true,
-            true,
-            imscUtils.parseTextShadow,
-            function (doc, parent, element, attr) {
-
-                /*
-                 * returns [{x_off: <length>, y_off: <length>, b_radius: <length>, color: <color>}*] or "none"
-                 * 
-                 */
-
-                if (attr === "none")
-                    return attr;
-
-                var r = [];
-
-                for (var i = 0; i < attr.length; i++) {
-
-                    var shadow = {};
-
-                    shadow.x_off = imscUtils.toComputedLength(
-                        attr[i][0].value,
-                        attr[i][0].unit,
-                        null,
-                        element.styleAttrs[imscStyles.byName.fontSize.qname],
-                        null,
-                        doc.pxLength.w
-                        );
-
-                    if (shadow.x_off === null)
-                        return null;
-
-                    shadow.y_off = imscUtils.toComputedLength(
-                        attr[i][1].value,
-                        attr[i][1].unit,
-                        null,
-                        element.styleAttrs[imscStyles.byName.fontSize.qname],
-                        null,
-                        doc.pxLength.h
-                        );
-
-                    if (shadow.y_off === null)
-                        return null;
-
-                    if (attr[i][2] === null) {
-
-                        shadow.b_radius = 0;
-
-                    } else {
-
-                        shadow.b_radius = imscUtils.toComputedLength(
-                            attr[i][2].value,
-                            attr[i][2].unit,
-                            null,
-                            element.styleAttrs[imscStyles.byName.fontSize.qname],
-                            null,
-                            doc.pxLength.h
-                            );
-
-                        if (shadow.b_radius === null)
-                            return null;
-
-                    }
-
-                    if (attr[i][3] === null) {
-
-                        shadow.color = element.styleAttrs[imscStyles.byName.color.qname];
-
-                    } else {
-
-                        shadow.color = attr[i][3];
-
-                    }
-
-                    r.push(shadow);
-
-                }
-
-                return r;
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "unicodeBidi",
-            "normal",
-            ['span', 'p'],
-            false,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "visibility",
-            "visible",
-            ['body', 'div', 'p', 'region', 'span'],
-            true,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "wrapOption",
-            "wrap",
-            ['span'],
-            true,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "writingMode",
-            "lrtb",
-            ['region'],
-            false,
-            true,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_tts,
-            "zIndex",
-            "auto",
-            ['region'],
-            false,
-            true,
-            function (str) {
-
-                var rslt;
-
-                if (str === 'auto') {
-
-                    rslt = str;
-
-                } else {
-
-                    rslt = parseInt(str);
-
-                    if (isNaN(rslt)) {
-                        rslt = null;
-                    }
-
-                }
-
-                return rslt;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_ebutts,
-            "linePadding",
-            "0c",
-            ['p'],
-            true,
-            false,
-            imscUtils.parseLength,
-            function (doc, parent, element, attr, context) {
-
-                return imscUtils.toComputedLength(attr.value, attr.unit, null, null, doc.cellLength.w, null);
-
-            }
-        ),
-        new StylingAttributeDefinition(
-            imscNames.ns_ebutts,
-            "multiRowAlign",
-            "auto",
-            ['p'],
-            true,
-            false,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_smpte,
-            "backgroundImage",
-            null,
-            ['div'],
-            false,
-            false,
-            function (str) {
-                return str;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_itts,
-            "forcedDisplay",
-            "false",
-            ['body', 'div', 'p', 'region', 'span'],
-            true,
-            true,
-            function (str) {
-                return str === 'true' ? true : false;
-            },
-            null
-            ),
-        new StylingAttributeDefinition(
-            imscNames.ns_itts,
-            "fillLineGap",
-            "false",
-            ['p'],
-            true,
-            true,
-            function (str) {
-                return str === 'true' ? true : false;
-            },
-            null
-            )
-    ];
-
-    /* TODO: allow null parse function */
-
-    imscStyles.byQName = {};
-    for (var i in imscStyles.all) {
-
-        imscStyles.byQName[imscStyles.all[i].qname] = imscStyles.all[i];
-    }
-
-    imscStyles.byName = {};
-    for (var j in imscStyles.all) {
-
-        imscStyles.byName[imscStyles.all[j].name] = imscStyles.all[j];
-    }
-
-
-})( false ? 0 : exports,
-    typeof imscNames === 'undefined' ? __webpack_require__(/*! ./names */ "./node_modules/imsc/src/main/js/names.js") : imscNames,
-    typeof imscUtils === 'undefined' ? __webpack_require__(/*! ./utils */ "./node_modules/imsc/src/main/js/utils.js") : imscUtils);
-
-
-/***/ }),
-
-/***/ "./node_modules/imsc/src/main/js/utils.js":
-/*!************************************************!*\
-  !*** ./node_modules/imsc/src/main/js/utils.js ***!
-  \************************************************/
-/***/ (function(__unused_webpack_module, exports) {
-
-/* 
- * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * * Redistributions of source code must retain the above copyright notice, this
- *   list of conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * @module imscUtils
- */
-
-;
-(function (imscUtils) { // wrapper for non-node envs
-
-    /* Documents the error handler interface */
-
-    /**
-     * @classdesc Generic interface for handling events. The interface exposes four
-     * methods:
-     * * <pre>info</pre>: unusual event that does not result in an inconsistent state
-     * * <pre>warn</pre>: unexpected event that should not result in an inconsistent state
-     * * <pre>error</pre>: unexpected event that may result in an inconsistent state
-     * * <pre>fatal</pre>: unexpected event that results in an inconsistent state
-     *   and termination of processing
-     * Each method takes a single <pre>string</pre> describing the event as argument,
-     * and returns a single <pre>boolean</pre>, which terminates processing if <pre>true</pre>.
-     *
-     * @name ErrorHandler
-     * @class
-     */
-
-
-    /*
-     * Parses a TTML color expression
-     * 
-     */
-
-    var HEX_COLOR_RE = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})?/;
-    var DEC_COLOR_RE = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/;
-    var DEC_COLORA_RE = /rgba\(\s*(\d+),\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/;
-    var NAMED_COLOR = {
-        transparent: [0, 0, 0, 0],
-        black: [0, 0, 0, 255],
-        silver: [192, 192, 192, 255],
-        gray: [128, 128, 128, 255],
-        white: [255, 255, 255, 255],
-        maroon: [128, 0, 0, 255],
-        red: [255, 0, 0, 255],
-        purple: [128, 0, 128, 255],
-        fuchsia: [255, 0, 255, 255],
-        magenta: [255, 0, 255, 255],
-        green: [0, 128, 0, 255],
-        lime: [0, 255, 0, 255],
-        olive: [128, 128, 0, 255],
-        yellow: [255, 255, 0, 255],
-        navy: [0, 0, 128, 255],
-        blue: [0, 0, 255, 255],
-        teal: [0, 128, 128, 255],
-        aqua: [0, 255, 255, 255],
-        cyan: [0, 255, 255, 255]
-    };
-
-    imscUtils.parseColor = function (str) {
-
-        var m;
-        
-        var r = null;
-        
-        var nc = NAMED_COLOR[str.toLowerCase()];
-        
-        if (nc !== undefined) {
-
-            r = nc;
-
-        } else if ((m = HEX_COLOR_RE.exec(str)) !== null) {
-
-            r = [parseInt(m[1], 16),
-                parseInt(m[2], 16),
-                parseInt(m[3], 16),
-                (m[4] !== undefined ? parseInt(m[4], 16) : 255)];
-            
-        } else if ((m = DEC_COLOR_RE.exec(str)) !== null) {
-
-            r = [parseInt(m[1]),
-                parseInt(m[2]),
-                parseInt(m[3]),
-                255];
-            
-        } else if ((m = DEC_COLORA_RE.exec(str)) !== null) {
-
-            r = [parseInt(m[1]),
-                parseInt(m[2]),
-                parseInt(m[3]),
-                parseInt(m[4])];
-            
-        }
-
-        return r;
-    };
-
-    var LENGTH_RE = /^((?:\+|\-)?\d*(?:\.\d+)?)(px|em|c|%|rh|rw)$/;
-
-    imscUtils.parseLength = function (str) {
-
-        var m;
-
-        var r = null;
-
-        if ((m = LENGTH_RE.exec(str)) !== null) {
-
-            r = {value: parseFloat(m[1]), unit: m[2]};
-        }
-
-        return r;
-    };
-
-    imscUtils.parseTextShadow = function (str) {
-
-        var shadows = str.match(/([^\(,\)]|\([^\)]+\))+/g);
-        
-        var r = [];
-
-        for (var i = 0; i < shadows.length; i++) {
-
-            var shadow = shadows[i].split(" ");
-
-            if (shadow.length === 1 && shadow[0] === "none") {
-
-                return "none";
-
-            } else if (shadow.length > 1 && shadow.length < 5) {
-
-                var out_shadow = [null, null, null, null];
-
-                /* x offset */
-
-                var l = imscUtils.parseLength(shadow.shift());
-
-                if (l === null)
-                    return null;
-
-                out_shadow[0] = l;
-
-                /* y offset */
-
-                l = imscUtils.parseLength(shadow.shift());
-
-                if (l === null)
-                    return null;
-
-                out_shadow[1] = l;
-
-                /* is there a third component */
-
-                if (shadow.length === 0) {
-                    r.push(out_shadow);
-                    continue;
-                }
-
-                l = imscUtils.parseLength(shadow[0]);
-
-                if (l !== null) {
-
-                    out_shadow[2] = l;
-
-                    shadow.shift();
-
-                }
-
-                if (shadow.length === 0) {
-                    r.push(out_shadow);
-                    continue;
-                }
-
-                var c = imscUtils.parseColor(shadow[0]);
-
-                if (c === null)
-                    return null;
-
-                out_shadow[3] = c;
-
-                r.push(out_shadow);
-            }
-
-        }
-
-        return r;
-    };
-
-
-    imscUtils.parsePosition = function (str) {
-
-        /* see https://www.w3.org/TR/ttml2/#style-value-position */
-
-        var s = str.split(" ");
-
-        var isKeyword = function (str) {
-
-            return str === "center" ||
-                    str === "left" ||
-                    str === "top" ||
-                    str === "bottom" ||
-                    str === "right";
-
-        };
-
-        if (s.length > 4) {
-
-            return null;
-
-        }
-
-        /* initial clean-up pass */
-
-        for (var j = 0 ; j < s.length; j++) {
-
-            if (!isKeyword(s[j])) {
-
-                var l = imscUtils.parseLength(s[j]);
-
-                if (l === null)
-                    return null;
-
-                s[j] = l;
-            }
-
-        }
-
-        /* position default */
-
-        var pos = {
-            h: {edge: "left", offset: {value: 50, unit: "%"}},
-            v: {edge: "top", offset: {value: 50, unit: "%"}}
-        };
-
-        /* update position */
-
-        for (var i = 0; i < s.length; ) {
-
-            /* extract the current component */
-
-            var comp = s[i++];
-
-            if (isKeyword(comp)) {
-
-                /* we have a keyword */
-
-                var offset = {value: 0, unit: "%"};
-
-                /* peek at the next component */
-
-                if (s.length !== 2 && i < s.length && (!isKeyword(s[i]))) {
-
-                    /* followed by an offset */
-
-                    offset = s[i++];
-
-                }
-
-                /* skip if center */
-
-                if (comp === "right") {
-
-                    pos.h.edge = comp;
-
-                    pos.h.offset = offset;
-
-                } else if (comp === "bottom") {
-
-                    pos.v.edge = comp;
-
-
-                    pos.v.offset = offset;
-
-
-                } else if (comp === "left") {
-
-                    pos.h.offset = offset;
-
-
-                } else if (comp === "top") {
-
-                    pos.v.offset = offset;
-
-
-                }
-
-            } else if (s.length === 1 || s.length === 2) {
-
-                /* we have a bare value */
-
-                if (i === 1) {
-
-                    /* assign it to left edge if first bare value */
-
-                    pos.h.offset = comp;
-
-                } else {
-
-                    /* assign it to top edge if second bare value */
-
-                    pos.v.offset = comp;
-
-                }
-
-            } else {
-
-                /* error condition */
-
-                return null;
-
-            }
-
-        }
-
-        return pos;
-    };
-
-
-    imscUtils.ComputedLength = function (rw, rh) {
-        this.rw = rw;
-        this.rh = rh;
-    };
-
-    imscUtils.ComputedLength.prototype.toUsedLength = function (width, height) {
-        return width * this.rw + height * this.rh;
-    };
-
-    imscUtils.ComputedLength.prototype.isZero = function () {
-        return this.rw === 0 && this.rh === 0;
-    };
-
-    /**
-     * Computes a specified length to a root container relative length
-     * 
-     * @param {number} lengthVal Length value to be computed
-     * @param {string} lengthUnit Units of the length value
-     * @param {number} emScale length of 1em, or null if em is not allowed
-     * @param {number} percentScale length to which , or null if perecentage is not allowed
-     * @param {number} cellScale length of 1c, or null if c is not allowed
-     * @param {number} pxScale length of 1px, or null if px is not allowed
-     * @param {number} direction 0 if the length is computed in the horizontal direction, 1 if the length is computed in the vertical direction
-     * @return {number} Computed length
-     */
-    imscUtils.toComputedLength = function(lengthVal, lengthUnit, emLength, percentLength, cellLength, pxLength) {
-
-        if (lengthUnit === "%" && percentLength) {
-
-            return new imscUtils.ComputedLength(
-                    percentLength.rw * lengthVal / 100,
-                    percentLength.rh * lengthVal / 100
-                    );
-
-        } else if (lengthUnit === "em" && emLength) {
-
-            return new imscUtils.ComputedLength(
-                    emLength.rw * lengthVal,
-                    emLength.rh * lengthVal
-                    );
-
-        } else if (lengthUnit === "c" && cellLength) {
-
-            return new imscUtils.ComputedLength(
-                    lengthVal * cellLength.rw,
-                    lengthVal * cellLength.rh
-                    );
-
-        } else if (lengthUnit === "px" && pxLength) {
-
-            return new imscUtils.ComputedLength(
-                    lengthVal * pxLength.rw,
-                    lengthVal * pxLength.rh
-                    );
-
-        } else if (lengthUnit === "rh") {
-
-            return new imscUtils.ComputedLength(
-                    0,
-                    lengthVal / 100
-                    );
-
-        } else if (lengthUnit === "rw") {
-
-            return new imscUtils.ComputedLength(
-                    lengthVal / 100,
-                    0                    
-                    );
-
-        } else {
-
-            return null;
-
-        }
-
-    };
-
-
-
-})( false ? 0 : exports);
-
-
-/***/ }),
-
-/***/ "./node_modules/is-alphabetical/index.js":
-/*!***********************************************!*\
-  !*** ./node_modules/is-alphabetical/index.js ***!
-  \***********************************************/
-/***/ (function(module) {
-
-"use strict";
-
-
-module.exports = alphabetical
-
-// Check if the given character code, or the character code at the first
-// character, is alphabetical.
-function alphabetical(character) {
-  var code = typeof character === 'string' ? character.charCodeAt(0) : character
-
-  return (
-    (code >= 97 && code <= 122) /* a-z */ ||
-    (code >= 65 && code <= 90) /* A-Z */
-  )
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/is-alphanumerical/index.js":
-/*!*************************************************!*\
-  !*** ./node_modules/is-alphanumerical/index.js ***!
-  \*************************************************/
-/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
-
-"use strict";
-
-
-var alphabetical = __webpack_require__(/*! is-alphabetical */ "./node_modules/is-alphabetical/index.js")
-var decimal = __webpack_require__(/*! is-decimal */ "./node_modules/is-decimal/index.js")
-
-module.exports = alphanumerical
-
-// Check if the given character code, or the character code at the first
-// character, is alphanumerical.
-function alphanumerical(character) {
-  return alphabetical(character) || decimal(character)
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/is-decimal/index.js":
-/*!******************************************!*\
-  !*** ./node_modules/is-decimal/index.js ***!
-  \******************************************/
-/***/ (function(module) {
-
-"use strict";
-
-
-module.exports = decimal
-
-// Check if the given character code, or the character code at the first
-// character, is decimal.
-function decimal(character) {
-  var code = typeof character === 'string' ? character.charCodeAt(0) : character
-
-  return code >= 48 && code <= 57 /* 0-9 */
-}
-
-
-/***/ }),
-
-/***/ "./node_modules/path-browserify/index.js":
-/*!***********************************************!*\
-  !*** ./node_modules/path-browserify/index.js ***!
-  \***********************************************/
-/***/ (function(module) {
-
-"use strict";
-// 'path' module extracted from Node.js v8.11.1 (only the posix part)
-// transplited with Babel
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-
-function assertPath(path) {
-  if (typeof path !== 'string') {
-    throw new TypeError('Path must be a string. Received ' + JSON.stringify(path));
-  }
-}
-
-// Resolves . and .. elements in a path with directory names
-function normalizeStringPosix(path, allowAboveRoot) {
-  var res = '';
-  var lastSegmentLength = 0;
-  var lastSlash = -1;
-  var dots = 0;
-  var code;
-  for (var i = 0; i <= path.length; ++i) {
-    if (i < path.length)
-      code = path.charCodeAt(i);
-    else if (code === 47 /*/*/)
-      break;
-    else
-      code = 47 /*/*/;
-    if (code === 47 /*/*/) {
-      if (lastSlash === i - 1 || dots === 1) {
-        // NOOP
-      } else if (lastSlash !== i - 1 && dots === 2) {
-        if (res.length < 2 || lastSegmentLength !== 2 || res.charCodeAt(res.length - 1) !== 46 /*.*/ || res.charCodeAt(res.length - 2) !== 46 /*.*/) {
-          if (res.length > 2) {
-            var lastSlashIndex = res.lastIndexOf('/');
-            if (lastSlashIndex !== res.length - 1) {
-              if (lastSlashIndex === -1) {
-                res = '';
-                lastSegmentLength = 0;
-              } else {
-                res = res.slice(0, lastSlashIndex);
-                lastSegmentLength = res.length - 1 - res.lastIndexOf('/');
-              }
-              lastSlash = i;
-              dots = 0;
-              continue;
-            }
-          } else if (res.length === 2 || res.length === 1) {
-            res = '';
-            lastSegmentLength = 0;
-            lastSlash = i;
-            dots = 0;
-            continue;
-          }
-        }
-        if (allowAboveRoot) {
-          if (res.length > 0)
-            res += '/..';
-          else
-            res = '..';
-          lastSegmentLength = 2;
-        }
-      } else {
-        if (res.length > 0)
-          res += '/' + path.slice(lastSlash + 1, i);
-        else
-          res = path.slice(lastSlash + 1, i);
-        lastSegmentLength = i - lastSlash - 1;
-      }
-      lastSlash = i;
-      dots = 0;
-    } else if (code === 46 /*.*/ && dots !== -1) {
-      ++dots;
-    } else {
-      dots = -1;
-    }
-  }
-  return res;
-}
-
-function _format(sep, pathObject) {
-  var dir = pathObject.dir || pathObject.root;
-  var base = pathObject.base || (pathObject.name || '') + (pathObject.ext || '');
-  if (!dir) {
-    return base;
-  }
-  if (dir === pathObject.root) {
-    return dir + base;
-  }
-  return dir + sep + base;
-}
-
-var posix = {
-  // path.resolve([from ...], to)
-  resolve: function resolve() {
-    var resolvedPath = '';
-    var resolvedAbsolute = false;
-    var cwd;
-
-    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-      var path;
-      if (i >= 0)
-        path = arguments[i];
-      else {
-        if (cwd === undefined)
-          cwd = process.cwd();
-        path = cwd;
-      }
-
-      assertPath(path);
-
-      // Skip empty entries
-      if (path.length === 0) {
-        continue;
-      }
-
-      resolvedPath = path + '/' + resolvedPath;
-      resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/;
-    }
-
-    // At this point the path should be resolved to a full absolute path, but
-    // handle relative paths to be safe (might happen when process.cwd() fails)
-
-    // Normalize the path
-    resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
-
-    if (resolvedAbsolute) {
-      if (resolvedPath.length > 0)
-        return '/' + resolvedPath;
-      else
-        return '/';
-    } else if (resolvedPath.length > 0) {
-      return resolvedPath;
-    } else {
-      return '.';
-    }
-  },
-
-  normalize: function normalize(path) {
-    assertPath(path);
-
-    if (path.length === 0) return '.';
-
-    var isAbsolute = path.charCodeAt(0) === 47 /*/*/;
-    var trailingSeparator = path.charCodeAt(path.length - 1) === 47 /*/*/;
-
-    // Normalize the path
-    path = normalizeStringPosix(path, !isAbsolute);
-
-    if (path.length === 0 && !isAbsolute) path = '.';
-    if (path.length > 0 && trailingSeparator) path += '/';
-
-    if (isAbsolute) return '/' + path;
-    return path;
-  },
-
-  isAbsolute: function isAbsolute(path) {
-    assertPath(path);
-    return path.length > 0 && path.charCodeAt(0) === 47 /*/*/;
-  },
-
-  join: function join() {
-    if (arguments.length === 0)
-      return '.';
-    var joined;
-    for (var i = 0; i < arguments.length; ++i) {
-      var arg = arguments[i];
-      assertPath(arg);
-      if (arg.length > 0) {
-        if (joined === undefined)
-          joined = arg;
-        else
-          joined += '/' + arg;
-      }
-    }
-    if (joined === undefined)
-      return '.';
-    return posix.normalize(joined);
-  },
-
-  relative: function relative(from, to) {
-    assertPath(from);
-    assertPath(to);
-
-    if (from === to) return '';
-
-    from = posix.resolve(from);
-    to = posix.resolve(to);
-
-    if (from === to) return '';
-
-    // Trim any leading backslashes
-    var fromStart = 1;
-    for (; fromStart < from.length; ++fromStart) {
-      if (from.charCodeAt(fromStart) !== 47 /*/*/)
-        break;
-    }
-    var fromEnd = from.length;
-    var fromLen = fromEnd - fromStart;
-
-    // Trim any leading backslashes
-    var toStart = 1;
-    for (; toStart < to.length; ++toStart) {
-      if (to.charCodeAt(toStart) !== 47 /*/*/)
-        break;
-    }
-    var toEnd = to.length;
-    var toLen = toEnd - toStart;
-
-    // Compare paths to find the longest common path from root
-    var length = fromLen < toLen ? fromLen : toLen;
-    var lastCommonSep = -1;
-    var i = 0;
-    for (; i <= length; ++i) {
-      if (i === length) {
-        if (toLen > length) {
-          if (to.charCodeAt(toStart + i) === 47 /*/*/) {
-            // We get here if `from` is the exact base path for `to`.
-            // For example: from='/foo/bar'; to='/foo/bar/baz'
-            return to.slice(toStart + i + 1);
-          } else if (i === 0) {
-            // We get here if `from` is the root
-            // For example: from='/'; to='/foo'
-            return to.slice(toStart + i);
-          }
-        } else if (fromLen > length) {
-          if (from.charCodeAt(fromStart + i) === 47 /*/*/) {
-            // We get here if `to` is the exact base path for `from`.
-            // For example: from='/foo/bar/baz'; to='/foo/bar'
-            lastCommonSep = i;
-          } else if (i === 0) {
-            // We get here if `to` is the root.
-            // For example: from='/foo'; to='/'
-            lastCommonSep = 0;
-          }
-        }
-        break;
-      }
-      var fromCode = from.charCodeAt(fromStart + i);
-      var toCode = to.charCodeAt(toStart + i);
-      if (fromCode !== toCode)
-        break;
-      else if (fromCode === 47 /*/*/)
-        lastCommonSep = i;
-    }
-
-    var out = '';
-    // Generate the relative path based on the path difference between `to`
-    // and `from`
-    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
-      if (i === fromEnd || from.charCodeAt(i) === 47 /*/*/) {
-        if (out.length === 0)
-          out += '..';
-        else
-          out += '/..';
-      }
-    }
-
-    // Lastly, append the rest of the destination (`to`) path that comes after
-    // the common path parts
-    if (out.length > 0)
-      return out + to.slice(toStart + lastCommonSep);
-    else {
-      toStart += lastCommonSep;
-      if (to.charCodeAt(toStart) === 47 /*/*/)
-        ++toStart;
-      return to.slice(toStart);
-    }
-  },
-
-  _makeLong: function _makeLong(path) {
-    return path;
-  },
-
-  dirname: function dirname(path) {
-    assertPath(path);
-    if (path.length === 0) return '.';
-    var code = path.charCodeAt(0);
-    var hasRoot = code === 47 /*/*/;
-    var end = -1;
-    var matchedSlash = true;
-    for (var i = path.length - 1; i >= 1; --i) {
-      code = path.charCodeAt(i);
-      if (code === 47 /*/*/) {
-          if (!matchedSlash) {
-            end = i;
-            break;
-          }
-        } else {
-        // We saw the first non-path separator
-        matchedSlash = false;
-      }
-    }
-
-    if (end === -1) return hasRoot ? '/' : '.';
-    if (hasRoot && end === 1) return '//';
-    return path.slice(0, end);
-  },
-
-  basename: function basename(path, ext) {
-    if (ext !== undefined && typeof ext !== 'string') throw new TypeError('"ext" argument must be a string');
-    assertPath(path);
-
-    var start = 0;
-    var end = -1;
-    var matchedSlash = true;
-    var i;
-
-    if (ext !== undefined && ext.length > 0 && ext.length <= path.length) {
-      if (ext.length === path.length && ext === path) return '';
-      var extIdx = ext.length - 1;
-      var firstNonSlashEnd = -1;
-      for (i = path.length - 1; i >= 0; --i) {
-        var code = path.charCodeAt(i);
-        if (code === 47 /*/*/) {
-            // If we reached a path separator that was not part of a set of path
-            // separators at the end of the string, stop now
-            if (!matchedSlash) {
-              start = i + 1;
-              break;
-            }
-          } else {
-          if (firstNonSlashEnd === -1) {
-            // We saw the first non-path separator, remember this index in case
-            // we need it if the extension ends up not matching
-            matchedSlash = false;
-            firstNonSlashEnd = i + 1;
-          }
-          if (extIdx >= 0) {
-            // Try to match the explicit extension
-            if (code === ext.charCodeAt(extIdx)) {
-              if (--extIdx === -1) {
-                // We matched the extension, so mark this as the end of our path
-                // component
-                end = i;
-              }
-            } else {
-              // Extension does not match, so our result is the entire path
-              // component
-              extIdx = -1;
-              end = firstNonSlashEnd;
-            }
-          }
-        }
-      }
-
-      if (start === end) end = firstNonSlashEnd;else if (end === -1) end = path.length;
-      return path.slice(start, end);
-    } else {
-      for (i = path.length - 1; i >= 0; --i) {
-        if (path.charCodeAt(i) === 47 /*/*/) {
-            // If we reached a path separator that was not part of a set of path
-            // separators at the end of the string, stop now
-            if (!matchedSlash) {
-              start = i + 1;
-              break;
-            }
-          } else if (end === -1) {
-          // We saw the first non-path separator, mark this as the end of our
-          // path component
-          matchedSlash = false;
-          end = i + 1;
-        }
-      }
-
-      if (end === -1) return '';
-      return path.slice(start, end);
-    }
-  },
-
-  extname: function extname(path) {
-    assertPath(path);
-    var startDot = -1;
-    var startPart = 0;
-    var end = -1;
-    var matchedSlash = true;
-    // Track the state of characters (if any) we see before our first dot and
-    // after any path separator we find
-    var preDotState = 0;
-    for (var i = path.length - 1; i >= 0; --i) {
-      var code = path.charCodeAt(i);
-      if (code === 47 /*/*/) {
-          // If we reached a path separator that was not part of a set of path
-          // separators at the end of the string, stop now
-          if (!matchedSlash) {
-            startPart = i + 1;
-            break;
-          }
-          continue;
-        }
-      if (end === -1) {
-        // We saw the first non-path separator, mark this as the end of our
-        // extension
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code === 46 /*.*/) {
-          // If this is our first dot, mark it as the start of our extension
-          if (startDot === -1)
-            startDot = i;
-          else if (preDotState !== 1)
-            preDotState = 1;
-      } else if (startDot !== -1) {
-        // We saw a non-dot and non-path separator before our dot, so we should
-        // have a good chance at having a non-empty extension
-        preDotState = -1;
-      }
-    }
-
-    if (startDot === -1 || end === -1 ||
-        // We saw a non-dot character immediately before the dot
-        preDotState === 0 ||
-        // The (right-most) trimmed path component is exactly '..'
-        preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-      return '';
-    }
-    return path.slice(startDot, end);
-  },
-
-  format: function format(pathObject) {
-    if (pathObject === null || typeof pathObject !== 'object') {
-      throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof pathObject);
-    }
-    return _format('/', pathObject);
-  },
-
-  parse: function parse(path) {
-    assertPath(path);
-
-    var ret = { root: '', dir: '', base: '', ext: '', name: '' };
-    if (path.length === 0) return ret;
-    var code = path.charCodeAt(0);
-    var isAbsolute = code === 47 /*/*/;
-    var start;
-    if (isAbsolute) {
-      ret.root = '/';
-      start = 1;
-    } else {
-      start = 0;
-    }
-    var startDot = -1;
-    var startPart = 0;
-    var end = -1;
-    var matchedSlash = true;
-    var i = path.length - 1;
-
-    // Track the state of characters (if any) we see before our first dot and
-    // after any path separator we find
-    var preDotState = 0;
-
-    // Get non-dir info
-    for (; i >= start; --i) {
-      code = path.charCodeAt(i);
-      if (code === 47 /*/*/) {
-          // If we reached a path separator that was not part of a set of path
-          // separators at the end of the string, stop now
-          if (!matchedSlash) {
-            startPart = i + 1;
-            break;
-          }
-          continue;
-        }
-      if (end === -1) {
-        // We saw the first non-path separator, mark this as the end of our
-        // extension
-        matchedSlash = false;
-        end = i + 1;
-      }
-      if (code === 46 /*.*/) {
-          // If this is our first dot, mark it as the start of our extension
-          if (startDot === -1) startDot = i;else if (preDotState !== 1) preDotState = 1;
-        } else if (startDot !== -1) {
-        // We saw a non-dot and non-path separator before our dot, so we should
-        // have a good chance at having a non-empty extension
-        preDotState = -1;
-      }
-    }
-
-    if (startDot === -1 || end === -1 ||
-    // We saw a non-dot character immediately before the dot
-    preDotState === 0 ||
-    // The (right-most) trimmed path component is exactly '..'
-    preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
-      if (end !== -1) {
-        if (startPart === 0 && isAbsolute) ret.base = ret.name = path.slice(1, end);else ret.base = ret.name = path.slice(startPart, end);
-      }
-    } else {
-      if (startPart === 0 && isAbsolute) {
-        ret.name = path.slice(1, startDot);
-        ret.base = path.slice(1, end);
-      } else {
-        ret.name = path.slice(startPart, startDot);
-        ret.base = path.slice(startPart, end);
-      }
-      ret.ext = path.slice(startDot, end);
-    }
-
-    if (startPart > 0) ret.dir = path.slice(0, startPart - 1);else if (isAbsolute) ret.dir = '/';
-
-    return ret;
-  },
-
-  sep: '/',
-  delimiter: ':',
-  win32: null,
-  posix: null
-};
-
-posix.posix = posix;
-
-module.exports = posix;
-
-
-/***/ }),
-
-/***/ "./node_modules/safe-buffer/index.js":
-/*!*******************************************!*\
-  !*** ./node_modules/safe-buffer/index.js ***!
-  \*******************************************/
+/***/ "./node_modules/imsc/node_modules/safe-buffer/index.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/imsc/node_modules/safe-buffer/index.js ***!
+  \*************************************************************/
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
@@ -65285,10 +58343,10 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 /***/ }),
 
-/***/ "./node_modules/sax/lib/sax.js":
-/*!*************************************!*\
-  !*** ./node_modules/sax/lib/sax.js ***!
-  \*************************************/
+/***/ "./node_modules/imsc/node_modules/sax/lib/sax.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/imsc/node_modules/sax/lib/sax.js ***!
+  \*******************************************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 ;(function (sax) { // wrapper for non-node envs
@@ -65523,7 +58581,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
       typeof Buffer.isBuffer === 'function' &&
       Buffer.isBuffer(data)) {
       if (!this._decoder) {
-        var SD = (__webpack_require__(/*! string_decoder */ "./node_modules/string_decoder/lib/string_decoder.js").StringDecoder)
+        var SD = (__webpack_require__(/*! string_decoder */ "./node_modules/imsc/node_modules/string_decoder/lib/string_decoder.js").StringDecoder)
         this._decoder = new SD('utf8')
       }
       data = this._decoder.write(data)
@@ -66867,6 +59925,994 @@ SafeBuffer.allocUnsafeSlow = function (size) {
     }())
   }
 })( false ? 0 : exports)
+
+
+/***/ }),
+
+/***/ "./node_modules/imsc/node_modules/string_decoder/lib/string_decoder.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/imsc/node_modules/string_decoder/lib/string_decoder.js ***!
+  \*****************************************************************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+/*<replacement>*/
+
+var Buffer = (__webpack_require__(/*! safe-buffer */ "./node_modules/imsc/node_modules/safe-buffer/index.js").Buffer);
+/*</replacement>*/
+
+var isEncoding = Buffer.isEncoding || function (encoding) {
+  encoding = '' + encoding;
+  switch (encoding && encoding.toLowerCase()) {
+    case 'hex':case 'utf8':case 'utf-8':case 'ascii':case 'binary':case 'base64':case 'ucs2':case 'ucs-2':case 'utf16le':case 'utf-16le':case 'raw':
+      return true;
+    default:
+      return false;
+  }
+};
+
+function _normalizeEncoding(enc) {
+  if (!enc) return 'utf8';
+  var retried;
+  while (true) {
+    switch (enc) {
+      case 'utf8':
+      case 'utf-8':
+        return 'utf8';
+      case 'ucs2':
+      case 'ucs-2':
+      case 'utf16le':
+      case 'utf-16le':
+        return 'utf16le';
+      case 'latin1':
+      case 'binary':
+        return 'latin1';
+      case 'base64':
+      case 'ascii':
+      case 'hex':
+        return enc;
+      default:
+        if (retried) return; // undefined
+        enc = ('' + enc).toLowerCase();
+        retried = true;
+    }
+  }
+};
+
+// Do not cache `Buffer.isEncoding` when checking encoding names as some
+// modules monkey-patch it to support additional encodings
+function normalizeEncoding(enc) {
+  var nenc = _normalizeEncoding(enc);
+  if (typeof nenc !== 'string' && (Buffer.isEncoding === isEncoding || !isEncoding(enc))) throw new Error('Unknown encoding: ' + enc);
+  return nenc || enc;
+}
+
+// StringDecoder provides an interface for efficiently splitting a series of
+// buffers into a series of JS strings without breaking apart multi-byte
+// characters.
+exports.StringDecoder = StringDecoder;
+function StringDecoder(encoding) {
+  this.encoding = normalizeEncoding(encoding);
+  var nb;
+  switch (this.encoding) {
+    case 'utf16le':
+      this.text = utf16Text;
+      this.end = utf16End;
+      nb = 4;
+      break;
+    case 'utf8':
+      this.fillLast = utf8FillLast;
+      nb = 4;
+      break;
+    case 'base64':
+      this.text = base64Text;
+      this.end = base64End;
+      nb = 3;
+      break;
+    default:
+      this.write = simpleWrite;
+      this.end = simpleEnd;
+      return;
+  }
+  this.lastNeed = 0;
+  this.lastTotal = 0;
+  this.lastChar = Buffer.allocUnsafe(nb);
+}
+
+StringDecoder.prototype.write = function (buf) {
+  if (buf.length === 0) return '';
+  var r;
+  var i;
+  if (this.lastNeed) {
+    r = this.fillLast(buf);
+    if (r === undefined) return '';
+    i = this.lastNeed;
+    this.lastNeed = 0;
+  } else {
+    i = 0;
+  }
+  if (i < buf.length) return r ? r + this.text(buf, i) : this.text(buf, i);
+  return r || '';
+};
+
+StringDecoder.prototype.end = utf8End;
+
+// Returns only complete characters in a Buffer
+StringDecoder.prototype.text = utf8Text;
+
+// Attempts to complete a partial non-UTF-8 character using bytes from a Buffer
+StringDecoder.prototype.fillLast = function (buf) {
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, this.lastTotal - this.lastNeed, 0, buf.length);
+  this.lastNeed -= buf.length;
+};
+
+// Checks the type of a UTF-8 byte, whether it's ASCII, a leading byte, or a
+// continuation byte. If an invalid byte is detected, -2 is returned.
+function utf8CheckByte(byte) {
+  if (byte <= 0x7F) return 0;else if (byte >> 5 === 0x06) return 2;else if (byte >> 4 === 0x0E) return 3;else if (byte >> 3 === 0x1E) return 4;
+  return byte >> 6 === 0x02 ? -1 : -2;
+}
+
+// Checks at most 3 bytes at the end of a Buffer in order to detect an
+// incomplete multi-byte UTF-8 character. The total number of bytes (2, 3, or 4)
+// needed to complete the UTF-8 character (if applicable) are returned.
+function utf8CheckIncomplete(self, buf, i) {
+  var j = buf.length - 1;
+  if (j < i) return 0;
+  var nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 1;
+    return nb;
+  }
+  if (--j < i || nb === -2) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) self.lastNeed = nb - 2;
+    return nb;
+  }
+  if (--j < i || nb === -2) return 0;
+  nb = utf8CheckByte(buf[j]);
+  if (nb >= 0) {
+    if (nb > 0) {
+      if (nb === 2) nb = 0;else self.lastNeed = nb - 3;
+    }
+    return nb;
+  }
+  return 0;
+}
+
+// Validates as many continuation bytes for a multi-byte UTF-8 character as
+// needed or are available. If we see a non-continuation byte where we expect
+// one, we "replace" the validated continuation bytes we've seen so far with
+// a single UTF-8 replacement character ('\ufffd'), to match v8's UTF-8 decoding
+// behavior. The continuation byte check is included three times in the case
+// where all of the continuation bytes for a character exist in the same buffer.
+// It is also done this way as a slight performance increase instead of using a
+// loop.
+function utf8CheckExtraBytes(self, buf, p) {
+  if ((buf[0] & 0xC0) !== 0x80) {
+    self.lastNeed = 0;
+    return '\ufffd';
+  }
+  if (self.lastNeed > 1 && buf.length > 1) {
+    if ((buf[1] & 0xC0) !== 0x80) {
+      self.lastNeed = 1;
+      return '\ufffd';
+    }
+    if (self.lastNeed > 2 && buf.length > 2) {
+      if ((buf[2] & 0xC0) !== 0x80) {
+        self.lastNeed = 2;
+        return '\ufffd';
+      }
+    }
+  }
+}
+
+// Attempts to complete a multi-byte UTF-8 character using bytes from a Buffer.
+function utf8FillLast(buf) {
+  var p = this.lastTotal - this.lastNeed;
+  var r = utf8CheckExtraBytes(this, buf, p);
+  if (r !== undefined) return r;
+  if (this.lastNeed <= buf.length) {
+    buf.copy(this.lastChar, p, 0, this.lastNeed);
+    return this.lastChar.toString(this.encoding, 0, this.lastTotal);
+  }
+  buf.copy(this.lastChar, p, 0, buf.length);
+  this.lastNeed -= buf.length;
+}
+
+// Returns all complete UTF-8 characters in a Buffer. If the Buffer ended on a
+// partial character, the character's bytes are buffered until the required
+// number of bytes are available.
+function utf8Text(buf, i) {
+  var total = utf8CheckIncomplete(this, buf, i);
+  if (!this.lastNeed) return buf.toString('utf8', i);
+  this.lastTotal = total;
+  var end = buf.length - (total - this.lastNeed);
+  buf.copy(this.lastChar, 0, end);
+  return buf.toString('utf8', i, end);
+}
+
+// For UTF-8, a replacement character is added when ending on a partial
+// character.
+function utf8End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + '\ufffd';
+  return r;
+}
+
+// UTF-16LE typically needs two bytes per character, but even if we have an even
+// number of bytes available, we need to check if we end on a leading/high
+// surrogate. In that case, we need to wait for the next two bytes in order to
+// decode the last character properly.
+function utf16Text(buf, i) {
+  if ((buf.length - i) % 2 === 0) {
+    var r = buf.toString('utf16le', i);
+    if (r) {
+      var c = r.charCodeAt(r.length - 1);
+      if (c >= 0xD800 && c <= 0xDBFF) {
+        this.lastNeed = 2;
+        this.lastTotal = 4;
+        this.lastChar[0] = buf[buf.length - 2];
+        this.lastChar[1] = buf[buf.length - 1];
+        return r.slice(0, -1);
+      }
+    }
+    return r;
+  }
+  this.lastNeed = 1;
+  this.lastTotal = 2;
+  this.lastChar[0] = buf[buf.length - 1];
+  return buf.toString('utf16le', i, buf.length - 1);
+}
+
+// For UTF-16LE we do not explicitly append special replacement characters if we
+// end on a partial character, we simply let v8 handle that.
+function utf16End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) {
+    var end = this.lastTotal - this.lastNeed;
+    return r + this.lastChar.toString('utf16le', 0, end);
+  }
+  return r;
+}
+
+function base64Text(buf, i) {
+  var n = (buf.length - i) % 3;
+  if (n === 0) return buf.toString('base64', i);
+  this.lastNeed = 3 - n;
+  this.lastTotal = 3;
+  if (n === 1) {
+    this.lastChar[0] = buf[buf.length - 1];
+  } else {
+    this.lastChar[0] = buf[buf.length - 2];
+    this.lastChar[1] = buf[buf.length - 1];
+  }
+  return buf.toString('base64', i, buf.length - n);
+}
+
+function base64End(buf) {
+  var r = buf && buf.length ? this.write(buf) : '';
+  if (this.lastNeed) return r + this.lastChar.toString('base64', 0, 3 - this.lastNeed);
+  return r;
+}
+
+// Pass bytes on through for single-byte encodings (e.g. ascii, latin1, hex)
+function simpleWrite(buf) {
+  return buf.toString(this.encoding);
+}
+
+function simpleEnd(buf) {
+  return buf && buf.length ? this.write(buf) : '';
+}
+
+/***/ }),
+
+/***/ "./node_modules/is-alphabetical/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/is-alphabetical/index.js ***!
+  \***********************************************/
+/***/ (function(module) {
+
+"use strict";
+
+
+module.exports = alphabetical
+
+// Check if the given character code, or the character code at the first
+// character, is alphabetical.
+function alphabetical(character) {
+  var code = typeof character === 'string' ? character.charCodeAt(0) : character
+
+  return (
+    (code >= 97 && code <= 122) /* a-z */ ||
+    (code >= 65 && code <= 90) /* A-Z */
+  )
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/is-alphanumerical/index.js":
+/*!*************************************************!*\
+  !*** ./node_modules/is-alphanumerical/index.js ***!
+  \*************************************************/
+/***/ (function(module, __unused_webpack_exports, __webpack_require__) {
+
+"use strict";
+
+
+var alphabetical = __webpack_require__(/*! is-alphabetical */ "./node_modules/is-alphabetical/index.js")
+var decimal = __webpack_require__(/*! is-decimal */ "./node_modules/is-decimal/index.js")
+
+module.exports = alphanumerical
+
+// Check if the given character code, or the character code at the first
+// character, is alphanumerical.
+function alphanumerical(character) {
+  return alphabetical(character) || decimal(character)
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/is-decimal/index.js":
+/*!******************************************!*\
+  !*** ./node_modules/is-decimal/index.js ***!
+  \******************************************/
+/***/ (function(module) {
+
+"use strict";
+
+
+module.exports = decimal
+
+// Check if the given character code, or the character code at the first
+// character, is decimal.
+function decimal(character) {
+  var code = typeof character === 'string' ? character.charCodeAt(0) : character
+
+  return code >= 48 && code <= 57 /* 0-9 */
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/path-browserify/index.js":
+/*!***********************************************!*\
+  !*** ./node_modules/path-browserify/index.js ***!
+  \***********************************************/
+/***/ (function(module) {
+
+"use strict";
+// 'path' module extracted from Node.js v8.11.1 (only the posix part)
+// transplited with Babel
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+function assertPath(path) {
+  if (typeof path !== 'string') {
+    throw new TypeError('Path must be a string. Received ' + JSON.stringify(path));
+  }
+}
+
+// Resolves . and .. elements in a path with directory names
+function normalizeStringPosix(path, allowAboveRoot) {
+  var res = '';
+  var lastSegmentLength = 0;
+  var lastSlash = -1;
+  var dots = 0;
+  var code;
+  for (var i = 0; i <= path.length; ++i) {
+    if (i < path.length)
+      code = path.charCodeAt(i);
+    else if (code === 47 /*/*/)
+      break;
+    else
+      code = 47 /*/*/;
+    if (code === 47 /*/*/) {
+      if (lastSlash === i - 1 || dots === 1) {
+        // NOOP
+      } else if (lastSlash !== i - 1 && dots === 2) {
+        if (res.length < 2 || lastSegmentLength !== 2 || res.charCodeAt(res.length - 1) !== 46 /*.*/ || res.charCodeAt(res.length - 2) !== 46 /*.*/) {
+          if (res.length > 2) {
+            var lastSlashIndex = res.lastIndexOf('/');
+            if (lastSlashIndex !== res.length - 1) {
+              if (lastSlashIndex === -1) {
+                res = '';
+                lastSegmentLength = 0;
+              } else {
+                res = res.slice(0, lastSlashIndex);
+                lastSegmentLength = res.length - 1 - res.lastIndexOf('/');
+              }
+              lastSlash = i;
+              dots = 0;
+              continue;
+            }
+          } else if (res.length === 2 || res.length === 1) {
+            res = '';
+            lastSegmentLength = 0;
+            lastSlash = i;
+            dots = 0;
+            continue;
+          }
+        }
+        if (allowAboveRoot) {
+          if (res.length > 0)
+            res += '/..';
+          else
+            res = '..';
+          lastSegmentLength = 2;
+        }
+      } else {
+        if (res.length > 0)
+          res += '/' + path.slice(lastSlash + 1, i);
+        else
+          res = path.slice(lastSlash + 1, i);
+        lastSegmentLength = i - lastSlash - 1;
+      }
+      lastSlash = i;
+      dots = 0;
+    } else if (code === 46 /*.*/ && dots !== -1) {
+      ++dots;
+    } else {
+      dots = -1;
+    }
+  }
+  return res;
+}
+
+function _format(sep, pathObject) {
+  var dir = pathObject.dir || pathObject.root;
+  var base = pathObject.base || (pathObject.name || '') + (pathObject.ext || '');
+  if (!dir) {
+    return base;
+  }
+  if (dir === pathObject.root) {
+    return dir + base;
+  }
+  return dir + sep + base;
+}
+
+var posix = {
+  // path.resolve([from ...], to)
+  resolve: function resolve() {
+    var resolvedPath = '';
+    var resolvedAbsolute = false;
+    var cwd;
+
+    for (var i = arguments.length - 1; i >= -1 && !resolvedAbsolute; i--) {
+      var path;
+      if (i >= 0)
+        path = arguments[i];
+      else {
+        if (cwd === undefined)
+          cwd = process.cwd();
+        path = cwd;
+      }
+
+      assertPath(path);
+
+      // Skip empty entries
+      if (path.length === 0) {
+        continue;
+      }
+
+      resolvedPath = path + '/' + resolvedPath;
+      resolvedAbsolute = path.charCodeAt(0) === 47 /*/*/;
+    }
+
+    // At this point the path should be resolved to a full absolute path, but
+    // handle relative paths to be safe (might happen when process.cwd() fails)
+
+    // Normalize the path
+    resolvedPath = normalizeStringPosix(resolvedPath, !resolvedAbsolute);
+
+    if (resolvedAbsolute) {
+      if (resolvedPath.length > 0)
+        return '/' + resolvedPath;
+      else
+        return '/';
+    } else if (resolvedPath.length > 0) {
+      return resolvedPath;
+    } else {
+      return '.';
+    }
+  },
+
+  normalize: function normalize(path) {
+    assertPath(path);
+
+    if (path.length === 0) return '.';
+
+    var isAbsolute = path.charCodeAt(0) === 47 /*/*/;
+    var trailingSeparator = path.charCodeAt(path.length - 1) === 47 /*/*/;
+
+    // Normalize the path
+    path = normalizeStringPosix(path, !isAbsolute);
+
+    if (path.length === 0 && !isAbsolute) path = '.';
+    if (path.length > 0 && trailingSeparator) path += '/';
+
+    if (isAbsolute) return '/' + path;
+    return path;
+  },
+
+  isAbsolute: function isAbsolute(path) {
+    assertPath(path);
+    return path.length > 0 && path.charCodeAt(0) === 47 /*/*/;
+  },
+
+  join: function join() {
+    if (arguments.length === 0)
+      return '.';
+    var joined;
+    for (var i = 0; i < arguments.length; ++i) {
+      var arg = arguments[i];
+      assertPath(arg);
+      if (arg.length > 0) {
+        if (joined === undefined)
+          joined = arg;
+        else
+          joined += '/' + arg;
+      }
+    }
+    if (joined === undefined)
+      return '.';
+    return posix.normalize(joined);
+  },
+
+  relative: function relative(from, to) {
+    assertPath(from);
+    assertPath(to);
+
+    if (from === to) return '';
+
+    from = posix.resolve(from);
+    to = posix.resolve(to);
+
+    if (from === to) return '';
+
+    // Trim any leading backslashes
+    var fromStart = 1;
+    for (; fromStart < from.length; ++fromStart) {
+      if (from.charCodeAt(fromStart) !== 47 /*/*/)
+        break;
+    }
+    var fromEnd = from.length;
+    var fromLen = fromEnd - fromStart;
+
+    // Trim any leading backslashes
+    var toStart = 1;
+    for (; toStart < to.length; ++toStart) {
+      if (to.charCodeAt(toStart) !== 47 /*/*/)
+        break;
+    }
+    var toEnd = to.length;
+    var toLen = toEnd - toStart;
+
+    // Compare paths to find the longest common path from root
+    var length = fromLen < toLen ? fromLen : toLen;
+    var lastCommonSep = -1;
+    var i = 0;
+    for (; i <= length; ++i) {
+      if (i === length) {
+        if (toLen > length) {
+          if (to.charCodeAt(toStart + i) === 47 /*/*/) {
+            // We get here if `from` is the exact base path for `to`.
+            // For example: from='/foo/bar'; to='/foo/bar/baz'
+            return to.slice(toStart + i + 1);
+          } else if (i === 0) {
+            // We get here if `from` is the root
+            // For example: from='/'; to='/foo'
+            return to.slice(toStart + i);
+          }
+        } else if (fromLen > length) {
+          if (from.charCodeAt(fromStart + i) === 47 /*/*/) {
+            // We get here if `to` is the exact base path for `from`.
+            // For example: from='/foo/bar/baz'; to='/foo/bar'
+            lastCommonSep = i;
+          } else if (i === 0) {
+            // We get here if `to` is the root.
+            // For example: from='/foo'; to='/'
+            lastCommonSep = 0;
+          }
+        }
+        break;
+      }
+      var fromCode = from.charCodeAt(fromStart + i);
+      var toCode = to.charCodeAt(toStart + i);
+      if (fromCode !== toCode)
+        break;
+      else if (fromCode === 47 /*/*/)
+        lastCommonSep = i;
+    }
+
+    var out = '';
+    // Generate the relative path based on the path difference between `to`
+    // and `from`
+    for (i = fromStart + lastCommonSep + 1; i <= fromEnd; ++i) {
+      if (i === fromEnd || from.charCodeAt(i) === 47 /*/*/) {
+        if (out.length === 0)
+          out += '..';
+        else
+          out += '/..';
+      }
+    }
+
+    // Lastly, append the rest of the destination (`to`) path that comes after
+    // the common path parts
+    if (out.length > 0)
+      return out + to.slice(toStart + lastCommonSep);
+    else {
+      toStart += lastCommonSep;
+      if (to.charCodeAt(toStart) === 47 /*/*/)
+        ++toStart;
+      return to.slice(toStart);
+    }
+  },
+
+  _makeLong: function _makeLong(path) {
+    return path;
+  },
+
+  dirname: function dirname(path) {
+    assertPath(path);
+    if (path.length === 0) return '.';
+    var code = path.charCodeAt(0);
+    var hasRoot = code === 47 /*/*/;
+    var end = -1;
+    var matchedSlash = true;
+    for (var i = path.length - 1; i >= 1; --i) {
+      code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          if (!matchedSlash) {
+            end = i;
+            break;
+          }
+        } else {
+        // We saw the first non-path separator
+        matchedSlash = false;
+      }
+    }
+
+    if (end === -1) return hasRoot ? '/' : '.';
+    if (hasRoot && end === 1) return '//';
+    return path.slice(0, end);
+  },
+
+  basename: function basename(path, ext) {
+    if (ext !== undefined && typeof ext !== 'string') throw new TypeError('"ext" argument must be a string');
+    assertPath(path);
+
+    var start = 0;
+    var end = -1;
+    var matchedSlash = true;
+    var i;
+
+    if (ext !== undefined && ext.length > 0 && ext.length <= path.length) {
+      if (ext.length === path.length && ext === path) return '';
+      var extIdx = ext.length - 1;
+      var firstNonSlashEnd = -1;
+      for (i = path.length - 1; i >= 0; --i) {
+        var code = path.charCodeAt(i);
+        if (code === 47 /*/*/) {
+            // If we reached a path separator that was not part of a set of path
+            // separators at the end of the string, stop now
+            if (!matchedSlash) {
+              start = i + 1;
+              break;
+            }
+          } else {
+          if (firstNonSlashEnd === -1) {
+            // We saw the first non-path separator, remember this index in case
+            // we need it if the extension ends up not matching
+            matchedSlash = false;
+            firstNonSlashEnd = i + 1;
+          }
+          if (extIdx >= 0) {
+            // Try to match the explicit extension
+            if (code === ext.charCodeAt(extIdx)) {
+              if (--extIdx === -1) {
+                // We matched the extension, so mark this as the end of our path
+                // component
+                end = i;
+              }
+            } else {
+              // Extension does not match, so our result is the entire path
+              // component
+              extIdx = -1;
+              end = firstNonSlashEnd;
+            }
+          }
+        }
+      }
+
+      if (start === end) end = firstNonSlashEnd;else if (end === -1) end = path.length;
+      return path.slice(start, end);
+    } else {
+      for (i = path.length - 1; i >= 0; --i) {
+        if (path.charCodeAt(i) === 47 /*/*/) {
+            // If we reached a path separator that was not part of a set of path
+            // separators at the end of the string, stop now
+            if (!matchedSlash) {
+              start = i + 1;
+              break;
+            }
+          } else if (end === -1) {
+          // We saw the first non-path separator, mark this as the end of our
+          // path component
+          matchedSlash = false;
+          end = i + 1;
+        }
+      }
+
+      if (end === -1) return '';
+      return path.slice(start, end);
+    }
+  },
+
+  extname: function extname(path) {
+    assertPath(path);
+    var startDot = -1;
+    var startPart = 0;
+    var end = -1;
+    var matchedSlash = true;
+    // Track the state of characters (if any) we see before our first dot and
+    // after any path separator we find
+    var preDotState = 0;
+    for (var i = path.length - 1; i >= 0; --i) {
+      var code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          // If we reached a path separator that was not part of a set of path
+          // separators at the end of the string, stop now
+          if (!matchedSlash) {
+            startPart = i + 1;
+            break;
+          }
+          continue;
+        }
+      if (end === -1) {
+        // We saw the first non-path separator, mark this as the end of our
+        // extension
+        matchedSlash = false;
+        end = i + 1;
+      }
+      if (code === 46 /*.*/) {
+          // If this is our first dot, mark it as the start of our extension
+          if (startDot === -1)
+            startDot = i;
+          else if (preDotState !== 1)
+            preDotState = 1;
+      } else if (startDot !== -1) {
+        // We saw a non-dot and non-path separator before our dot, so we should
+        // have a good chance at having a non-empty extension
+        preDotState = -1;
+      }
+    }
+
+    if (startDot === -1 || end === -1 ||
+        // We saw a non-dot character immediately before the dot
+        preDotState === 0 ||
+        // The (right-most) trimmed path component is exactly '..'
+        preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      return '';
+    }
+    return path.slice(startDot, end);
+  },
+
+  format: function format(pathObject) {
+    if (pathObject === null || typeof pathObject !== 'object') {
+      throw new TypeError('The "pathObject" argument must be of type Object. Received type ' + typeof pathObject);
+    }
+    return _format('/', pathObject);
+  },
+
+  parse: function parse(path) {
+    assertPath(path);
+
+    var ret = { root: '', dir: '', base: '', ext: '', name: '' };
+    if (path.length === 0) return ret;
+    var code = path.charCodeAt(0);
+    var isAbsolute = code === 47 /*/*/;
+    var start;
+    if (isAbsolute) {
+      ret.root = '/';
+      start = 1;
+    } else {
+      start = 0;
+    }
+    var startDot = -1;
+    var startPart = 0;
+    var end = -1;
+    var matchedSlash = true;
+    var i = path.length - 1;
+
+    // Track the state of characters (if any) we see before our first dot and
+    // after any path separator we find
+    var preDotState = 0;
+
+    // Get non-dir info
+    for (; i >= start; --i) {
+      code = path.charCodeAt(i);
+      if (code === 47 /*/*/) {
+          // If we reached a path separator that was not part of a set of path
+          // separators at the end of the string, stop now
+          if (!matchedSlash) {
+            startPart = i + 1;
+            break;
+          }
+          continue;
+        }
+      if (end === -1) {
+        // We saw the first non-path separator, mark this as the end of our
+        // extension
+        matchedSlash = false;
+        end = i + 1;
+      }
+      if (code === 46 /*.*/) {
+          // If this is our first dot, mark it as the start of our extension
+          if (startDot === -1) startDot = i;else if (preDotState !== 1) preDotState = 1;
+        } else if (startDot !== -1) {
+        // We saw a non-dot and non-path separator before our dot, so we should
+        // have a good chance at having a non-empty extension
+        preDotState = -1;
+      }
+    }
+
+    if (startDot === -1 || end === -1 ||
+    // We saw a non-dot character immediately before the dot
+    preDotState === 0 ||
+    // The (right-most) trimmed path component is exactly '..'
+    preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      if (end !== -1) {
+        if (startPart === 0 && isAbsolute) ret.base = ret.name = path.slice(1, end);else ret.base = ret.name = path.slice(startPart, end);
+      }
+    } else {
+      if (startPart === 0 && isAbsolute) {
+        ret.name = path.slice(1, startDot);
+        ret.base = path.slice(1, end);
+      } else {
+        ret.name = path.slice(startPart, startDot);
+        ret.base = path.slice(startPart, end);
+      }
+      ret.ext = path.slice(startDot, end);
+    }
+
+    if (startPart > 0) ret.dir = path.slice(0, startPart - 1);else if (isAbsolute) ret.dir = '/';
+
+    return ret;
+  },
+
+  sep: '/',
+  delimiter: ':',
+  win32: null,
+  posix: null
+};
+
+posix.posix = posix;
+
+module.exports = posix;
+
+
+/***/ }),
+
+/***/ "./node_modules/safe-buffer/index.js":
+/*!*******************************************!*\
+  !*** ./node_modules/safe-buffer/index.js ***!
+  \*******************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+/* eslint-disable node/no-deprecated-api */
+var buffer = __webpack_require__(/*! buffer */ "./node_modules/buffer/index.js")
+var Buffer = buffer.Buffer
+
+// alternative to using Object.keys for old browsers
+function copyProps (src, dst) {
+  for (var key in src) {
+    dst[key] = src[key]
+  }
+}
+if (Buffer.from && Buffer.alloc && Buffer.allocUnsafe && Buffer.allocUnsafeSlow) {
+  module.exports = buffer
+} else {
+  // Copy properties from require('buffer')
+  copyProps(buffer, exports)
+  exports.Buffer = SafeBuffer
+}
+
+function SafeBuffer (arg, encodingOrOffset, length) {
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+// Copy static methods from Buffer
+copyProps(Buffer, SafeBuffer)
+
+SafeBuffer.from = function (arg, encodingOrOffset, length) {
+  if (typeof arg === 'number') {
+    throw new TypeError('Argument must not be a number')
+  }
+  return Buffer(arg, encodingOrOffset, length)
+}
+
+SafeBuffer.alloc = function (size, fill, encoding) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  var buf = Buffer(size)
+  if (fill !== undefined) {
+    if (typeof encoding === 'string') {
+      buf.fill(fill, encoding)
+    } else {
+      buf.fill(fill)
+    }
+  } else {
+    buf.fill(0)
+  }
+  return buf
+}
+
+SafeBuffer.allocUnsafe = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return Buffer(size)
+}
+
+SafeBuffer.allocUnsafeSlow = function (size) {
+  if (typeof size !== 'number') {
+    throw new TypeError('Argument must be a number')
+  }
+  return buffer.SlowBuffer(size)
+}
 
 
 /***/ }),
@@ -71626,6 +65672,5753 @@ function config (name) {
 /***/ (function() {
 
 /* (ignored) */
+
+/***/ }),
+
+/***/ "./node_modules/imsc/node_modules/tslib/tslib.es6.mjs":
+/*!************************************************************!*\
+  !*** ./node_modules/imsc/node_modules/tslib/tslib.es6.mjs ***!
+  \************************************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "__addDisposableResource": function() { return /* binding */ __addDisposableResource; },
+/* harmony export */   "__assign": function() { return /* binding */ __assign; },
+/* harmony export */   "__asyncDelegator": function() { return /* binding */ __asyncDelegator; },
+/* harmony export */   "__asyncGenerator": function() { return /* binding */ __asyncGenerator; },
+/* harmony export */   "__asyncValues": function() { return /* binding */ __asyncValues; },
+/* harmony export */   "__await": function() { return /* binding */ __await; },
+/* harmony export */   "__awaiter": function() { return /* binding */ __awaiter; },
+/* harmony export */   "__classPrivateFieldGet": function() { return /* binding */ __classPrivateFieldGet; },
+/* harmony export */   "__classPrivateFieldIn": function() { return /* binding */ __classPrivateFieldIn; },
+/* harmony export */   "__classPrivateFieldSet": function() { return /* binding */ __classPrivateFieldSet; },
+/* harmony export */   "__createBinding": function() { return /* binding */ __createBinding; },
+/* harmony export */   "__decorate": function() { return /* binding */ __decorate; },
+/* harmony export */   "__disposeResources": function() { return /* binding */ __disposeResources; },
+/* harmony export */   "__esDecorate": function() { return /* binding */ __esDecorate; },
+/* harmony export */   "__exportStar": function() { return /* binding */ __exportStar; },
+/* harmony export */   "__extends": function() { return /* binding */ __extends; },
+/* harmony export */   "__generator": function() { return /* binding */ __generator; },
+/* harmony export */   "__importDefault": function() { return /* binding */ __importDefault; },
+/* harmony export */   "__importStar": function() { return /* binding */ __importStar; },
+/* harmony export */   "__makeTemplateObject": function() { return /* binding */ __makeTemplateObject; },
+/* harmony export */   "__metadata": function() { return /* binding */ __metadata; },
+/* harmony export */   "__param": function() { return /* binding */ __param; },
+/* harmony export */   "__propKey": function() { return /* binding */ __propKey; },
+/* harmony export */   "__read": function() { return /* binding */ __read; },
+/* harmony export */   "__rest": function() { return /* binding */ __rest; },
+/* harmony export */   "__runInitializers": function() { return /* binding */ __runInitializers; },
+/* harmony export */   "__setFunctionName": function() { return /* binding */ __setFunctionName; },
+/* harmony export */   "__spread": function() { return /* binding */ __spread; },
+/* harmony export */   "__spreadArray": function() { return /* binding */ __spreadArray; },
+/* harmony export */   "__spreadArrays": function() { return /* binding */ __spreadArrays; },
+/* harmony export */   "__values": function() { return /* binding */ __values; }
+/* harmony export */ });
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
+var extendStatics = function(d, b) {
+  extendStatics = Object.setPrototypeOf ||
+      ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+      function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+  return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+  if (typeof b !== "function" && b !== null)
+      throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+  extendStatics(d, b);
+  function __() { this.constructor = d; }
+  d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+  __assign = Object.assign || function __assign(t) {
+      for (var s, i = 1, n = arguments.length; i < n; i++) {
+          s = arguments[i];
+          for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+      }
+      return t;
+  }
+  return __assign.apply(this, arguments);
+}
+
+function __rest(s, e) {
+  var t = {};
+  for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+      t[p] = s[p];
+  if (s != null && typeof Object.getOwnPropertySymbols === "function")
+      for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+          if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+              t[p[i]] = s[p[i]];
+      }
+  return t;
+}
+
+function __decorate(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+function __param(paramIndex, decorator) {
+  return function (target, key) { decorator(target, key, paramIndex); }
+}
+
+function __esDecorate(ctor, descriptorIn, decorators, contextIn, initializers, extraInitializers) {
+  function accept(f) { if (f !== void 0 && typeof f !== "function") throw new TypeError("Function expected"); return f; }
+  var kind = contextIn.kind, key = kind === "getter" ? "get" : kind === "setter" ? "set" : "value";
+  var target = !descriptorIn && ctor ? contextIn["static"] ? ctor : ctor.prototype : null;
+  var descriptor = descriptorIn || (target ? Object.getOwnPropertyDescriptor(target, contextIn.name) : {});
+  var _, done = false;
+  for (var i = decorators.length - 1; i >= 0; i--) {
+      var context = {};
+      for (var p in contextIn) context[p] = p === "access" ? {} : contextIn[p];
+      for (var p in contextIn.access) context.access[p] = contextIn.access[p];
+      context.addInitializer = function (f) { if (done) throw new TypeError("Cannot add initializers after decoration has completed"); extraInitializers.push(accept(f || null)); };
+      var result = (0, decorators[i])(kind === "accessor" ? { get: descriptor.get, set: descriptor.set } : descriptor[key], context);
+      if (kind === "accessor") {
+          if (result === void 0) continue;
+          if (result === null || typeof result !== "object") throw new TypeError("Object expected");
+          if (_ = accept(result.get)) descriptor.get = _;
+          if (_ = accept(result.set)) descriptor.set = _;
+          if (_ = accept(result.init)) initializers.unshift(_);
+      }
+      else if (_ = accept(result)) {
+          if (kind === "field") initializers.unshift(_);
+          else descriptor[key] = _;
+      }
+  }
+  if (target) Object.defineProperty(target, contextIn.name, descriptor);
+  done = true;
+};
+
+function __runInitializers(thisArg, initializers, value) {
+  var useValue = arguments.length > 2;
+  for (var i = 0; i < initializers.length; i++) {
+      value = useValue ? initializers[i].call(thisArg, value) : initializers[i].call(thisArg);
+  }
+  return useValue ? value : void 0;
+};
+
+function __propKey(x) {
+  return typeof x === "symbol" ? x : "".concat(x);
+};
+
+function __setFunctionName(f, name, prefix) {
+  if (typeof name === "symbol") name = name.description ? "[".concat(name.description, "]") : "";
+  return Object.defineProperty(f, "name", { configurable: true, value: prefix ? "".concat(prefix, " ", name) : name });
+};
+
+function __metadata(metadataKey, metadataValue) {
+  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+  function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+  return new (P || (P = Promise))(function (resolve, reject) {
+      function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+      function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+      function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
+
+function __generator(thisArg, body) {
+  var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+  return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+  function verb(n) { return function (v) { return step([n, v]); }; }
+  function step(op) {
+      if (f) throw new TypeError("Generator is already executing.");
+      while (g && (g = 0, op[0] && (_ = 0)), _) try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+          if (y = 0, t) op = [op[0] & 2, t.value];
+          switch (op[0]) {
+              case 0: case 1: t = op; break;
+              case 4: _.label++; return { value: op[1], done: false };
+              case 5: _.label++; y = op[1]; op = [0]; continue;
+              case 7: op = _.ops.pop(); _.trys.pop(); continue;
+              default:
+                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                  if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                  if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                  if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                  if (t[2]) _.ops.pop();
+                  _.trys.pop(); continue;
+          }
+          op = body.call(thisArg, _);
+      } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+      if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+  }
+}
+
+var __createBinding = Object.create ? (function(o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  var desc = Object.getOwnPropertyDescriptor(m, k);
+  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+  }
+  Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+  if (k2 === undefined) k2 = k;
+  o[k2] = m[k];
+});
+
+function __exportStar(m, o) {
+  for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
+}
+
+function __values(o) {
+  var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+  if (m) return m.call(o);
+  if (o && typeof o.length === "number") return {
+      next: function () {
+          if (o && i >= o.length) o = void 0;
+          return { value: o && o[i++], done: !o };
+      }
+  };
+  throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+}
+
+function __read(o, n) {
+  var m = typeof Symbol === "function" && o[Symbol.iterator];
+  if (!m) return o;
+  var i = m.call(o), r, ar = [], e;
+  try {
+      while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+  }
+  catch (error) { e = { error: error }; }
+  finally {
+      try {
+          if (r && !r.done && (m = i["return"])) m.call(i);
+      }
+      finally { if (e) throw e.error; }
+  }
+  return ar;
+}
+
+/** @deprecated */
+function __spread() {
+  for (var ar = [], i = 0; i < arguments.length; i++)
+      ar = ar.concat(__read(arguments[i]));
+  return ar;
+}
+
+/** @deprecated */
+function __spreadArrays() {
+  for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+  for (var r = Array(s), k = 0, i = 0; i < il; i++)
+      for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+          r[k] = a[j];
+  return r;
+}
+
+function __spreadArray(to, from, pack) {
+  if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+      if (ar || !(i in from)) {
+          if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+          ar[i] = from[i];
+      }
+  }
+  return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+function __await(v) {
+  return this instanceof __await ? (this.v = v, this) : new __await(v);
+}
+
+function __asyncGenerator(thisArg, _arguments, generator) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var g = generator.apply(thisArg, _arguments || []), i, q = [];
+  return i = Object.create((typeof AsyncIterator === "function" ? AsyncIterator : Object).prototype), verb("next"), verb("throw"), verb("return", awaitReturn), i[Symbol.asyncIterator] = function () { return this; }, i;
+  function awaitReturn(f) { return function (v) { return Promise.resolve(v).then(f, reject); }; }
+  function verb(n, f) { if (g[n]) { i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; if (f) i[n] = f(i[n]); } }
+  function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+  function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+  function fulfill(value) { resume("next", value); }
+  function reject(value) { resume("throw", value); }
+  function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+}
+
+function __asyncDelegator(o) {
+  var i, p;
+  return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
+  function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: false } : f ? f(v) : v; } : f; }
+}
+
+function __asyncValues(o) {
+  if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+  var m = o[Symbol.asyncIterator], i;
+  return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+  function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+  function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+}
+
+function __makeTemplateObject(cooked, raw) {
+  if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+  return cooked;
+};
+
+var __setModuleDefault = Object.create ? (function(o, v) {
+  Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+  o["default"] = v;
+};
+
+function __importStar(mod) {
+  if (mod && mod.__esModule) return mod;
+  var result = {};
+  if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+  __setModuleDefault(result, mod);
+  return result;
+}
+
+function __importDefault(mod) {
+  return (mod && mod.__esModule) ? mod : { default: mod };
+}
+
+function __classPrivateFieldGet(receiver, state, kind, f) {
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+}
+
+function __classPrivateFieldSet(receiver, state, value, kind, f) {
+  if (kind === "m") throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+}
+
+function __classPrivateFieldIn(state, receiver) {
+  if (receiver === null || (typeof receiver !== "object" && typeof receiver !== "function")) throw new TypeError("Cannot use 'in' operator on non-object");
+  return typeof state === "function" ? receiver === state : state.has(receiver);
+}
+
+function __addDisposableResource(env, value, async) {
+  if (value !== null && value !== void 0) {
+    if (typeof value !== "object" && typeof value !== "function") throw new TypeError("Object expected.");
+    var dispose, inner;
+    if (async) {
+      if (!Symbol.asyncDispose) throw new TypeError("Symbol.asyncDispose is not defined.");
+      dispose = value[Symbol.asyncDispose];
+    }
+    if (dispose === void 0) {
+      if (!Symbol.dispose) throw new TypeError("Symbol.dispose is not defined.");
+      dispose = value[Symbol.dispose];
+      if (async) inner = dispose;
+    }
+    if (typeof dispose !== "function") throw new TypeError("Object not disposable.");
+    if (inner) dispose = function() { try { inner.call(this); } catch (e) { return Promise.reject(e); } };
+    env.stack.push({ value: value, dispose: dispose, async: async });
+  }
+  else if (async) {
+    env.stack.push({ async: true });
+  }
+  return value;
+}
+
+var _SuppressedError = typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+  var e = new Error(message);
+  return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+function __disposeResources(env) {
+  function fail(e) {
+    env.error = env.hasError ? new _SuppressedError(e, env.error, "An error was suppressed during disposal.") : e;
+    env.hasError = true;
+  }
+  var r, s = 0;
+  function next() {
+    while (r = env.stack.pop()) {
+      try {
+        if (!r.async && s === 1) return s = 0, env.stack.push(r), Promise.resolve().then(next);
+        if (r.dispose) {
+          var result = r.dispose.call(r.value);
+          if (r.async) return s |= 2, Promise.resolve(result).then(next, function(e) { fail(e); return next(); });
+        }
+        else s |= 1;
+      }
+      catch (e) {
+        fail(e);
+      }
+    }
+    if (s === 1) return env.hasError ? Promise.reject(env.error) : Promise.resolve();
+    if (env.hasError) throw env.error;
+  }
+  return next();
+}
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  __extends,
+  __assign,
+  __rest,
+  __decorate,
+  __param,
+  __metadata,
+  __awaiter,
+  __generator,
+  __createBinding,
+  __exportStar,
+  __values,
+  __read,
+  __spread,
+  __spreadArrays,
+  __spreadArray,
+  __await,
+  __asyncGenerator,
+  __asyncDelegator,
+  __asyncValues,
+  __makeTemplateObject,
+  __importStar,
+  __importDefault,
+  __classPrivateFieldGet,
+  __classPrivateFieldSet,
+  __classPrivateFieldIn,
+  __addDisposableResource,
+  __disposeResources,
+});
+
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/doc.js":
+/*!********************************************!*\
+  !*** ./node_modules/imsc/dist/main/doc.js ***!
+  \********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "fromXML": function() { return /* binding */ fromXML; }
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! tslib */ "./node_modules/imsc/node_modules/tslib/tslib.es6.mjs");
+/* harmony import */ var sax__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sax */ "./node_modules/imsc/node_modules/sax/lib/sax.js");
+/* harmony import */ var _error_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./error.js */ "./node_modules/imsc/dist/main/error.js");
+/* harmony import */ var _names_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./names.js */ "./node_modules/imsc/dist/main/names.js");
+/* harmony import */ var _styles_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./styles.js */ "./node_modules/imsc/dist/main/styles.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./utils.js */ "./node_modules/imsc/dist/main/utils.js");
+/*
+ * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+
+
+
+
+/**
+ * @module imscDoc
+ */
+/**
+ * Allows a client to provide callbacks to handle children of the <metadata> element
+ * @typedef {Object} MetadataHandler
+ * @property {?OpenTagCallBack} onOpenTag
+ * @property {?CloseTagCallBack} onCloseTag
+ * @property {?TextCallBack} onText
+ */
+/**
+ * Called when the opening tag of an element node is encountered.
+ * @callback OpenTagCallBack
+ * @param {string} ns Namespace URI of the element
+ * @param {string} name Local name of the element
+ * @param {Object[]} attributes List of attributes, each consisting of a
+ *                              `uri`, `name` and `value`
+ */
+/**
+ * Called when the closing tag of an element node is encountered.
+ * @callback CloseTagCallBack
+ */
+/**
+ * Called when a text node is encountered.
+ * @callback TextCallBack
+ * @param {string} contents Contents of the text node
+ */
+/**
+ * Parses an IMSC1 document into an opaque in-memory representation that exposes
+ * a single method <pre>getMediaTimeEvents()</pre> that returns a list of time
+ * offsets (in seconds) of the ISD, i.e. the points in time where the visual
+ * representation of the document change. `metadataHandler` allows the caller to
+ * be called back when nodes are present in <metadata> elements.
+ *
+ * @param {string} xmlstring XML document
+ * @param {?module:imscUtils.ErrorHandler} errorHandler Error callback
+ * @param {?MetadataHandler} metadataHandler Callback for <Metadata> elements
+ * @returns {Object} Opaque in-memory representation of an IMSC1 document
+ */
+function fromXML(xmlstring, errorHandler, metadataHandler) {
+    var p = sax__WEBPACK_IMPORTED_MODULE_0__.parser(true, { xmlns: true });
+    var estack = [];
+    var xmllangstack = [];
+    var xmlspacestack = [];
+    var metadata_depth = 0;
+    var doc = null;
+    p.onclosetag = function () {
+        if (estack[0] instanceof Region) {
+            /* merge referenced styles */
+            if (doc.head !== null && doc.head.styling !== null) {
+                mergeReferencedStyles(doc.head.styling, estack[0].styleRefs, estack[0].styleAttrs, errorHandler);
+            }
+            delete estack[0].styleRefs;
+        }
+        else if (estack[0] instanceof Styling) {
+            /* flatten chained referential styling */
+            for (var sid in estack[0].styles) {
+                if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.hasOwnProperty)(estack[0].styles, sid))
+                    continue;
+                mergeChainedStyles(estack[0], estack[0].styles[sid], errorHandler);
+            }
+        }
+        else if (estack[0] instanceof P || estack[0] instanceof Span) {
+            /* merge anonymous spans */
+            if (estack[0].contents.length > 1) {
+                var cs = [estack[0].contents[0]];
+                var c = void 0;
+                for (c = 1; c < estack[0].contents.length; c++) {
+                    if (estack[0].contents[c] instanceof AnonymousSpan &&
+                        cs[cs.length - 1] instanceof AnonymousSpan) {
+                        cs[cs.length - 1].text += estack[0].contents[c].text;
+                    }
+                    else {
+                        cs.push(estack[0].contents[c]);
+                    }
+                }
+                estack[0].contents = cs;
+            }
+            // remove redundant nested anonymous spans (9.3.3(1)(c))
+            if (estack[0] instanceof Span &&
+                estack[0].contents.length === 1 &&
+                estack[0].contents[0] instanceof AnonymousSpan) {
+                estack[0].text = estack[0].contents[0].text;
+                delete estack[0].contents;
+            }
+        }
+        else if (estack[0] instanceof ForeignElement) {
+            if (estack[0].node.uri === _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_tt &&
+                estack[0].node.local === "metadata") {
+                /* leave the metadata element */
+                metadata_depth--;
+            }
+            else if (metadata_depth > 0 &&
+                metadataHandler &&
+                "onCloseTag" in metadataHandler) {
+                /* end of child of metadata element */
+                metadataHandler.onCloseTag();
+            }
+        }
+        // TODO: delete stylerefs?
+        // maintain the xml:space stack
+        xmlspacestack.shift();
+        // maintain the xml:lang stack
+        xmllangstack.shift();
+        // prepare for the next element
+        estack.shift();
+    };
+    p.ontext = function (str) {
+        if (estack[0] === undefined) {
+            /* ignoring text outside of elements */
+        }
+        else if (estack[0] instanceof Span || estack[0] instanceof P) {
+            /* ignore children text nodes in ruby container spans */
+            if (estack[0] instanceof Span) {
+                var ruby = estack[0].styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_3__.byName.ruby.qname];
+                if (ruby === "container" || ruby === "textContainer" || ruby === "baseContainer") {
+                    return;
+                }
+            }
+            /* create an anonymous span */
+            var s = new AnonymousSpan();
+            s.initFromText(doc, estack[0], str, xmllangstack[0], xmlspacestack[0], errorHandler);
+            estack[0].contents.push(s);
+        }
+        else if (estack[0] instanceof ForeignElement &&
+            metadata_depth > 0 &&
+            metadataHandler &&
+            "onText" in metadataHandler) {
+            /* text node within a child of metadata element */
+            metadataHandler.onText(str);
+        }
+    };
+    p.onopentag = function (node) {
+        // maintain the xml:space stack
+        var xmlspace = node.attributes["xml:space"];
+        if (xmlspace) {
+            xmlspacestack.unshift(xmlspace.value);
+        }
+        else {
+            if (xmlspacestack.length === 0) {
+                xmlspacestack.unshift("default");
+            }
+            else {
+                xmlspacestack.unshift(xmlspacestack[0]);
+            }
+        }
+        /* maintain the xml:lang stack */
+        var xmllang = node.attributes["xml:lang"];
+        if (xmllang) {
+            xmllangstack.unshift(xmllang.value);
+        }
+        else {
+            if (xmllangstack.length === 0) {
+                xmllangstack.unshift("");
+            }
+            else {
+                xmllangstack.unshift(xmllangstack[0]);
+            }
+        }
+        /* process the element */
+        if (node.uri === _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_tt) {
+            if (node.local === "tt") {
+                if (doc !== null) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Two <tt> elements at (" + this.line + "," + this.column + ")");
+                }
+                doc = new TT();
+                doc.initFromNode(node, xmllangstack[0], errorHandler);
+                estack.unshift(doc);
+            }
+            else if (node.local === "head") {
+                if (!(estack[0] instanceof TT)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <head> element is not <tt> at (" + this.line + "," + this.column + ")");
+                }
+                estack.unshift(doc.head);
+            }
+            else if (node.local === "styling") {
+                if (!(estack[0] instanceof Head)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <styling> element is not <head> at (" + this.line + "," + this.column + ")");
+                }
+                estack.unshift(doc.head.styling);
+            }
+            else if (node.local === "style") {
+                var s = void 0;
+                if (estack[0] instanceof Styling) {
+                    s = new Style();
+                    s.initFromNode(node, errorHandler);
+                    /* ignore <style> element missing @id */
+                    if (!s.id) {
+                        (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "<style> element missing @id attribute");
+                    }
+                    else {
+                        doc.head.styling.styles[s.id] = s;
+                    }
+                    estack.unshift(s);
+                }
+                else if (estack[0] instanceof Region) {
+                    /* nested styles can be merged with specified styles
+                     * immediately, with lower priority
+                     * (see 8.4.4.2(3) at TTML1 )
+                     */
+                    s = new Style();
+                    s.initFromNode(node, errorHandler);
+                    mergeStylesIfNotPresent(s.styleAttrs, estack[0].styleAttrs);
+                    estack.unshift(s);
+                }
+                else {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <style> element is not <styling> or <region> at (" + this.line + "," + this.column + ")");
+                }
+            }
+            else if (node.local === "initial") {
+                var ini = void 0;
+                if (estack[0] instanceof Styling) {
+                    ini = new Initial();
+                    ini.initFromNode(node, errorHandler);
+                    for (var qn in ini.styleAttrs) {
+                        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.hasOwnProperty)(ini.styleAttrs, qn))
+                            continue;
+                        doc.head.styling.initials[qn] = ini.styleAttrs[qn];
+                    }
+                    estack.unshift(ini);
+                }
+                else {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <initial> element is not <styling> at (" + this.line + "," + this.column + ")");
+                }
+            }
+            else if (node.local === "layout") {
+                if (!(estack[0] instanceof Head)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <layout> element is not <head> at " + this.line + "," + this.column + ")");
+                }
+                estack.unshift(doc.head.layout);
+            }
+            else if (node.local === "region") {
+                if (!(estack[0] instanceof Layout)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <region> element is not <layout> at " + this.line + "," + this.column + ")");
+                }
+                var r = new Region();
+                r.initFromNode(doc, node, xmllangstack[0], errorHandler);
+                if (!r.id || r.id in doc.head.layout.regions) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Ignoring <region> with duplicate or missing @id at " + this.line + "," + this.column + ")");
+                }
+                else {
+                    doc.head.layout.regions[r.id] = r;
+                }
+                estack.unshift(r);
+            }
+            else if (node.local === "body") {
+                if (!(estack[0] instanceof TT)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <body> element is not <tt> at " + this.line + "," + this.column + ")");
+                }
+                if (doc.body !== null) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Second <body> element at " + this.line + "," + this.column + ")");
+                }
+                var b = new Body();
+                b.initFromNode(doc, node, xmllangstack[0], errorHandler);
+                doc.body = b;
+                estack.unshift(b);
+            }
+            else if (node.local === "div") {
+                if (!(estack[0] instanceof Div || estack[0] instanceof Body)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <div> element is not <body> or <div> at " + this.line + "," + this.column + ")");
+                }
+                var d = new Div();
+                d.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
+                /* transform smpte:backgroundImage to TTML2 image element */
+                var bi = d.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_3__.byName.backgroundImage.qname];
+                if (bi) {
+                    d.contents.push(new Image(bi));
+                    delete d.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_3__.byName.backgroundImage.qname];
+                }
+                estack[0].contents.push(d);
+                estack.unshift(d);
+            }
+            else if (node.local === "image") {
+                if (!(estack[0] instanceof Div)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <image> element is not <div> at " + this.line + "," + this.column + ")");
+                }
+                var img = new Image();
+                img.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
+                estack[0].contents.push(img);
+                estack.unshift(img);
+            }
+            else if (node.local === "p") {
+                if (!(estack[0] instanceof Div)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <p> element is not <div> at " + this.line + "," + this.column + ")");
+                }
+                var p_1 = new P();
+                p_1.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
+                estack[0].contents.push(p_1);
+                estack.unshift(p_1);
+            }
+            else if (node.local === "span") {
+                if (!(estack[0] instanceof Span || estack[0] instanceof P)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <span> element is not <span> or <p> at " + this.line + "," + this.column + ")");
+                }
+                var ns = new Span();
+                ns.initFromNode(doc, estack[0], node, xmllangstack[0], xmlspacestack[0], errorHandler);
+                estack[0].contents.push(ns);
+                estack.unshift(ns);
+            }
+            else if (node.local === "br") {
+                if (!(estack[0] instanceof Span || estack[0] instanceof P)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <br> element is not <span> or <p> at " + this.line + "," + this.column + ")");
+                }
+                var nb = new Br();
+                nb.initFromNode(doc, estack[0], node, xmllangstack[0], errorHandler);
+                estack[0].contents.push(nb);
+                estack.unshift(nb);
+            }
+            else if (node.local === "set") {
+                if (!(estack[0] instanceof Span ||
+                    estack[0] instanceof P ||
+                    estack[0] instanceof Div ||
+                    estack[0] instanceof Body ||
+                    estack[0] instanceof Region ||
+                    estack[0] instanceof Br)) {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Parent of <set> element is not a content element or a region at " + this.line + "," + this.column + ")");
+                }
+                var st = new Set();
+                st.initFromNode(doc, estack[0], node, errorHandler);
+                estack[0].sets.push(st);
+                estack.unshift(st);
+            }
+            else {
+                /* element in the TT namespace, but not a content element */
+                estack.unshift(new ForeignElement(node));
+            }
+        }
+        else {
+            /* ignore elements not in the TTML namespace unless in metadata element */
+            estack.unshift(new ForeignElement(node));
+        }
+        /* handle metadata callbacks */
+        if (estack[0] instanceof ForeignElement) {
+            if (node.uri === _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_tt &&
+                node.local === "metadata") {
+                /* enter the metadata element */
+                metadata_depth++;
+            }
+            else if (metadata_depth > 0 &&
+                metadataHandler &&
+                "onOpenTag" in metadataHandler) {
+                /* start of child of metadata element */
+                var attrs = [];
+                for (var a in node.attributes) {
+                    attrs[node.attributes[a].uri + " " + node.attributes[a].local] =
+                        {
+                            uri: node.attributes[a].uri,
+                            local: node.attributes[a].local,
+                            value: node.attributes[a].value,
+                        };
+                }
+                metadataHandler.onOpenTag(node.uri, node.local, attrs);
+            }
+        }
+    };
+    // parse the document
+    p.write(xmlstring).close();
+    // all referential styling has been flatten, so delete styles
+    delete doc.head.styling.styles;
+    // create default region if no regions specified
+    var regions = doc.head.layout.regions;
+    var hasRegions = false;
+    /* AFAIK the only way to determine whether an object has members */
+    for (var i in regions) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.hasOwnProperty)(regions, i)) {
+            hasRegions = true;
+            break;
+        }
+    }
+    if (!hasRegions) {
+        /* create default region */
+        var dr = Region.prototype.createDefaultRegion(doc.lang);
+        regions[dr.id] = dr;
+    }
+    /* resolve desired timing for regions */
+    for (var region_i in regions) {
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.hasOwnProperty)(regions, region_i))
+            continue;
+        resolveTiming(doc, regions[region_i], null, null);
+    }
+    /* resolve desired timing for content elements */
+    if (doc.body) {
+        resolveTiming(doc, doc.body, null, null);
+    }
+    /* remove undefined spans in ruby containers */
+    if (doc.body) {
+        cleanRubyContainers(doc.body);
+    }
+    return doc;
+}
+;
+function cleanRubyContainers(element) {
+    if (!("contents" in element))
+        return;
+    var rubyval = "styleAttrs" in element ? element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_3__.byName.ruby.qname] : null;
+    var isrubycontainer = (element.kind === "span" && (rubyval === "container" || rubyval === "textContainer" || rubyval === "baseContainer"));
+    for (var i = element.contents.length - 1; i >= 0; i--) {
+        if (isrubycontainer && !("styleAttrs" in element.contents[i] && _styles_js__WEBPACK_IMPORTED_MODULE_3__.byName.ruby.qname in element.contents[i].styleAttrs)) {
+            /* prune undefined <span> in ruby containers */
+            delete element.contents[i];
+        }
+        else {
+            cleanRubyContainers(element.contents[i]);
+        }
+    }
+}
+function resolveTiming(doc, element, prev_sibling, parent) {
+    /* are we in a seq container? */
+    var isinseq = parent && parent.timeContainer === "seq";
+    /* determine implicit begin */
+    var implicit_begin = 0; /* default */
+    if (parent) {
+        if (isinseq && prev_sibling) {
+            /*
+             * if seq time container, offset from the previous sibling end
+             */
+            implicit_begin = prev_sibling.end;
+        }
+        else {
+            implicit_begin = parent.begin;
+        }
+    }
+    /* compute desired begin */
+    element.begin = element.explicit_begin ? element.explicit_begin + implicit_begin : implicit_begin;
+    /* determine implicit end */
+    var implicit_end = element.begin;
+    var s = null;
+    if ("sets" in element) {
+        for (var set_i = 0; set_i < element.sets.length; set_i++) {
+            resolveTiming(doc, element.sets[set_i], s, element);
+            if (element.timeContainer === "seq") {
+                implicit_end = element.sets[set_i].end;
+            }
+            else {
+                implicit_end = Math.max(implicit_end, element.sets[set_i].end);
+            }
+            s = element.sets[set_i];
+        }
+    }
+    if (!("contents" in element)) {
+        /* anonymous spans and regions and <set> and <br>s and spans with only children text nodes */
+        if (isinseq) {
+            /* in seq container, implicit duration is zero */
+            implicit_end = element.begin;
+        }
+        else {
+            /* in par container, implicit duration is indefinite */
+            implicit_end = Number.POSITIVE_INFINITY;
+        }
+    }
+    else if ("contents" in element) {
+        for (var content_i = 0; content_i < element.contents.length; content_i++) {
+            resolveTiming(doc, element.contents[content_i], s, element);
+            if (element.timeContainer === "seq") {
+                implicit_end = element.contents[content_i].end;
+            }
+            else {
+                implicit_end = Math.max(implicit_end, element.contents[content_i].end);
+            }
+            s = element.contents[content_i];
+        }
+    }
+    /* determine desired end */
+    /* it is never made really clear in SMIL that the explicit end is offset by the implicit begin */
+    if (element.explicit_end !== null && element.explicit_dur !== null) {
+        element.end = Math.min(element.begin + element.explicit_dur, implicit_begin + element.explicit_end);
+    }
+    else if (element.explicit_end === null && element.explicit_dur !== null) {
+        element.end = element.begin + element.explicit_dur;
+    }
+    else if (element.explicit_end !== null && element.explicit_dur === null) {
+        element.end = implicit_begin + element.explicit_end;
+    }
+    else {
+        element.end = implicit_end;
+    }
+    delete element.explicit_begin;
+    delete element.explicit_dur;
+    delete element.explicit_end;
+    doc._registerEvent(element);
+}
+var ForeignElement = /** @class */ (function () {
+    function ForeignElement(node) {
+        this.node = node;
+    }
+    return ForeignElement;
+}());
+var TT = /** @class */ (function () {
+    function TT() {
+        this.events = [];
+        this.head = new Head();
+        this.body = null;
+    }
+    TT.prototype.initFromNode = function (node, xmllang, errorHandler) {
+        /* compute cell resolution */
+        var cr = extractCellResolution(node, errorHandler);
+        this.cellLength = {
+            "h": new _utils_js__WEBPACK_IMPORTED_MODULE_4__.ComputedLength(0, 1 / cr.h),
+            "w": new _utils_js__WEBPACK_IMPORTED_MODULE_4__.ComputedLength(1 / cr.w, 0),
+        };
+        /* extract frame rate and tick rate */
+        var frtr = extractFrameAndTickRate(node, errorHandler);
+        this.effectiveFrameRate = frtr.effectiveFrameRate;
+        this.tickRate = frtr.tickRate;
+        /* extract aspect ratio */
+        this.aspectRatio = extractAspectRatio(node, errorHandler);
+        /* check timebase */
+        var attr = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ttp, "timeBase");
+        if (attr !== null && attr !== "media") {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Unsupported time base");
+        }
+        /* retrieve extent */
+        var e = extractExtent(node, errorHandler);
+        if (e === null) {
+            this.pxLength = {
+                "h": null,
+                "w": null,
+            };
+        }
+        else {
+            if (e.h.unit !== "px" || e.w.unit !== "px") {
+                (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportFatal)(errorHandler, "Extent on TT must be in px or absent");
+            }
+            this.pxLength = {
+                "h": new _utils_js__WEBPACK_IMPORTED_MODULE_4__.ComputedLength(0, 1 / e.h.value),
+                "w": new _utils_js__WEBPACK_IMPORTED_MODULE_4__.ComputedLength(1 / e.w.value, 0),
+            };
+        }
+        /** set root container dimensions to (1, 1) arbitrarily
+          * the root container is mapped to actual dimensions at rendering
+        **/
+        this.dimensions = {
+            "h": new _utils_js__WEBPACK_IMPORTED_MODULE_4__.ComputedLength(0, 1),
+            "w": new _utils_js__WEBPACK_IMPORTED_MODULE_4__.ComputedLength(1, 0),
+        };
+        /* xml:lang */
+        this.lang = xmllang;
+    };
+    /* register a temporal events */
+    TT.prototype._registerEvent = function (elem) {
+        /* skip if begin is not < then end */
+        if (elem.end <= elem.begin)
+            return;
+        /* index the begin time of the event */
+        var b_i = indexOf(this.events, elem.begin);
+        if (!b_i.found) {
+            this.events.splice(b_i.index, 0, elem.begin);
+        }
+        /* index the end time of the event */
+        if (elem.end !== Number.POSITIVE_INFINITY) {
+            var e_i = indexOf(this.events, elem.end);
+            if (!e_i.found) {
+                this.events.splice(e_i.index, 0, elem.end);
+            }
+        }
+    };
+    /*
+     * Retrieves the range of ISD times covered by the document
+     *
+     * @returns {Array} Array of two elements: min_begin_time and max_begin_time
+     *
+     */
+    TT.prototype.getMediaTimeRange = function () {
+        return [this.events[0], this.events[this.events.length - 1]];
+    };
+    ;
+    /*
+     * Returns list of ISD begin times
+     *
+     * @returns {Array}
+     */
+    TT.prototype.getMediaTimeEvents = function () {
+        return this.events;
+    };
+    ;
+    return TT;
+}());
+/*
+ * Represents a TTML Head element
+ */
+var Head = /** @class */ (function () {
+    function Head() {
+        this.styling = new Styling();
+        this.layout = new Layout();
+    }
+    return Head;
+}());
+/*
+ * Represents a TTML Styling element
+ */
+var Styling = /** @class */ (function () {
+    function Styling() {
+        this.styles = {};
+        this.initials = {};
+    }
+    return Styling;
+}());
+/*
+ * Represents a TTML Style element
+ */
+var Style = /** @class */ (function () {
+    function Style() {
+        this.id = null;
+        this.styleAttrs = null;
+        this.styleRefs = null;
+    }
+    Style.prototype.initFromNode = function (node, errorHandler) {
+        this.id = elementGetXMLID(node);
+        this.styleAttrs = elementGetStyles(node, errorHandler);
+        this.styleRefs = elementGetStyleRefs(node);
+    };
+    ;
+    return Style;
+}());
+/*
+ * Represents a TTML initial element
+ */
+var Initial = /** @class */ (function () {
+    function Initial() {
+        this.styleAttrs = null;
+    }
+    Initial.prototype.initFromNode = function (node) {
+        this.styleAttrs = {};
+        for (var i in node.attributes) {
+            if (node.attributes[i].uri === _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_itts ||
+                node.attributes[i].uri === _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ebutts ||
+                node.attributes[i].uri === _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_tts) {
+                var qname = node.attributes[i].uri + " " + node.attributes[i].local;
+                this.styleAttrs[qname] = node.attributes[i].value;
+            }
+        }
+    };
+    return Initial;
+}());
+/*
+ * Represents a TTML Layout element
+ *
+ */
+var Layout = /** @class */ (function () {
+    function Layout() {
+        this.regions = {};
+    }
+    return Layout;
+}());
+var ContentElement = /** @class */ (function () {
+    function ContentElement(kind) {
+        this.kind = kind;
+    }
+    return ContentElement;
+}());
+/*
+ * Represents a TTML image element
+ */
+var Image = /** @class */ (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__extends)(Image, _super);
+    function Image(src, type) {
+        var _this = _super.call(this, "image") || this;
+        _this.src = src;
+        _this.type = type;
+        return _this;
+    }
+    Image.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
+        this.src = "src" in node.attributes ? node.attributes.src.value : null;
+        if (!this.src) {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Invalid image@src attribute");
+        }
+        this.type = "type" in node.attributes ? node.attributes.type.value : null;
+        if (!this.type) {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Invalid image@type attribute");
+        }
+        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        this.lang = xmllang;
+    };
+    return Image;
+}(ContentElement));
+/*
+ * TTML element utility functions
+ *
+ */
+var IdentifiedElement = /** @class */ (function () {
+    function IdentifiedElement(id) {
+        this.id = id;
+    }
+    IdentifiedElement.prototype.initFromNode = function (doc, parent, node) {
+        this.id = elementGetXMLID(node);
+    };
+    return IdentifiedElement;
+}());
+var LayoutElement = /** @class */ (function () {
+    function LayoutElement(id) {
+        this.regionID = id;
+    }
+    LayoutElement.prototype.initFromNode = function (doc, parent, node) {
+        this.regionID = elementGetRegionID(node);
+    };
+    return LayoutElement;
+}());
+var StyledElement = /** @class */ (function () {
+    function StyledElement(styleAttrs) {
+        this.styleAttrs = styleAttrs;
+    }
+    StyledElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
+        this.styleAttrs = elementGetStyles(node, errorHandler);
+        if (doc.head !== null && doc.head.styling !== null) {
+            mergeReferencedStyles(doc.head.styling, elementGetStyleRefs(node), this.styleAttrs, errorHandler);
+        }
+    };
+    return StyledElement;
+}());
+var AnimatedElement = /** @class */ (function () {
+    function AnimatedElement(sets) {
+        this.sets = sets;
+    }
+    AnimatedElement.prototype.initFromNode = function () {
+        this.sets = [];
+    };
+    return AnimatedElement;
+}());
+var ContainerElement = /** @class */ (function () {
+    function ContainerElement(contents) {
+        this.contents = contents;
+    }
+    ContainerElement.prototype.initFromNode = function () {
+        this.contents = [];
+    };
+    return ContainerElement;
+}());
+var TimedElement = /** @class */ (function () {
+    function TimedElement(explicit_begin, explicit_end, explicit_dur) {
+        this.explicit_begin = explicit_begin;
+        this.explicit_end = explicit_end;
+        this.explicit_dur = explicit_dur;
+    }
+    TimedElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
+        var t = processTiming(doc, parent, node, errorHandler);
+        this.explicit_begin = t.explicit_begin;
+        this.explicit_end = t.explicit_end;
+        this.explicit_dur = t.explicit_dur;
+        this.timeContainer = elementGetTimeContainer(node, errorHandler);
+    };
+    return TimedElement;
+}());
+/*
+ * Represents a TTML body element
+ */
+var Body = /** @class */ (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__extends)(Body, _super);
+    function Body() {
+        return _super.call(this, "body") || this;
+    }
+    Body.prototype.initFromNode = function (doc, node, xmllang, errorHandler) {
+        StyledElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        AnimatedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        LayoutElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        ContainerElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        this.lang = xmllang;
+    };
+    return Body;
+}(ContentElement));
+/*
+ * Represents a TTML div element
+ */
+var Div = /** @class */ (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__extends)(Div, _super);
+    function Div() {
+        return _super.call(this, "div") || this;
+    }
+    Div.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
+        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        ContainerElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        this.lang = xmllang;
+    };
+    return Div;
+}(ContentElement));
+/*
+ * Represents a TTML p element
+ */
+var P = /** @class */ (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__extends)(P, _super);
+    function P() {
+        return _super.call(this, "p") || this;
+    }
+    P.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
+        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        ContainerElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        this.lang = xmllang;
+    };
+    return P;
+}(ContentElement));
+/*
+ * Represents a TTML span element
+ */
+var Span = /** @class */ (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__extends)(Span, _super);
+    function Span() {
+        return _super.call(this, "span") || this;
+    }
+    Span.prototype.initFromNode = function (doc, parent, node, xmllang, xmlspace, errorHandler) {
+        StyledElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        AnimatedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        ContainerElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        this.space = xmlspace;
+        this.lang = xmllang;
+    };
+    return Span;
+}(ContentElement));
+/*
+ * Represents a TTML anonymous span element
+ */
+var AnonymousSpan = /** @class */ (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__extends)(AnonymousSpan, _super);
+    function AnonymousSpan() {
+        return _super.call(this, "span") || this;
+    }
+    AnonymousSpan.prototype.initFromText = function (doc, parent, text, xmllang, xmlspace, errorHandler) {
+        TimedElement.prototype.initFromNode.call(this, doc, parent, null, errorHandler);
+        this.text = text;
+        this.space = xmlspace;
+        this.lang = xmllang;
+    };
+    return AnonymousSpan;
+}(ContentElement));
+/*
+ * Represents a TTML br element
+ */
+var Br = /** @class */ (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__extends)(Br, _super);
+    function Br() {
+        return _super.call(this, "br") || this;
+    }
+    Br.prototype.initFromNode = function (doc, parent, node, xmllang, errorHandler) {
+        LayoutElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        this.lang = xmllang;
+    };
+    return Br;
+}(ContentElement));
+/*
+ * Represents a TTML Region element
+ *
+ */
+var Region = /** @class */ (function () {
+    function Region() {
+    }
+    Region.prototype.createDefaultRegion = function (xmllang) {
+        var r = new Region();
+        r.id = "";
+        r.styleAttrs = {};
+        r.sets = [];
+        r.explicit_begin = 0;
+        r.explicit_end = Number.POSITIVE_INFINITY;
+        r.explicit_dur = null;
+        this.lang = xmllang;
+        return r;
+    };
+    Region.prototype.initFromNode = function (doc, node, xmllang, errorHandler) {
+        IdentifiedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        TimedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        AnimatedElement.prototype.initFromNode.call(this, doc, null, node, errorHandler);
+        /* add specified styles */
+        this.styleAttrs = elementGetStyles(node, errorHandler);
+        /* remember referential styles for merging after nested styling is processed*/
+        this.styleRefs = elementGetStyleRefs(node);
+        /* xml:lang */
+        this.lang = xmllang;
+    };
+    return Region;
+}());
+/*
+ * Represents a TTML Set element
+ *
+ */
+var Set = /** @class */ (function () {
+    function Set() {
+    }
+    Set.prototype.initFromNode = function (doc, parent, node, errorHandler) {
+        TimedElement.prototype.initFromNode.call(this, doc, parent, node, errorHandler);
+        var styles = elementGetStyles(node, errorHandler);
+        this.qname = null;
+        this.value = null;
+        for (var qname in styles) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.hasOwnProperty)(styles, qname))
+                continue;
+            if (this.qname) {
+                (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "More than one style specified on set");
+                break;
+            }
+            this.qname = qname;
+            this.value = styles[qname];
+        }
+    };
+    return Set;
+}());
+/*
+ * Utility functions
+ *
+ */
+function elementGetXMLID(node) {
+    return node && "xml:id" in node.attributes ? node.attributes["xml:id"].value || null : null;
+}
+function elementGetRegionID(node) {
+    return node && "region" in node.attributes ? node.attributes.region.value : "";
+}
+function elementGetTimeContainer(node, errorHandler) {
+    var tc = node && "timeContainer" in node.attributes ? node.attributes.timeContainer.value : null;
+    if ((!tc) || tc === "par") {
+        return "par";
+    }
+    else if (tc === "seq") {
+        return "seq";
+    }
+    else {
+        (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Illegal value of timeContainer (assuming 'par')");
+        return "par";
+    }
+}
+function elementGetStyleRefs(node) {
+    return node && "style" in node.attributes ? node.attributes.style.value.split(" ") : [];
+}
+function elementGetStyles(node, errorHandler) {
+    var s = {};
+    if (node !== null) {
+        for (var i in node.attributes) {
+            var qname = node.attributes[i].uri + " " + node.attributes[i].local;
+            var sa = _styles_js__WEBPACK_IMPORTED_MODULE_3__.byQName[qname];
+            if (sa !== undefined) {
+                var val = sa.parse(node.attributes[i].value);
+                if (val !== null) {
+                    s[qname] = val;
+                    /* TODO: consider refactoring errorHandler into parse and compute routines */
+                    if (sa === _styles_js__WEBPACK_IMPORTED_MODULE_3__.byName.zIndex) {
+                        (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "zIndex attribute present but not used by IMSC1 since regions do not overlap");
+                    }
+                }
+                else {
+                    (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Cannot parse styling attribute " + qname + " --> " + node.attributes[i].value);
+                }
+            }
+        }
+    }
+    return s;
+}
+function findAttribute(node, ns, name) {
+    for (var i in node.attributes) {
+        if (node.attributes[i].uri === ns &&
+            node.attributes[i].local === name) {
+            return node.attributes[i].value;
+        }
+    }
+    return null;
+}
+function extractAspectRatio(node, errorHandler) {
+    var ar = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ittp, "aspectRatio");
+    if (ar === null) {
+        ar = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ttp, "displayAspectRatio");
+    }
+    var rslt = null;
+    if (ar !== null) {
+        var ASPECT_RATIO_RE = /(\d+)\s+(\d+)/;
+        var m = ASPECT_RATIO_RE.exec(ar);
+        if (m !== null) {
+            var w = parseInt(m[1]);
+            var h = parseInt(m[2]);
+            if (w !== 0 && h !== 0) {
+                rslt = w / h;
+            }
+            else {
+                (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Illegal aspectRatio values (ignoring)");
+            }
+        }
+        else {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Malformed aspectRatio attribute (ignoring)");
+        }
+    }
+    return rslt;
+}
+/*
+ * Returns the cellResolution attribute from a node
+ *
+ */
+function extractCellResolution(node, errorHandler) {
+    var cr = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ttp, "cellResolution");
+    // initial value
+    var h = 15;
+    var w = 32;
+    if (cr !== null) {
+        var CELL_RESOLUTION_RE = /(\d+) (\d+)/;
+        var m = CELL_RESOLUTION_RE.exec(cr);
+        if (m !== null) {
+            w = parseInt(m[1]);
+            h = parseInt(m[2]);
+        }
+        else {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed cellResolution value (using initial value instead)");
+        }
+    }
+    return { "w": w, "h": h };
+}
+function extractFrameAndTickRate(node, errorHandler) {
+    // subFrameRate is ignored per IMSC1 specification
+    // extract frame rate
+    var fps_attr = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ttp, "frameRate");
+    // initial value
+    var fps = 30;
+    // match variable
+    var m;
+    if (fps_attr !== null) {
+        var FRAME_RATE_RE = /(\d+)/;
+        m = FRAME_RATE_RE.exec(fps_attr);
+        if (m !== null) {
+            fps = parseInt(m[1]);
+        }
+        else {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed frame rate attribute (using initial value instead)");
+        }
+    }
+    // extract frame rate multiplier
+    var frm_attr = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ttp, "frameRateMultiplier");
+    // initial value
+    var frm = 1;
+    if (frm_attr !== null) {
+        var FRAME_RATE_MULT_RE = /(\d+) (\d+)/;
+        m = FRAME_RATE_MULT_RE.exec(frm_attr);
+        if (m !== null) {
+            frm = parseInt(m[1]) / parseInt(m[2]);
+        }
+        else {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed frame rate multiplier attribute (using initial value instead)");
+        }
+    }
+    var efps = frm * fps;
+    // extract tick rate
+    var tr = 1;
+    var trattr = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_ttp, "tickRate");
+    if (trattr === null) {
+        if (fps_attr !== null)
+            tr = efps;
+    }
+    else {
+        var TICK_RATE_RE = /(\d+)/;
+        m = TICK_RATE_RE.exec(trattr);
+        if (m !== null) {
+            tr = parseInt(m[1]);
+        }
+        else {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed tick rate attribute (using initial value instead)");
+        }
+    }
+    return { effectiveFrameRate: efps, tickRate: tr };
+}
+function extractExtent(node, errorHandler) {
+    var attr = findAttribute(node, _names_js__WEBPACK_IMPORTED_MODULE_2__.ns_tts, "extent");
+    if (attr === null)
+        return null;
+    var s = attr.split(" ");
+    if (s.length !== 2) {
+        (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed extent (ignoring)");
+        return null;
+    }
+    var w = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.parseLength)(s[0]);
+    var h = (0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.parseLength)(s[1]);
+    if (!h || !w) {
+        (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed extent values (ignoring)");
+        return null;
+    }
+    return { "h": h, "w": w };
+}
+function parseTimeExpression(tickRate, effectiveFrameRate, str) {
+    var CLOCK_TIME_FRACTION_RE = /^(\d{2,}):(\d\d):(\d\d(?:\.\d+)?)$/;
+    var CLOCK_TIME_FRAMES_RE = /^(\d{2,}):(\d\d):(\d\d):(\d{2,})$/;
+    var OFFSET_FRAME_RE = /^(\d+(?:\.\d+)?)f$/;
+    var OFFSET_TICK_RE = /^(\d+(?:\.\d+)?)t$/;
+    var OFFSET_MS_RE = /^(\d+(?:\.\d+)?)ms$/;
+    var OFFSET_S_RE = /^(\d+(?:\.\d+)?)s$/;
+    var OFFSET_H_RE = /^(\d+(?:\.\d+)?)h$/;
+    var OFFSET_M_RE = /^(\d+(?:\.\d+)?)m$/;
+    var m;
+    var r = null;
+    if ((m = OFFSET_FRAME_RE.exec(str)) !== null) {
+        if (effectiveFrameRate !== null) {
+            r = parseFloat(m[1]) / effectiveFrameRate;
+        }
+    }
+    else if ((m = OFFSET_TICK_RE.exec(str)) !== null) {
+        if (tickRate !== null) {
+            r = parseFloat(m[1]) / tickRate;
+        }
+    }
+    else if ((m = OFFSET_MS_RE.exec(str)) !== null) {
+        r = parseFloat(m[1]) / 1000.0;
+    }
+    else if ((m = OFFSET_S_RE.exec(str)) !== null) {
+        r = parseFloat(m[1]);
+    }
+    else if ((m = OFFSET_H_RE.exec(str)) !== null) {
+        r = parseFloat(m[1]) * 3600.0;
+    }
+    else if ((m = OFFSET_M_RE.exec(str)) !== null) {
+        r = parseFloat(m[1]) * 60.0;
+    }
+    else if ((m = CLOCK_TIME_FRACTION_RE.exec(str)) !== null) {
+        r = parseInt(m[1]) * 3600 +
+            parseInt(m[2]) * 60 +
+            parseFloat(m[3]);
+    }
+    else if ((m = CLOCK_TIME_FRAMES_RE.exec(str)) !== null) {
+        /* this assumes that HH:MM:SS is a clock-time-with-fraction */
+        if (effectiveFrameRate !== null) {
+            r = parseInt(m[1]) * 3600 +
+                parseInt(m[2]) * 60 +
+                parseInt(m[3]) +
+                (m[4] === null ? 0 : parseInt(m[4]) / effectiveFrameRate);
+        }
+    }
+    return r;
+}
+function processTiming(doc, parent, node, errorHandler) {
+    /* determine explicit begin */
+    var explicit_begin = null;
+    if (node && "begin" in node.attributes) {
+        explicit_begin = parseTimeExpression(doc.tickRate, doc.effectiveFrameRate, node.attributes.begin.value);
+        if (explicit_begin === null) {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed begin value " + node.attributes.begin.value + " (using 0)");
+        }
+    }
+    /* determine explicit duration */
+    var explicit_dur = null;
+    if (node && "dur" in node.attributes) {
+        explicit_dur = parseTimeExpression(doc.tickRate, doc.effectiveFrameRate, node.attributes.dur.value);
+        if (explicit_dur === null) {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed dur value " + node.attributes.dur.value + " (ignoring)");
+        }
+    }
+    /* determine explicit end */
+    var explicit_end = null;
+    if (node && "end" in node.attributes) {
+        explicit_end = parseTimeExpression(doc.tickRate, doc.effectiveFrameRate, node.attributes.end.value);
+        if (explicit_end === null) {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportWarning)(errorHandler, "Malformed end value (ignoring)");
+        }
+    }
+    return {
+        explicit_begin: explicit_begin,
+        explicit_end: explicit_end,
+        explicit_dur: explicit_dur,
+    };
+}
+function mergeChainedStyles(styling, style, errorHandler) {
+    while (style.styleRefs.length > 0) {
+        var sref = style.styleRefs.pop();
+        if (!(sref in styling.styles)) {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Non-existant style id referenced");
+            continue;
+        }
+        mergeChainedStyles(styling, styling.styles[sref], errorHandler);
+        mergeStylesIfNotPresent(styling.styles[sref].styleAttrs, style.styleAttrs);
+    }
+}
+function mergeReferencedStyles(styling, stylerefs, styleattrs, errorHandler) {
+    for (var i = stylerefs.length - 1; i >= 0; i--) {
+        var sref = stylerefs[i];
+        if (!(sref in styling.styles)) {
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_1__.reportError)(errorHandler, "Non-existant style id referenced");
+            continue;
+        }
+        mergeStylesIfNotPresent(styling.styles[sref].styleAttrs, styleattrs);
+    }
+}
+function mergeStylesIfNotPresent(from_styles, into_styles) {
+    for (var sname in from_styles) {
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_4__.hasOwnProperty)(from_styles, sname))
+            continue;
+        if (sname in into_styles)
+            continue;
+        into_styles[sname] = from_styles[sname];
+    }
+}
+/* TODO: validate style format at parsing */
+/*
+ * Binary search utility function
+ *
+ * @typedef {Object} BinarySearchResult
+ * @property {boolean} found Was an exact match found?
+ * @property {number} index Position of the exact match or insert position
+ *
+ * @returns {BinarySearchResult}
+ */
+function indexOf(arr, searchval) {
+    var min = 0;
+    var max = arr.length - 1;
+    var cur;
+    while (min <= max) {
+        cur = Math.floor((min + max) / 2);
+        var curval = arr[cur];
+        if (curval < searchval) {
+            min = cur + 1;
+        }
+        else if (curval > searchval) {
+            max = cur - 1;
+        }
+        else {
+            return { found: true, index: cur };
+        }
+    }
+    return { found: false, index: min };
+}
+//# sourceMappingURL=doc.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/error.js":
+/*!**********************************************!*\
+  !*** ./node_modules/imsc/dist/main/error.js ***!
+  \**********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "reportError": function() { return /* binding */ reportError; },
+/* harmony export */   "reportFatal": function() { return /* binding */ reportFatal; },
+/* harmony export */   "reportWarning": function() { return /* binding */ reportWarning; }
+/* harmony export */ });
+/*
+ * ERROR HANDLING UTILITY FUNCTIONS
+ *
+ */
+function reportWarning(errorHandler, msg) {
+    if (errorHandler && errorHandler.warn && errorHandler.warn(msg))
+        throw msg;
+}
+function reportError(errorHandler, msg) {
+    if (errorHandler && errorHandler.error && errorHandler.error(msg))
+        throw msg;
+}
+function reportFatal(errorHandler, msg) {
+    if (errorHandler && errorHandler.fatal)
+        errorHandler.fatal(msg);
+    throw msg;
+}
+//# sourceMappingURL=error.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/html.js":
+/*!*********************************************!*\
+  !*** ./node_modules/imsc/dist/main/html.js ***!
+  \*********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "renderHTML": function() { return /* binding */ renderHTML; }
+/* harmony export */ });
+/* harmony import */ var _error_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./error.js */ "./node_modules/imsc/dist/main/error.js");
+/* harmony import */ var _styles_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./styles.js */ "./node_modules/imsc/dist/main/styles.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils.js */ "./node_modules/imsc/dist/main/utils.js");
+/*
+ * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+
+/**
+ * @module imscHTML
+ */
+var backgroundColorAdjustSuffix = "BackgroundColorAdjust";
+var browserIsFirefox = /firefox/i.test(navigator.userAgent);
+/**
+ * Function that maps <pre>smpte:background</pre> URIs to URLs resolving to image resource
+ * @callback IMGResolver
+ * @param {string} <pre>smpte:background</pre> URI
+ * @return {string} PNG resource URL
+ */
+/**
+ * Renders an ISD object (returned by <pre>generateISD()</pre>) into a
+ * parent element, that must be attached to the DOM. The ISD will be rendered
+ * into a child <pre>div</pre>
+ * with heigh and width equal to the clientHeight and clientWidth of the element,
+ * unless explicitly specified otherwise by the caller. Images URIs specified
+ * by <pre>smpte:background</pre> attributes are mapped to image resource URLs
+ * by an <pre>imgResolver</pre> function. The latter takes the value of <code>smpte:background</code>
+ * attribute and an <code>img</code> DOM element as input, and is expected to
+ * set the <code>src</code> attribute of the <code>img</code> to the absolute URI of the image.
+ * <pre>displayForcedOnlyMode</pre> sets the (boolean)
+ * value of the IMSC1 displayForcedOnlyMode parameter. The function returns
+ * an opaque object that should passed in <code>previousISDState</code> when this function
+ * is called for the next ISD, otherwise <code>previousISDState</code> should be set to
+ * <code>null</code>.
+ *
+ * The <pre>options</pre> parameter can be used to configure adjustments
+ * that change the presentation away from the document defaults:
+ * <pre>sizeAdjust: {number}</pre> scales the text size and line padding
+ * <pre>lineHeightAdjust: {number}</pre> scales the line height
+ * <pre>backgroundOpacityScale: {number}</pre> scales the backgroundColor opacity
+ * <pre>fontFamily: {string}</pre> comma-separated list of font family values to use, if present.
+ * <pre>colorAdjust: [{colorSelector: selector, ColorGenerator: generator}*]</pre> list of color replacement rules
+ * <pre>colorOpacityScale: {number}</pre> opacity override on text color (ignored if zero)
+ * <pre>regionOpacityScale: {number}</pre> scales the region opacity
+ * <pre>textOutline: {string}</pre> textOutline value to use, if present
+ * <pre>[span|p|div|body|region]BackgroundColorAdjust: {documentColor: replaceColor*}</pre> map of backgroundColors and the value with which to replace them for each element type
+ *
+ * @param {Object} isd ISD to be rendered
+ * @param {Object} element Element into which the ISD is rendered
+ * @param {?IMGResolver} imgResolver Resolve <pre>smpte:background</pre> URIs into URLs.
+ * @param {?number} eheight Height (in pixel) of the child <div>div</div> or null
+ *                  to use clientHeight of the parent element
+ * @param {?number} ewidth Width (in pixel) of the child <div>div</div> or null
+ *                  to use clientWidth of the parent element
+ * @param {?boolean} displayForcedOnlyMode Value of the IMSC1 displayForcedOnlyMode parameter,
+ *                   or false if null
+ * @param {?module:imscUtils.ErrorHandler} errorHandler Error callback
+ * @param {Object} previousISDState State saved during processing of the previous ISD, or null if initial call
+ * @param {?boolean} enableRollUp Enables roll-up animations (see CEA 708)
+ * @param {?Object} options Configuration options
+ * @return {Object} ISD state to be provided when this funtion is called for the next ISD
+ */
+function renderHTML(isd, element, imgResolver, eheight, ewidth, displayForcedOnlyMode, errorHandler, previousISDState, enableRollUp, options) {
+    /* maintain aspect ratio if specified */
+    if (options === void 0) { options = Object.assign({}, options) || {}; }
+    var height = eheight || element.clientHeight;
+    var width = ewidth || element.clientWidth;
+    if (isd.aspectRatio !== null) {
+        var twidth = height * isd.aspectRatio;
+        if (twidth > width) {
+            height = Math.round(width / isd.aspectRatio);
+        }
+        else {
+            width = twidth;
+        }
+    }
+    var rootcontainer = document.createElement("div");
+    rootcontainer.style.position = "relative";
+    rootcontainer.style.width = width + "px";
+    rootcontainer.style.height = height + "px";
+    rootcontainer.style.margin = "auto";
+    rootcontainer.style.top = 0;
+    rootcontainer.style.bottom = 0;
+    rootcontainer.style.left = 0;
+    rootcontainer.style.right = 0;
+    rootcontainer.style.zIndex = 0;
+    var context = {
+        h: height,
+        w: width,
+        regionH: null,
+        regionW: null,
+        imgResolver: imgResolver,
+        displayForcedOnlyMode: displayForcedOnlyMode || false,
+        isd: isd,
+        errorHandler: errorHandler,
+        previousISDState: previousISDState,
+        enableRollUp: enableRollUp || false,
+        currentISDState: {},
+        flg: null, /* current fillLineGap value if active, null otherwise */
+        lp: null, /* current linePadding value if active, null otherwise */
+        mra: null, /* current multiRowAlign value if active, null otherwise */
+        ipd: null, /* inline progression direction (lr, rl, tb) */
+        bpd: null, /* block progression direction (lr, rl, tb) */
+        ruby: null, /* is ruby present in a <p> */
+        textEmphasis: null, /* is textEmphasis present in a <p> */
+        rubyReserve: null, /* is rubyReserve applicable to a <p> */
+        options: options,
+    };
+    element.appendChild(rootcontainer);
+    if ("contents" in isd) {
+        for (var i = 0; i < isd.contents.length; i++) {
+            processElement(context, rootcontainer, isd.contents[i], isd);
+        }
+    }
+    return context.currentISDState;
+}
+;
+function processElement(context, dom_parent, isd_element, isd_parent) {
+    var e;
+    if (isd_element.kind === "region") {
+        e = document.createElement("div");
+        e.style.position = "absolute";
+    }
+    else if (isd_element.kind === "body") {
+        e = document.createElement("div");
+    }
+    else if (isd_element.kind === "div") {
+        e = document.createElement("div");
+    }
+    else if (isd_element.kind === "image") {
+        e = document.createElement("img");
+        if (context.imgResolver !== null && isd_element.src !== null) {
+            var uri = context.imgResolver(isd_element.src, e);
+            if (uri)
+                e.src = uri;
+            e.height = context.regionH;
+            e.width = context.regionW;
+        }
+    }
+    else if (isd_element.kind === "p") {
+        e = document.createElement("p");
+    }
+    else if (isd_element.kind === "span") {
+        if (isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "container") {
+            e = document.createElement("ruby");
+            context.ruby = true;
+        }
+        else if (isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "base") {
+            e = document.createElement("span"); // rb element is deprecated in HTML
+        }
+        else if (isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "text") {
+            e = document.createElement("rt");
+        }
+        else if (isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "baseContainer") {
+            e = document.createElement("rbc");
+        }
+        else if (isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "textContainer") {
+            e = document.createElement("rtc");
+        }
+        else if (isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "delimiter") {
+            /* ignore rp */
+            return;
+        }
+        else {
+            e = document.createElement("span");
+        }
+        //e.textContent = isd_element.text;
+    }
+    else if (isd_element.kind === "br") {
+        e = document.createElement("br");
+    }
+    if (!e) {
+        (0,_error_js__WEBPACK_IMPORTED_MODULE_0__.reportError)(context.errorHandler, "Error processing ISD element kind: " + isd_element.kind);
+        return;
+    }
+    /* set language */
+    if (isd_element.lang) {
+        if (isd_element.kind === "region" || isd_element.lang !== isd_parent.lang) {
+            e.lang = isd_element.lang;
+        }
+    }
+    /* add to parent */
+    dom_parent.appendChild(e);
+    /* override UA default margin */
+    /* TODO: should apply to <p> only */
+    e.style.margin = "0";
+    /* determine ipd and bpd */
+    if (isd_element.kind === "region") {
+        var wdir = isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.writingMode.qname];
+        if (wdir === "lrtb" || wdir === "lr") {
+            context.ipd = "lr";
+            context.bpd = "tb";
+        }
+        else if (wdir === "rltb" || wdir === "rl") {
+            context.ipd = "rl";
+            context.bpd = "tb";
+        }
+        else if (wdir === "tblr") {
+            context.ipd = "tb";
+            context.bpd = "lr";
+        }
+        else if (wdir === "tbrl" || wdir === "tb") {
+            context.ipd = "tb";
+            context.bpd = "rl";
+        }
+    }
+    else if (isd_element.kind === "p" && context.bpd === "tb") {
+        var pdir = isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.direction.qname];
+        context.ipd = pdir === "ltr" ? "lr" : "rl";
+    }
+    /* tranform TTML styles to CSS styles */
+    for (var i = 0; i < STYLING_MAP_DEFS.length; i++) {
+        var sm = STYLING_MAP_DEFS[i];
+        var attr = isd_element.styleAttrs[sm.qname];
+        if (attr !== undefined && sm.map !== null) {
+            sm.map(context, e, isd_element, attr);
+        }
+    }
+    var proc_e = e;
+    /* do we have linePadding ? */
+    var lp = isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.linePadding.qname];
+    if (lp && (!lp.isZero())) {
+        var plength = lp.multiply(lp.toUsedLength(context.w, context.h), context.options.sizeAdjust);
+        if (plength > 0) {
+            /* apply padding to the <p> so that line padding does not cause line wraps */
+            var padmeasure = Math.ceil(plength) + "px";
+            if (context.bpd === "tb") {
+                proc_e.style.paddingLeft = padmeasure;
+                proc_e.style.paddingRight = padmeasure;
+            }
+            else {
+                proc_e.style.paddingTop = padmeasure;
+                proc_e.style.paddingBottom = padmeasure;
+            }
+            context.lp = lp;
+        }
+    }
+    // do we have multiRowAlign?
+    var mra = isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.multiRowAlign.qname];
+    if (mra && mra !== "auto") {
+        /* create inline block to handle multirowAlign */
+        var s = document.createElement("span");
+        s.style.display = "inline-block";
+        s.style.textAlign = mra;
+        e.appendChild(s);
+        proc_e = s;
+        context.mra = mra;
+    }
+    /* do we have rubyReserve? */
+    var rr = isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.rubyReserve.qname];
+    if (rr && rr[0] !== "none") {
+        context.rubyReserve = rr;
+    }
+    /* remember we are filling line gaps */
+    if (isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.fillLineGap.qname]) {
+        context.flg = true;
+    }
+    if (isd_element.kind === "span" && isd_element.text) {
+        var te = isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textEmphasis.qname];
+        if (te && te.style !== "none") {
+            context.textEmphasis = true;
+        }
+        if (_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textCombine.qname in isd_element.styleAttrs &&
+            isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textCombine.qname] === "all") {
+            /* ignore tate-chu-yoku since line break cannot happen within */
+            e.textContent = isd_element.text;
+            e._isd_element = isd_element;
+            if (te) {
+                applyTextEmphasis(context, e, isd_element, te);
+            }
+            ;
+        }
+        else {
+            // wrap characters in spans to find the line wrap locations
+            var cbuf = "";
+            for (var j = 0; j < isd_element.text.length; j++) {
+                cbuf += isd_element.text.charAt(j);
+                var cc = isd_element.text.charCodeAt(j);
+                if (cc < 0xD800 || cc > 0xDBFF || j === isd_element.text.length - 1) {
+                    /* wrap the character(s) in a span unless it is a high surrogate */
+                    var span = document.createElement("span");
+                    span.textContent = cbuf;
+                    /* apply textEmphasis */
+                    if (te) {
+                        applyTextEmphasis(context, span, isd_element, te);
+                    }
+                    ;
+                    e.appendChild(span);
+                    cbuf = "";
+                    //For the sake of merging these back together, record what isd element generated it.
+                    span._isd_element = isd_element;
+                }
+            }
+        }
+    }
+    /* process the children of the ISD element */
+    if ("contents" in isd_element) {
+        for (var k = 0; k < isd_element.contents.length; k++) {
+            processElement(context, proc_e, isd_element.contents[k], isd_element);
+        }
+    }
+    /* list of lines */
+    var linelist = [];
+    /* paragraph processing */
+    /* TODO: linePadding only supported for horizontal scripts */
+    if (isd_element.kind === "p") {
+        constructLineList(context, proc_e, linelist, null);
+        /* apply rubyReserve */
+        if (context.rubyReserve) {
+            applyRubyReserve(linelist, context);
+            context.rubyReserve = null;
+        }
+        /* apply tts:rubyPosition="outside" */
+        if (context.ruby || context.rubyReserve) {
+            applyRubyPosition(linelist, context);
+            context.ruby = null;
+        }
+        /* apply text emphasis "outside" position */
+        if (context.textEmphasis) {
+            applyTextEmphasisOutside(linelist, context);
+            context.textEmphasis = null;
+        }
+        /* insert line breaks for multirowalign */
+        if (context.mra) {
+            applyMultiRowAlign(linelist);
+            context.mra = null;
+        }
+        /* add linepadding */
+        if (context.lp) {
+            applyLinePadding(linelist, context.lp.toUsedLength(context.w, context.h), context);
+            context.lp = null;
+        }
+        mergeSpans(linelist, context); // The earlier we can do this the less processing there will be.
+        /* fill line gaps linepadding */
+        if (context.flg) {
+            var par_edges = rect2edges(proc_e.getBoundingClientRect(), context);
+            applyFillLineGap(linelist, par_edges.before, par_edges.after, context, proc_e);
+            context.flg = null;
+        }
+    }
+    /* region processing */
+    if (isd_element.kind === "region") {
+        /* perform roll up if needed */
+        if ((context.bpd === "tb") &&
+            context.enableRollUp &&
+            isd_element.contents.length > 0 &&
+            isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.displayAlign.qname] === "after") {
+            /* build line list */
+            constructLineList(context, proc_e, linelist, null);
+            /* horrible hack, perhaps default region id should be underscore everywhere? */
+            var rid = isd_element.id === "" ? "_" : isd_element.id;
+            var rb = new RegionPBuffer(rid, linelist);
+            context.currentISDState[rb.id] = rb;
+            if (context.previousISDState &&
+                rb.id in context.previousISDState &&
+                context.previousISDState[rb.id].plist.length > 0 &&
+                rb.plist.length > 1 &&
+                rb.plist[rb.plist.length - 2].text ===
+                    context.previousISDState[rb.id].plist[context.previousISDState[rb.id].plist.length - 1].text) {
+                var body_elem = e.firstElementChild;
+                var h = rb.plist[rb.plist.length - 1].after - rb.plist[rb.plist.length - 1].before;
+                body_elem.style.bottom = "-" + h + "px";
+                body_elem.style.transition = "transform 0.4s";
+                body_elem.style.position = "relative";
+                body_elem.style.transform = "translateY(-" + h + "px)";
+            }
+        }
+    }
+}
+function mergeSpans(lineList, context) {
+    for (var i = 0; i < lineList.length; i++) {
+        var line = lineList[i];
+        for (var j = 1; j < line.elements.length;) {
+            var previous = line.elements[j - 1];
+            var span = line.elements[j];
+            if (spanMerge(previous.node, span.node, context)) {
+                //removed from DOM by spanMerge(), remove from the list too.
+                line.elements.splice(j, 1);
+                continue;
+            }
+            else {
+                j++;
+            }
+        }
+    }
+    // Copy backgroundColor to each span so that fillLineGap will apply padding to elements with the right background
+    var thisNode, ancestorBackgroundColor;
+    var clearTheseBackgrounds = [];
+    for (var l = 0; l < lineList.length; l++) {
+        for (var el = 0; el < lineList[l].elements.length; el++) {
+            thisNode = lineList[l].elements[el].node;
+            ancestorBackgroundColor = getSpanAncestorColor(thisNode, clearTheseBackgrounds, false);
+            if (ancestorBackgroundColor) {
+                thisNode.style.backgroundColor = ancestorBackgroundColor;
+            }
+        }
+    }
+    for (var bi = 0; bi < clearTheseBackgrounds.length; bi++) {
+        clearTheseBackgrounds[bi].style.backgroundColor = "";
+    }
+}
+function getSpanAncestorColor(element, ancestorList, isAncestor) {
+    if (element.style.backgroundColor) {
+        if (isAncestor && !ancestorList.includes(element)) {
+            ancestorList.push(element);
+        }
+        return element.style.backgroundColor;
+    }
+    else {
+        if (element.parentElement.nodeName === "SPAN" ||
+            element.parentElement.nodeName === "RUBY" ||
+            element.parentElement.nodeName === "RBC" ||
+            element.parentElement.nodeName === "RTC" ||
+            element.parentElement.nodeName === "RT") {
+            return getSpanAncestorColor(element.parentElement, ancestorList, true);
+        }
+    }
+    return undefined;
+}
+function spanMerge(first, second, context) {
+    if (first.tagName === "SPAN" &&
+        second.tagName === "SPAN" &&
+        first._isd_element === second._isd_element) {
+        if (!first._isd_element) {
+            /* we should never get here since every span should have a source ISD element */
+            (0,_error_js__WEBPACK_IMPORTED_MODULE_0__.reportError)(context.errorHandler, "Internal error: HTML span is not linked to a source element; cannot merge spans.");
+            return false;
+        }
+        first.textContent += second.textContent;
+        for (var i = 0; i < second.style.length; i++) {
+            var styleName = second.style[i];
+            if (styleName.indexOf("border") >= 0 ||
+                styleName.indexOf("padding") >= 0 ||
+                styleName.indexOf("margin") >= 0) {
+                first.style[styleName] = second.style[styleName];
+            }
+        }
+        second.parentElement.removeChild(second);
+        return true;
+    }
+    return false;
+}
+function applyLinePadding(lineList, lp, context) {
+    if (lineList === null)
+        return;
+    for (var i = 0; i < lineList.length; i++) {
+        var l = lineList[i].elements.length;
+        var pospadpxlen = Math.ceil(lp) + "px";
+        var negpadpxlen = "-" + Math.ceil(lp) + "px";
+        if (l !== 0) {
+            var se = lineList[i].elements[lineList[i].start_elem];
+            var ee = lineList[i].elements[lineList[i].end_elem];
+            if (se === ee) {
+                // Check to see if there's any background at all
+                var elementBoundingRect = se.node.getBoundingClientRect();
+                if (elementBoundingRect.width == 0 || elementBoundingRect.height == 0) {
+                    // There's no background on this line, move on.
+                    continue;
+                }
+            }
+            // Start element
+            if (context.ipd === "lr") {
+                se.node.style.marginLeft = negpadpxlen;
+                se.node.style.paddingLeft = pospadpxlen;
+            }
+            else if (context.ipd === "rl") {
+                se.node.style.paddingRight = pospadpxlen;
+                se.node.style.marginRight = negpadpxlen;
+            }
+            else if (context.ipd === "tb") {
+                se.node.style.paddingTop = pospadpxlen;
+                se.node.style.marginTop = negpadpxlen;
+            }
+            // End element
+            if (context.ipd === "lr") {
+                // Firefox has a problem with line-breaking when a negative margin is applied.
+                // The positioning will be wrong but don't apply when on firefox.
+                // https://bugzilla.mozilla.org/show_bug.cgi?id=1502610
+                if (!browserIsFirefox) {
+                    ee.node.style.marginRight = negpadpxlen;
+                }
+                ee.node.style.paddingRight = pospadpxlen;
+            }
+            else if (context.ipd === "rl") {
+                ee.node.style.paddingLeft = pospadpxlen;
+                if (!browserIsFirefox) {
+                    ee.node.style.marginLeft = negpadpxlen;
+                }
+            }
+            else if (context.ipd === "tb") {
+                ee.node.style.paddingBottom = pospadpxlen;
+                ee.node.style.marginBottom = negpadpxlen;
+            }
+        }
+    }
+}
+function applyMultiRowAlign(lineList) {
+    /* apply an explicit br to all but the last line */
+    for (var i = 0; i < lineList.length - 1; i++) {
+        var l = lineList[i].elements.length;
+        if (l !== 0 && lineList[i].br === false) {
+            var br = document.createElement("br");
+            var lastnode = lineList[i].elements[l - 1].node;
+            lastnode.parentElement.insertBefore(br, lastnode.nextSibling);
+        }
+    }
+}
+function applyTextEmphasisOutside(lineList, context) {
+    /* supports "outside" only */
+    for (var i = 0; i < lineList.length; i++) {
+        for (var j = 0; j < lineList[i].te.length; j++) {
+            /* skip if position already set */
+            if (lineList[i].te[j].style[TEXTEMPHASISPOSITION_PROP] &&
+                lineList[i].te[j].style[TEXTEMPHASISPOSITION_PROP] !== "none")
+                continue;
+            var pos = void 0;
+            if (context.bpd === "tb") {
+                pos = (i === 0) ? "left over" : "left under";
+            }
+            else {
+                if (context.bpd === "rl") {
+                    pos = (i === 0) ? "right under" : "left under";
+                }
+                else {
+                    pos = (i === 0) ? "left under" : "right under";
+                }
+            }
+            lineList[i].te[j].style[TEXTEMPHASISPOSITION_PROP] = pos;
+        }
+    }
+}
+function applyRubyPosition(lineList, context) {
+    for (var i = 0; i < lineList.length; i++) {
+        for (var j = 0; j < lineList[i].rbc.length; j++) {
+            /* skip if ruby-position already set */
+            if (lineList[i].rbc[j].style[RUBYPOSITION_PROP])
+                continue;
+            var pos = void 0;
+            if (RUBYPOSITION_ISWK) {
+                /* WebKit exception */
+                pos = (i === 0) ? "before" : "after";
+            }
+            else if (context.bpd === "tb") {
+                pos = (i === 0) ? "over" : "under";
+            }
+            else {
+                if (context.bpd === "rl") {
+                    pos = (i === 0) ? "over" : "under";
+                }
+                else {
+                    pos = (i === 0) ? "under" : "over";
+                }
+            }
+            lineList[i].rbc[j].style[RUBYPOSITION_PROP] = pos;
+        }
+    }
+}
+function applyRubyReserve(lineList, context) {
+    for (var i = 0; i < lineList.length; i++) {
+        var ruby = document.createElement("ruby");
+        var rb = document.createElement("span"); // rb element is deprecated in HTML
+        rb.textContent = "\u200B";
+        ruby.appendChild(rb);
+        var rt1 = void 0;
+        var rt2 = void 0;
+        var fs = context.rubyReserve[1].toUsedLength(context.w, context.h) + "px";
+        if (context.rubyReserve[0] === "both" || (context.rubyReserve[0] === "outside" && lineList.length == 1)) {
+            rt1 = document.createElement("rtc");
+            rt1.style[RUBYPOSITION_PROP] = RUBYPOSITION_ISWK ? "after" : "under";
+            rt1.textContent = "\u200B";
+            rt1.style.fontSize = fs;
+            rt2 = document.createElement("rtc");
+            rt2.style[RUBYPOSITION_PROP] = RUBYPOSITION_ISWK ? "before" : "over";
+            rt2.textContent = "\u200B";
+            rt2.style.fontSize = fs;
+            ruby.appendChild(rt1);
+            ruby.appendChild(rt2);
+        }
+        else {
+            rt1 = document.createElement("rtc");
+            rt1.textContent = "\u200B";
+            rt1.style.fontSize = fs;
+            var pos = void 0;
+            if (context.rubyReserve[0] === "after" || (context.rubyReserve[0] === "outside" && i > 0)) {
+                pos = RUBYPOSITION_ISWK ? "after" : ((context.bpd === "tb" || context.bpd === "rl") ? "under" : "over");
+            }
+            else {
+                pos = RUBYPOSITION_ISWK ? "before" : ((context.bpd === "tb" || context.bpd === "rl") ? "over" : "under");
+            }
+            rt1.style[RUBYPOSITION_PROP] = pos;
+            ruby.appendChild(rt1);
+        }
+        /* add in front of the first ruby element of the line, if it exists */
+        var sib = null;
+        for (var j = 0; j < lineList[i].rbc.length; j++) {
+            if (lineList[i].rbc[j].localName === "ruby") {
+                sib = lineList[i].rbc[j];
+                /* copy specified style properties from the sibling ruby container */
+                for (var k = 0; k < sib.style.length; k++) {
+                    ruby.style.setProperty(sib.style.item(k), sib.style.getPropertyValue(sib.style.item(k)));
+                }
+                break;
+            }
+        }
+        /* otherwise add before first span */
+        sib = sib || lineList[i].elements[0].node;
+        sib.parentElement.insertBefore(ruby, sib);
+    }
+}
+function applyFillLineGap(lineList, par_before, par_after, context) {
+    /* positive for BPD = lr and tb, negative for BPD = rl */
+    var s = Math.sign(par_after - par_before);
+    for (var i = 0; i <= lineList.length; i++) {
+        /* compute frontier between lines */
+        var frontier = void 0;
+        if (i === 0) {
+            frontier = Math.round(par_before);
+        }
+        else if (i === lineList.length) {
+            frontier = Math.round(par_after);
+        }
+        else {
+            frontier = Math.round((lineList[i - 1].after + lineList[i].before) / 2);
+        }
+        var padding = void 0;
+        var l = void 0;
+        var thisNode = void 0;
+        /* before line */
+        if (i > 0) {
+            if (lineList[i - 1]) {
+                for (l = 0; l < lineList[i - 1].elements.length; l++) {
+                    thisNode = lineList[i - 1].elements[l];
+                    padding = s * (frontier - thisNode.after) + "px";
+                    if (context.bpd === "lr") {
+                        thisNode.node.style.paddingRight = padding;
+                    }
+                    else if (context.bpd === "rl") {
+                        thisNode.node.style.paddingLeft = padding;
+                    }
+                    else if (context.bpd === "tb") {
+                        thisNode.node.style.paddingBottom = padding;
+                    }
+                }
+            }
+        }
+        /* after line */
+        if (i < lineList.length) {
+            for (l = 0; l < lineList[i].elements.length; l++) {
+                thisNode = lineList[i].elements[l];
+                padding = s * (thisNode.before - frontier) + "px";
+                if (context.bpd === "lr") {
+                    thisNode.node.style.paddingLeft = padding;
+                }
+                else if (context.bpd === "rl") {
+                    thisNode.node.style.paddingRight = padding;
+                }
+                else if (context.bpd === "tb") {
+                    thisNode.node.style.paddingTop = padding;
+                }
+            }
+        }
+    }
+}
+var RegionPBuffer = /** @class */ (function () {
+    function RegionPBuffer(id, lineList) {
+        this.id = id;
+        this.plist = lineList;
+    }
+    return RegionPBuffer;
+}());
+function rect2edges(rect, context) {
+    var edges = { before: null, after: null, start: null, end: null };
+    if (context.bpd === "tb") {
+        edges.before = rect.top;
+        edges.after = rect.bottom;
+        if (context.ipd === "lr") {
+            edges.start = rect.left;
+            edges.end = rect.right;
+        }
+        else {
+            edges.start = rect.right;
+            edges.end = rect.left;
+        }
+    }
+    else if (context.bpd === "lr") {
+        edges.before = rect.left;
+        edges.after = rect.right;
+        edges.start = rect.top;
+        edges.end = rect.bottom;
+    }
+    else if (context.bpd === "rl") {
+        edges.before = rect.right;
+        edges.after = rect.left;
+        edges.start = rect.top;
+        edges.end = rect.bottom;
+    }
+    return edges;
+}
+function constructLineList(context, element, llist, bgcolor) {
+    if (element.localName === "rt" || element.localName === "rtc") {
+        /* skip ruby annotations */
+        return;
+    }
+    var curbgcolor = element.style.backgroundColor || bgcolor;
+    if (element.childElementCount === 0) {
+        if (element.localName === "span" || element.localName === "rb") {
+            var r = element.getBoundingClientRect();
+            var edges = rect2edges(r, context);
+            if (llist.length === 0 ||
+                (!isSameLine(edges.before, edges.after, llist[llist.length - 1].before, llist[llist.length - 1].after))) {
+                llist.push({
+                    before: edges.before,
+                    after: edges.after,
+                    start: edges.start,
+                    end: edges.end,
+                    start_elem: 0,
+                    end_elem: 0,
+                    elements: [],
+                    rbc: [],
+                    te: [],
+                    text: "",
+                    br: false,
+                });
+            }
+            else {
+                /* positive for BPD = lr and tb, negative for BPD = rl */
+                var bpd_dir = Math.sign(edges.after - edges.before);
+                /* positive for IPD = lr and tb, negative for IPD = rl */
+                var ipd_dir = Math.sign(edges.end - edges.start);
+                /* check if the line height has increased */
+                if (bpd_dir * (edges.before - llist[llist.length - 1].before) < 0) {
+                    llist[llist.length - 1].before = edges.before;
+                }
+                if (bpd_dir * (edges.after - llist[llist.length - 1].after) > 0) {
+                    llist[llist.length - 1].after = edges.after;
+                }
+                if (ipd_dir * (edges.start - llist[llist.length - 1].start) < 0) {
+                    llist[llist.length - 1].start = edges.start;
+                    llist[llist.length - 1].start_elem = llist[llist.length - 1].elements.length;
+                }
+                if (ipd_dir * (edges.end - llist[llist.length - 1].end) > 0) {
+                    llist[llist.length - 1].end = edges.end;
+                    llist[llist.length - 1].end_elem = llist[llist.length - 1].elements.length;
+                }
+            }
+            llist[llist.length - 1].text += element.textContent;
+            llist[llist.length - 1].elements.push({
+                node: element,
+                bgcolor: curbgcolor,
+                before: edges.before,
+                after: edges.after,
+            });
+        }
+        else if (element.localName === "br" && llist.length !== 0) {
+            llist[llist.length - 1].br = true;
+        }
+    }
+    else {
+        var child = element.firstChild;
+        while (child) {
+            if (child.nodeType === Node.ELEMENT_NODE) {
+                constructLineList(context, child, llist, curbgcolor);
+                if (child.localName === "ruby" || child.localName === "rtc") {
+                    /* remember non-empty ruby and rtc elements so that tts:rubyPosition can be applied */
+                    if (llist.length > 0) {
+                        llist[llist.length - 1].rbc.push(child);
+                    }
+                }
+                else if (child.localName === "span" &&
+                    child.style[TEXTEMPHASISSTYLE_PROP] &&
+                    child.style[TEXTEMPHASISSTYLE_PROP] !== "none") {
+                    /* remember non-empty span elements with textEmphasis */
+                    if (llist.length > 0) {
+                        llist[llist.length - 1].te.push(child);
+                    }
+                }
+            }
+            child = child.nextSibling;
+        }
+    }
+}
+function isSameLine(before1, after1, before2, after2) {
+    return ((after1 < after2) && (before1 > before2)) || ((after2 <= after1) && (before2 >= before1));
+}
+function applyTextEmphasis(context, dom_element, isd_element, attr) {
+    /* ignore color (not used in IMSC 1.1) */
+    if (attr.style === "none") {
+        /* text-emphasis is not inherited and the default is none, so nothing to do */
+        return;
+    }
+    else if (attr.style === "auto") {
+        dom_element.style[TEXTEMPHASISSTYLE_PROP] = "filled";
+    }
+    else {
+        dom_element.style[TEXTEMPHASISSTYLE_PROP] = attr.style + " " + attr.symbol;
+    }
+    /* ignore "outside" position (set in postprocessing) */
+    if (attr.position === "before" || attr.position === "after") {
+        var pos = void 0;
+        if (context.bpd === "tb") {
+            pos = (attr.position === "before") ? "left over" : "left under";
+        }
+        else {
+            if (context.bpd === "rl") {
+                pos = (attr.position === "before") ? "right under" : "left under";
+            }
+            else {
+                pos = (attr.position === "before") ? "left under" : "right under";
+            }
+        }
+        dom_element.style[TEXTEMPHASISPOSITION_PROP] = pos;
+    }
+}
+var HTMLStylingMapDefinition = /** @class */ (function () {
+    function HTMLStylingMapDefinition(qName, mapFunc) {
+        this.qname = qName;
+        this.map = mapFunc;
+    }
+    return HTMLStylingMapDefinition;
+}());
+var STYLING_MAP_DEFS = [
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling backgroundColor", function (context, dom_element, isd_element, attr) {
+        var backgroundColorAdjustMap = context.options[isd_element.kind + backgroundColorAdjustSuffix];
+        var map_attr = backgroundColorAdjustMap &&
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.customizeColor)(attr.toString(), backgroundColorAdjustMap);
+        if (map_attr)
+            attr = map_attr;
+        var opacity = attr[3];
+        /* skip if transparent */
+        if (opacity === 0)
+            return;
+        /* make sure that we allow a multiplier of 0 here*/
+        if (context.options.backgroundOpacityScale != undefined)
+            opacity = opacity * context.options.backgroundOpacityScale;
+        opacity = opacity / 255;
+        dom_element.style.backgroundColor = "rgba(" +
+            attr[0].toString() + "," +
+            attr[1].toString() + "," +
+            attr[2].toString() + "," +
+            opacity.toString() +
+            ")";
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling color", function (context, dom_element, isd_element, attr) {
+        /*
+        * <pre>colorAdjust: {documentColor: replaceColor*}</pre> map of document colors and the value with which to replace them
+        * <pre>colorOpacityScale: {number}</pre> opacity multiplier on text color (ignored if zero)
+        */
+        var opacityMultiplier = context.options.colorOpacityScale || 1;
+        var colorAdjustMap = context.options.colorAdjust;
+        if (colorAdjustMap != undefined) {
+            // var map_attr = colorAdjustMap[attr.toString()];
+            var map_attr = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.customizeColor)(attr, colorAdjustMap);
+            if (map_attr)
+                attr = map_attr;
+        }
+        dom_element.style.color = "rgba(" +
+            attr[0].toString() + "," +
+            attr[1].toString() + "," +
+            attr[2].toString() + "," +
+            (opacityMultiplier * attr[3] / 255).toString() +
+            ")";
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling direction", function (context, dom_element, isd_element, attr) {
+        dom_element.style.direction = attr;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling display", function () { }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling displayAlign", function (context, dom_element, isd_element, attr) {
+        /* see https://css-tricks.com/snippets/css/a-guide-to-flexbox/ */
+        /* TODO: is this affected by writing direction? */
+        dom_element.style.display = "flex";
+        dom_element.style.flexDirection = "column";
+        if (attr === "before") {
+            dom_element.style.justifyContent = "flex-start";
+        }
+        else if (attr === "center") {
+            dom_element.style.justifyContent = "center";
+        }
+        else if (attr === "after") {
+            dom_element.style.justifyContent = "flex-end";
+        }
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling extent", function (context, dom_element, isd_element, attr) {
+        /* TODO: this is super ugly */
+        context.regionH = attr.h.toUsedLength(context.w, context.h);
+        context.regionW = attr.w.toUsedLength(context.w, context.h);
+        /*
+         * CSS height/width are measured against the content rectangle,
+         * whereas TTML height/width include padding
+         */
+        var hdelta = 0;
+        var wdelta = 0;
+        var p = isd_element.styleAttrs["http://www.w3.org/ns/ttml#styling padding"];
+        if (!p) {
+            /* error */
+        }
+        else {
+            hdelta = p[0].toUsedLength(context.w, context.h) + p[2].toUsedLength(context.w, context.h);
+            wdelta = p[1].toUsedLength(context.w, context.h) + p[3].toUsedLength(context.w, context.h);
+        }
+        dom_element.style.height = (context.regionH - hdelta) + "px";
+        dom_element.style.width = (context.regionW - wdelta) + "px";
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling fontFamily", function (context, dom_element, isd_element, attr) {
+        var rslt = [];
+        /* per IMSC1 */
+        if (context.options.fontFamily) {
+            attr = context.options.fontFamily.split(",");
+        }
+        for (var i = 0; i < attr.length; i++) {
+            attr[i] = attr[i].trim();
+            if (attr[i] === "monospaceSerif") {
+                rslt.push("Courier New");
+                rslt.push('"Liberation Mono"');
+                rslt.push("Courier");
+                rslt.push("monospace");
+            }
+            else if (attr[i] === "proportionalSansSerif") {
+                rslt.push("Arial");
+                rslt.push("Helvetica");
+                rslt.push('"Liberation Sans"');
+                rslt.push("sans-serif");
+            }
+            else if (attr[i] === "monospace") {
+                rslt.push("monospace");
+            }
+            else if (attr[i] === "sansSerif") {
+                rslt.push("sans-serif");
+            }
+            else if (attr[i] === "serif") {
+                rslt.push("serif");
+            }
+            else if (attr[i] === "monospaceSansSerif") {
+                rslt.push("Consolas");
+                rslt.push("monospace");
+            }
+            else if (attr[i] === "proportionalSerif") {
+                rslt.push("serif");
+            }
+            else {
+                rslt.push(attr[i]);
+            }
+        }
+        // prune later duplicates we may have inserted
+        if (rslt.length > 0) {
+            var unique = [rslt[0]];
+            for (var fi = 1; fi < rslt.length; fi++) {
+                if (unique.indexOf(rslt[fi]) == -1) {
+                    unique.push(rslt[fi]);
+                }
+            }
+            rslt = unique;
+        }
+        dom_element.style.fontFamily = rslt.join(",");
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling shear", function (context, dom_element, isd_element, attr) {
+        /* return immediately if tts:shear is 0% since CSS transforms are not inherited*/
+        if (attr === 0)
+            return;
+        var angle = attr * -0.9;
+        /* context.bpd is needed since writing mode is not inherited and sets the inline progression */
+        if (context.bpd === "tb") {
+            dom_element.style.transform = "skewX(" + angle + "deg)";
+        }
+        else {
+            dom_element.style.transform = "skewY(" + angle + "deg)";
+        }
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling fontSize", function (context, dom_element, isd_element, attr) {
+        dom_element.style.fontSize = attr.multiply(attr.toUsedLength(context.w, context.h), context.options.sizeAdjust) + "px";
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling fontStyle", function (context, dom_element, isd_element, attr) {
+        dom_element.style.fontStyle = attr;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling fontWeight", function (context, dom_element, isd_element, attr) {
+        dom_element.style.fontWeight = attr;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling lineHeight", function (context, dom_element, isd_element, attr) {
+        if (attr === "normal") {
+            dom_element.style.lineHeight = "normal";
+        }
+        else {
+            dom_element.style.lineHeight =
+                attr.multiply(attr.multiply(attr.toUsedLength(context.w, context.h), context.options.sizeAdjust), context.options.lineHeightAdjust) + "px";
+        }
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling opacity", function (context, dom_element, isd_element, attr) {
+        /*
+         * Customisable using <pre>regionOpacityScale: {number}</pre>
+         * which acts as a multiplier.
+         */
+        var opacity = attr;
+        if (context.options.regionOpacityScale != undefined) {
+            opacity = opacity * context.options.regionOpacityScale;
+        }
+        dom_element.style.opacity = opacity;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling origin", function (context, dom_element, isd_element, attr) {
+        dom_element.style.top = attr.h.toUsedLength(context.w, context.h) + "px";
+        dom_element.style.left = attr.w.toUsedLength(context.w, context.h) + "px";
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling overflow", function (context, dom_element, isd_element, attr) {
+        dom_element.style.overflow = attr;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling padding", function (context, dom_element, isd_element, attr) {
+        /* attr: top,left,bottom,right*/
+        /* style: top right bottom left*/
+        var rslt = [];
+        rslt[0] = attr[0].toUsedLength(context.w, context.h) + "px";
+        rslt[1] = attr[3].toUsedLength(context.w, context.h) + "px";
+        rslt[2] = attr[2].toUsedLength(context.w, context.h) + "px";
+        rslt[3] = attr[1].toUsedLength(context.w, context.h) + "px";
+        dom_element.style.padding = rslt.join(" ");
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling position", function (context, dom_element, isd_element, attr) {
+        dom_element.style.top = attr.h.toUsedLength(context.w, context.h) + "px";
+        dom_element.style.left = attr.w.toUsedLength(context.w, context.h) + "px";
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling rubyAlign", function (context, dom_element, isd_element, attr) {
+        dom_element.style.rubyAlign = attr === "spaceAround" ? "space-around" : "center";
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling rubyPosition", function (context, dom_element, isd_element, attr) {
+        /* skip if "outside", which is handled by applyRubyPosition() */
+        if (attr === "before" || attr === "after") {
+            var pos = void 0;
+            if (RUBYPOSITION_ISWK) {
+                /* WebKit exception */
+                pos = attr;
+            }
+            else if (context.bpd === "tb") {
+                pos = (attr === "before") ? "over" : "under";
+            }
+            else {
+                if (context.bpd === "rl") {
+                    pos = (attr === "before") ? "over" : "under";
+                }
+                else {
+                    pos = (attr === "before") ? "under" : "over";
+                }
+            }
+            /* apply position to the parent dom_element, i.e. ruby or rtc */
+            dom_element.parentElement.style[RUBYPOSITION_PROP] = pos;
+        }
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling showBackground", null),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling textAlign", function (context, dom_element, isd_element, attr) {
+        var ta;
+        /* handle UAs that do not understand start or end */
+        if (attr === "start") {
+            ta = (context.ipd === "rl") ? "right" : "left";
+        }
+        else if (attr === "end") {
+            ta = (context.ipd === "rl") ? "left" : "right";
+        }
+        else {
+            ta = attr;
+        }
+        dom_element.style.textAlign = ta;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling textDecoration", function (context, dom_element, isd_element, attr) {
+        dom_element.style.textDecoration = attr.join(" ").replace("lineThrough", "line-through");
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling textOutline", function () {
+        /* defer to tts:textShadow */
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling textShadow", function (context, dom_element, isd_element, attr) {
+        var txto = isd_element.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textOutline.qname];
+        var otxto = context.options.textOutline;
+        if (otxto) {
+            if (otxto === "none") {
+                txto = otxto;
+            }
+            else {
+                var r = {};
+                var os = otxto.split(" ");
+                if (os.length !== 0 && os.length <= 2) {
+                    var c = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.parseColor)(os[0]);
+                    r.color = c;
+                    if (c !== null)
+                        os.shift();
+                    if (os.length === 1) {
+                        var l = (0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.parseLength)(os[0]);
+                        if (l) {
+                            r.thickness = l;
+                            txto = r;
+                        }
+                    }
+                }
+            }
+        }
+        if (attr === "none" && txto === "none") {
+            dom_element.style.textShadow = "";
+        }
+        else {
+            var s = [];
+            if (txto !== "none") {
+                /* emulate text outline */
+                var to_color = "rgba(" +
+                    txto.color[0].toString() + "," +
+                    txto.color[1].toString() + "," +
+                    txto.color[2].toString() + "," +
+                    (txto.color[3] / 255).toString() +
+                    ")";
+                s.push("1px 1px 1px " + to_color);
+                s.push("-1px 1px 1px " + to_color);
+                s.push("1px -1px 1px " + to_color);
+                s.push("-1px -1px 1px " + to_color);
+            }
+            /* add text shadow */
+            if (attr !== "none") {
+                for (var i = 0; i < attr.length; i++) {
+                    s.push(attr[i].x_off.toUsedLength(context.w, context.h) + "px " +
+                        attr[i].y_off.toUsedLength(context.w, context.h) + "px " +
+                        attr[i].b_radius.toUsedLength(context.w, context.h) + "px " +
+                        "rgba(" +
+                        attr[i].color[0].toString() + "," +
+                        attr[i].color[1].toString() + "," +
+                        attr[i].color[2].toString() + "," +
+                        (attr[i].color[3] / 255).toString() +
+                        ")");
+                }
+            }
+            dom_element.style.textShadow = s.join(",");
+        }
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling textCombine", function (context, dom_element, isd_element, attr) {
+        dom_element.style.textCombineUpright = attr;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling textEmphasis", function () {
+        /* applied as part of HTML document construction */
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling unicodeBidi", function (context, dom_element, isd_element, attr) {
+        var ub;
+        if (attr === "bidiOverride") {
+            ub = "bidi-override";
+        }
+        else {
+            ub = attr;
+        }
+        dom_element.style.unicodeBidi = ub;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling visibility", function (context, dom_element, isd_element, attr) {
+        dom_element.style.visibility = attr;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling wrapOption", function (context, dom_element, isd_element, attr) {
+        if (attr === "wrap") {
+            if (isd_element.space === "preserve") {
+                dom_element.style.whiteSpace = "pre-wrap";
+            }
+            else {
+                dom_element.style.whiteSpace = "normal";
+            }
+        }
+        else {
+            if (isd_element.space === "preserve") {
+                dom_element.style.whiteSpace = "pre";
+            }
+            else {
+                dom_element.style.whiteSpace = "noWrap";
+            }
+        }
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling writingMode", function (context, dom_element, isd_element, attr) {
+        if (attr === "lrtb" || attr === "lr") {
+            dom_element.style.writingMode = "horizontal-tb";
+        }
+        else if (attr === "rltb" || attr === "rl") {
+            dom_element.style.writingMode = "horizontal-tb";
+        }
+        else if (attr === "tblr") {
+            dom_element.style.writingMode = "vertical-lr";
+        }
+        else if (attr === "tbrl" || attr === "tb") {
+            dom_element.style.writingMode = "vertical-rl";
+        }
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml#styling zIndex", function (context, dom_element, isd_element, attr) {
+        dom_element.style.zIndex = attr;
+    }),
+    new HTMLStylingMapDefinition("http://www.w3.org/ns/ttml/profile/imsc1#styling forcedDisplay", function (context, dom_element, isd_element, attr) {
+        if (context.displayForcedOnlyMode && attr === false) {
+            dom_element.style.visibility = "hidden";
+        }
+    }),
+];
+var STYLMAP_BY_QNAME = {};
+for (var i = 0; i < STYLING_MAP_DEFS.length; i++) {
+    STYLMAP_BY_QNAME[STYLING_MAP_DEFS[i].qname] = STYLING_MAP_DEFS[i];
+}
+/* CSS property names */
+var RUBYPOSITION_ISWK = "webkitRubyPosition" in window.getComputedStyle(document.documentElement);
+var RUBYPOSITION_PROP = RUBYPOSITION_ISWK ? "webkitRubyPosition" : "rubyPosition";
+var TEXTEMPHASISSTYLE_PROP = "webkitTextEmphasisStyle" in window.getComputedStyle(document.documentElement) ? "webkitTextEmphasisStyle" : "textEmphasisStyle";
+var TEXTEMPHASISPOSITION_PROP = "webkitTextEmphasisPosition" in window.getComputedStyle(document.documentElement) ? "webkitTextEmphasisPosition" : "textEmphasisPosition";
+//# sourceMappingURL=html.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/isd.js":
+/*!********************************************!*\
+  !*** ./node_modules/imsc/dist/main/isd.js ***!
+  \********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "generateISD": function() { return /* binding */ generateISD; }
+/* harmony export */ });
+/* harmony import */ var _error_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./error.js */ "./node_modules/imsc/dist/main/error.js");
+/* harmony import */ var _styles_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./styles.js */ "./node_modules/imsc/dist/main/styles.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils.js */ "./node_modules/imsc/dist/main/utils.js");
+/*
+ * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+
+/**
+ * @module imscISD
+ */
+/**
+ * Creates a canonical representation of an IMSC1 document returned by <pre>imscDoc.fromXML()</pre>
+ * at a given absolute offset in seconds. This offset does not have to be one of the values returned
+ * by <pre>getMediaTimeEvents()</pre>.
+ *
+ * @param {Object} tt IMSC1 document
+ * @param {number} offset Absolute offset (in seconds)
+ * @param {?module:imscUtils.ErrorHandler} errorHandler Error callback
+ * @returns {Object} Opaque in-memory representation of an ISD
+ */
+function generateISD(tt, offset, errorHandler) {
+    /* TODO check for tt and offset validity */
+    /* create the ISD object from the IMSC1 doc */
+    var isd = new ISD(tt);
+    /* context */
+    var context = {
+    /*rubyfs: []*/ /* font size of the nearest textContainer or container */
+    };
+    /* Filter body contents - Only process what we need within the offset and discard regions not applicable to the content */
+    var body = {};
+    var activeRegions = {};
+    /* gather any regions that might have showBackground="always" and show a background */
+    var initialShowBackground = tt.head.styling.initials[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.showBackground.qname];
+    var initialbackgroundColor = tt.head.styling.initials[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.backgroundColor.qname];
+    var regions = tt.head.layout.regions;
+    for (var layout_child in regions) {
+        if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.hasOwnProperty)(regions, layout_child)) {
+            var region = regions[layout_child];
+            var showBackground = region.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.showBackground.qname] || initialShowBackground;
+            var backgroundColor = region.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.backgroundColor.qname] || initialbackgroundColor;
+            activeRegions[region.id] = ((showBackground === "always" || showBackground === undefined) &&
+                backgroundColor !== undefined &&
+                !(offset < region.begin || offset >= region.end));
+        }
+    }
+    /* If the body specifies a region, catch it, since no filtered content will */
+    /* likely specify the region. */
+    if (tt.body && tt.body.regionID) {
+        activeRegions[tt.body.regionID] = true;
+    }
+    function filter(offset, element) {
+        function offsetFilter(element) {
+            return !(offset < element.begin || offset >= element.end);
+        }
+        if (element.contents) {
+            var clone_1 = {};
+            for (var prop in element) {
+                if ((0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.hasOwnProperty)(element, prop)) {
+                    clone_1[prop] = element[prop];
+                }
+            }
+            clone_1.contents = [];
+            element.contents.filter(offsetFilter).forEach(function (el) {
+                var filteredElement = filter(offset, el);
+                if (filteredElement.regionID) {
+                    activeRegions[filteredElement.regionID] = true;
+                }
+                if (filteredElement !== null) {
+                    clone_1.contents.push(filteredElement);
+                }
+            });
+            return clone_1;
+        }
+        else {
+            return element;
+        }
+    }
+    if (tt.body !== null) {
+        body = filter(offset, tt.body);
+    }
+    else {
+        body = null;
+    }
+    /* rewritten TTML will always have a default - this covers it. because the region is defaulted to "" */
+    if (activeRegions[""] !== undefined) {
+        activeRegions[""] = true;
+    }
+    /* process regions */
+    for (var regionID in activeRegions) {
+        if (activeRegions[regionID]) {
+            /* post-order traversal of the body tree per [construct intermediate document] */
+            var c = isdProcessContentElement(tt, offset, tt.head.layout.regions[regionID], body, null, "", tt.head.layout.regions[regionID], errorHandler, context);
+            if (c !== null) {
+                /* add the region to the ISD */
+                isd.contents.push(c.element);
+            }
+        }
+    }
+    return isd;
+}
+;
+/* set of styles not applicable to ruby container spans */
+var _rcs_na_styles = [
+    _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.color.qname,
+    _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textCombine.qname,
+    _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textDecoration.qname,
+    _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textEmphasis.qname,
+    _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textOutline.qname,
+    _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textShadow.qname,
+];
+function isdProcessContentElement(doc, offset, region, body, parent, inherited_region_id, elem, errorHandler, context) {
+    /* prune if temporally inactive */
+    if (offset < elem.begin || offset >= elem.end) {
+        return null;
+    }
+    /*
+     * set the associated region as specified by the regionID attribute, or the
+     * inherited associated region otherwise
+     */
+    var associated_region_id = "regionID" in elem && elem.regionID !== "" ? elem.regionID : inherited_region_id;
+    /* prune the element if either:
+     * - the element is not terminal and the associated region is neither the default
+     *   region nor the parent region (this allows children to be associated with a
+     *   region later on)
+     * - the element is terminal and the associated region is not the parent region
+     */
+    /* TODO: improve detection of terminal elements since <region> has no contents */
+    if (parent !== null /* are we in the region element */ &&
+        associated_region_id !== region.id &&
+        ((!("contents" in elem)) ||
+            ("contents" in elem && elem.contents.length === 0) ||
+            associated_region_id !== ""))
+        return null;
+    /* create an ISD element, including applying specified styles */
+    var isd_element = new ISDContentElement(elem);
+    var styleAttrs = isd_element.styleAttrs;
+    /* apply set (animation) styling */
+    if ("sets" in elem) {
+        for (var i = 0; i < elem.sets.length; i++) {
+            if (offset < elem.sets[i].begin || offset >= elem.sets[i].end)
+                continue;
+            styleAttrs[elem.sets[i].qname] = elem.sets[i].value;
+        }
+    }
+    /*
+     * keep track of specified styling attributes so that we
+     * can compute them later
+     */
+    var spec_attr = {};
+    for (var qname in styleAttrs) {
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.hasOwnProperty)(styleAttrs, qname))
+            continue;
+        spec_attr[qname] = true;
+        /* special rule for tts:writingMode (section 7.29.1 of XSL)
+         * direction is set consistently with writingMode only
+         * if writingMode sets inline-direction to LTR or RTL
+         */
+        if (isd_element.kind === "region" &&
+            qname === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.writingMode.qname &&
+            !(_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.direction.qname in styleAttrs)) {
+            var wm = styleAttrs[qname];
+            if (wm === "lrtb" || wm === "lr") {
+                styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.direction.qname] = "ltr";
+            }
+            else if (wm === "rltb" || wm === "rl") {
+                styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.direction.qname] = "rtl";
+            }
+        }
+    }
+    /* inherited styling */
+    if (parent !== null) {
+        for (var j = 0; j < _styles_js__WEBPACK_IMPORTED_MODULE_1__.all.length; j++) {
+            var sa = _styles_js__WEBPACK_IMPORTED_MODULE_1__.all[j];
+            /* textDecoration has special inheritance rules */
+            if (sa.qname === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.textDecoration.qname) {
+                /* handle both textDecoration inheritance and specification */
+                var ps = parent.styleAttrs[sa.qname];
+                var es = styleAttrs[sa.qname];
+                var outs = [];
+                if (es === undefined) {
+                    outs = ps;
+                }
+                else if (es.indexOf("none") === -1) {
+                    if ((es.indexOf("noUnderline") === -1 &&
+                        ps.indexOf("underline") !== -1) ||
+                        es.indexOf("underline") !== -1) {
+                        outs.push("underline");
+                    }
+                    if ((es.indexOf("noLineThrough") === -1 &&
+                        ps.indexOf("lineThrough") !== -1) ||
+                        es.indexOf("lineThrough") !== -1) {
+                        outs.push("lineThrough");
+                    }
+                    if ((es.indexOf("noOverline") === -1 &&
+                        ps.indexOf("overline") !== -1) ||
+                        es.indexOf("overline") !== -1) {
+                        outs.push("overline");
+                    }
+                }
+                else {
+                    outs.push("none");
+                }
+                styleAttrs[sa.qname] = outs;
+            }
+            else if (sa.qname === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.fontSize.qname &&
+                !(sa.qname in styleAttrs) &&
+                isd_element.kind === "span" &&
+                styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "textContainer") {
+                /* special inheritance rule for ruby text container font size */
+                var ruby_fs = parent.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.fontSize.qname];
+                styleAttrs[sa.qname] = new _utils_js__WEBPACK_IMPORTED_MODULE_2__.ComputedLength(0.5 * ruby_fs.rw, 0.5 * ruby_fs.rh);
+            }
+            else if (sa.qname === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.fontSize.qname &&
+                !(sa.qname in styleAttrs) &&
+                isd_element.kind === "span" &&
+                styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "text") {
+                /* special inheritance rule for ruby text font size */
+                var parent_fs = parent.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.fontSize.qname];
+                if (parent.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname] === "textContainer") {
+                    styleAttrs[sa.qname] = parent_fs;
+                }
+                else {
+                    styleAttrs[sa.qname] = new _utils_js__WEBPACK_IMPORTED_MODULE_2__.ComputedLength(0.5 * parent_fs.rw, 0.5 * parent_fs.rh);
+                }
+            }
+            else if (sa.inherit &&
+                (sa.qname in parent.styleAttrs) &&
+                !(sa.qname in styleAttrs)) {
+                styleAttrs[sa.qname] = parent.styleAttrs[sa.qname];
+            }
+        }
+    }
+    /* initial value styling */
+    for (var k = 0; k < _styles_js__WEBPACK_IMPORTED_MODULE_1__.all.length; k++) {
+        var ivs = _styles_js__WEBPACK_IMPORTED_MODULE_1__.all[k];
+        /* skip if value is already specified */
+        if (ivs.qname in styleAttrs)
+            continue;
+        /* skip tts:position if tts:origin is specified */
+        if (ivs.qname === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.position.qname &&
+            _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.origin.qname in styleAttrs)
+            continue;
+        /* skip tts:origin if tts:position is specified */
+        if (ivs.qname === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.origin.qname &&
+            _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.position.qname in styleAttrs)
+            continue;
+        /* determine initial value */
+        var iv = doc.head.styling.initials[ivs.qname] || ivs.initial;
+        if (iv === null) {
+            /* skip processing if no initial value defined */
+            continue;
+        }
+        /* apply initial value to elements other than region only if non-inherited */
+        if (isd_element.kind === "region" || (ivs.inherit === false && iv !== null)) {
+            var piv = ivs.parse(iv);
+            if (piv !== null) {
+                styleAttrs[ivs.qname] = piv;
+                /* keep track of the style as specified */
+                spec_attr[ivs.qname] = true;
+            }
+            else {
+                (0,_error_js__WEBPACK_IMPORTED_MODULE_0__.reportError)(errorHandler, "Invalid initial value for '" + ivs.qname + "' on element '" + isd_element.kind);
+            }
+        }
+    }
+    /* compute styles (only for non-inherited styles) */
+    /* TODO: get rid of spec_attr */
+    for (var z = 0; z < _styles_js__WEBPACK_IMPORTED_MODULE_1__.all.length; z++) {
+        var cs = _styles_js__WEBPACK_IMPORTED_MODULE_1__.all[z];
+        if (!(cs.qname in spec_attr))
+            continue;
+        if (cs.compute !== null) {
+            var cstyle = cs.compute(
+            /*doc, parent, element, attr, context*/
+            doc, parent, isd_element, styleAttrs[cs.qname], context);
+            if (cstyle !== null) {
+                styleAttrs[cs.qname] = cstyle;
+            }
+            else {
+                /* if the style cannot be computed, replace it by its initial value */
+                styleAttrs[cs.qname] = cs.compute(
+                /*doc, parent, element, attr, context*/
+                doc, parent, isd_element, cs.parse(cs.initial), context);
+                (0,_error_js__WEBPACK_IMPORTED_MODULE_0__.reportError)(errorHandler, "Style '" + cs.qname + "' on element '" + isd_element.kind + "' cannot be computed");
+            }
+        }
+    }
+    /* prune if tts:display is none */
+    if (styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.display.qname] === "none")
+        return null;
+    /* process contents of the element */
+    var contents = null;
+    if (parent === null) {
+        /* we are processing the region */
+        if (body === null) {
+            /* if there is no body, still process the region but with empty content */
+            contents = [];
+        }
+        else {
+            /*use the body element as contents */
+            contents = [body];
+        }
+    }
+    else if ("contents" in elem) {
+        contents = elem.contents;
+    }
+    for (var x = 0; contents !== null && x < contents.length; x++) {
+        var c = isdProcessContentElement(doc, offset, region, body, isd_element, associated_region_id, contents[x], errorHandler, context);
+        /*
+         * keep child element only if they are non-null and their region match
+         * the region of this element
+         */
+        if (c !== null) {
+            isd_element.contents.push(c.element);
+        }
+    }
+    /* remove styles that are not applicable */
+    for (var qnameb in styleAttrs) {
+        if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.hasOwnProperty)(styleAttrs, qnameb))
+            continue;
+        /* true if not applicable */
+        var na = false;
+        /* special applicability of certain style properties to ruby container spans */
+        /* TODO: in the future ruby elements should be translated to elements instead of kept as spans */
+        if (isd_element.kind === "span") {
+            var rsp = styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname];
+            na = (rsp === "container" || rsp === "textContainer" || rsp === "baseContainer") &&
+                _rcs_na_styles.indexOf(qnameb) !== -1;
+            if (!na) {
+                na = rsp !== "container" &&
+                    qnameb === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.rubyAlign.qname;
+            }
+            if (!na) {
+                na = (!(rsp === "textContainer" || rsp === "text")) &&
+                    qnameb === _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.rubyPosition.qname;
+            }
+        }
+        /* normal applicability */
+        if (!na) {
+            var da = _styles_js__WEBPACK_IMPORTED_MODULE_1__.byQName[qnameb];
+            if ("applies" in da) {
+                na = da.applies.indexOf(isd_element.kind) === -1;
+            }
+        }
+        if (na) {
+            delete styleAttrs[qnameb];
+        }
+    }
+    /* trim whitespace around explicit line breaks */
+    var ruby = styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname];
+    if (isd_element.kind === "p" ||
+        (isd_element.kind === "span" && (ruby === "textContainer" || ruby === "text"))) {
+        var elist = [];
+        constructSpanList(isd_element, elist);
+        collapseLWSP(elist);
+        pruneEmptySpans(isd_element);
+    }
+    /* keep element if:
+     * * contains a background image
+     * * <br/>
+     * * if there are children
+     * * if it is an image
+     * * if <span> and has text
+     * * if region and showBackground = always
+     */
+    if ((isd_element.kind === "div" && _styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.backgroundImage.qname in styleAttrs) ||
+        isd_element.kind === "br" ||
+        isd_element.kind === "image" ||
+        ("contents" in isd_element && isd_element.contents.length > 0) ||
+        (isd_element.kind === "span" && isd_element.text !== null) ||
+        (isd_element.kind === "region" &&
+            styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.showBackground.qname] === "always")) {
+        return {
+            region_id: associated_region_id,
+            element: isd_element,
+        };
+    }
+    return null;
+}
+function collapseLWSP(elist) {
+    function isPrevCharLWSP(prev_element) {
+        return prev_element.kind === "br" || /[\r\n\t ]$/.test(prev_element.text);
+    }
+    function isNextCharLWSP(next_element) {
+        return next_element.kind === "br" || (next_element.space === "preserve" && /^[\r\n]/.test(next_element.text));
+    }
+    /* collapse spaces and remove leading LWSPs */
+    var element;
+    for (var i = 0; i < elist.length;) {
+        element = elist[i];
+        if (element.kind === "br" || element.space === "preserve") {
+            i++;
+            continue;
+        }
+        var trimmed_text = element.text.replace(/[\t\r\n ]+/g, " ");
+        if (/^[ ]/.test(trimmed_text)) {
+            if (i === 0 || isPrevCharLWSP(elist[i - 1])) {
+                trimmed_text = trimmed_text.substring(1);
+            }
+        }
+        element.text = trimmed_text;
+        if (trimmed_text.length === 0) {
+            elist.splice(i, 1);
+        }
+        else {
+            i++;
+        }
+    }
+    /* remove trailing LWSPs */
+    for (var i = 0; i < elist.length; i++) {
+        element = elist[i];
+        if (element.kind === "br" || element.space === "preserve") {
+            i++;
+            continue;
+        }
+        if (/[ ]$/.test(element.text)) {
+            if (i === (elist.length - 1) || isNextCharLWSP(elist[i + 1])) {
+                element.text = element.text.slice(0, -1);
+            }
+        }
+    }
+}
+function constructSpanList(element, elist) {
+    if (!("contents" in element)) {
+        return;
+    }
+    for (var i = 0; i < element.contents.length; i++) {
+        var child = element.contents[i];
+        var ruby = child.styleAttrs[_styles_js__WEBPACK_IMPORTED_MODULE_1__.byName.ruby.qname];
+        if (child.kind === "span" && (ruby === "textContainer" || ruby === "text")) {
+            /* skip ruby text and text containers, which are handled on their own */
+            continue;
+        }
+        else if ("contents" in child) {
+            constructSpanList(child, elist);
+        }
+        else if ((child.kind === "span" && child.text.length !== 0) || child.kind === "br") {
+            /* skip empty spans */
+            elist.push(child);
+        }
+    }
+}
+function pruneEmptySpans(element) {
+    if (element.kind === "br") {
+        return false;
+    }
+    else if ("text" in element) {
+        return element.text.length === 0;
+    }
+    else if ("contents" in element) {
+        var i = element.contents.length;
+        while (i--) {
+            if (pruneEmptySpans(element.contents[i])) {
+                element.contents.splice(i, 1);
+            }
+        }
+        return element.contents.length === 0;
+    }
+}
+var ISD = /** @class */ (function () {
+    function ISD(tt) {
+        this.contents = [];
+        this.aspectRatio = tt.aspectRatio;
+        this.lang = tt.lang;
+    }
+    return ISD;
+}());
+var ISDContentElement = /** @class */ (function () {
+    function ISDContentElement(ttelem) {
+        /* assume the element is a region if it does not have a kind */
+        this.kind = ttelem.kind || "region";
+        /* copy lang */
+        this.lang = ttelem.lang;
+        /* copy id */
+        if (ttelem.id) {
+            this.id = ttelem.id;
+        }
+        /* deep copy of style attributes */
+        this.styleAttrs = {};
+        for (var sname in ttelem.styleAttrs) {
+            if (!(0,_utils_js__WEBPACK_IMPORTED_MODULE_2__.hasOwnProperty)(ttelem.styleAttrs, sname))
+                continue;
+            this.styleAttrs[sname] =
+                ttelem.styleAttrs[sname];
+        }
+        /* copy src and type if image */
+        if ("src" in ttelem) {
+            this.src = ttelem.src;
+        }
+        if ("type" in ttelem) {
+            this.type = ttelem.type;
+        }
+        /* TODO: clean this!
+         * TODO: ISDElement and document element should be better tied together */
+        if ("text" in ttelem) {
+            this.text = ttelem.text;
+        }
+        else if (this.kind === "region" || "contents" in ttelem) {
+            this.contents = [];
+        }
+        if ("space" in ttelem) {
+            this.space = ttelem.space;
+        }
+    }
+    return ISDContentElement;
+}());
+//# sourceMappingURL=isd.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/main.js":
+/*!*********************************************!*\
+  !*** ./node_modules/imsc/dist/main/main.js ***!
+  \*********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "fromXML": function() { return /* reexport safe */ _doc_js__WEBPACK_IMPORTED_MODULE_0__.fromXML; },
+/* harmony export */   "generateISD": function() { return /* reexport safe */ _isd_js__WEBPACK_IMPORTED_MODULE_2__.generateISD; },
+/* harmony export */   "renderHTML": function() { return /* reexport safe */ _html_js__WEBPACK_IMPORTED_MODULE_1__.renderHTML; }
+/* harmony export */ });
+/* harmony import */ var _doc_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./doc.js */ "./node_modules/imsc/dist/main/doc.js");
+/* harmony import */ var _html_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./html.js */ "./node_modules/imsc/dist/main/html.js");
+/* harmony import */ var _isd_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./isd.js */ "./node_modules/imsc/dist/main/isd.js");
+/*
+ * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+
+//# sourceMappingURL=main.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/names.js":
+/*!**********************************************!*\
+  !*** ./node_modules/imsc/dist/main/names.js ***!
+  \**********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ns_ebutts": function() { return /* binding */ ns_ebutts; },
+/* harmony export */   "ns_ittp": function() { return /* binding */ ns_ittp; },
+/* harmony export */   "ns_itts": function() { return /* binding */ ns_itts; },
+/* harmony export */   "ns_smpte": function() { return /* binding */ ns_smpte; },
+/* harmony export */   "ns_tt": function() { return /* binding */ ns_tt; },
+/* harmony export */   "ns_ttp": function() { return /* binding */ ns_ttp; },
+/* harmony export */   "ns_tts": function() { return /* binding */ ns_tts; },
+/* harmony export */   "ns_xml": function() { return /* binding */ ns_xml; }
+/* harmony export */ });
+/*
+ * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+/**
+ * @module imscNames
+ */
+var ns_tt = "http://www.w3.org/ns/ttml";
+var ns_tts = "http://www.w3.org/ns/ttml#styling";
+var ns_ttp = "http://www.w3.org/ns/ttml#parameter";
+var ns_xml = "http://www.w3.org/XML/1998/namespace";
+var ns_itts = "http://www.w3.org/ns/ttml/profile/imsc1#styling";
+var ns_ittp = "http://www.w3.org/ns/ttml/profile/imsc1#parameter";
+var ns_smpte = "http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt";
+var ns_ebutts = "urn:ebu:tt:style";
+//# sourceMappingURL=names.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/styles.js":
+/*!***********************************************!*\
+  !*** ./node_modules/imsc/dist/main/styles.js ***!
+  \***********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "all": function() { return /* binding */ all; },
+/* harmony export */   "byName": function() { return /* binding */ byName; },
+/* harmony export */   "byQName": function() { return /* binding */ byQName; }
+/* harmony export */ });
+/* harmony import */ var _names_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./names.js */ "./node_modules/imsc/dist/main/names.js");
+/* harmony import */ var _utils_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils.js */ "./node_modules/imsc/dist/main/utils.js");
+/*
+ * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+
+/**
+ * @module imscStyles
+ */
+var StylingAttributeDefinition = /** @class */ (function () {
+    function StylingAttributeDefinition(ns, name, initialValue, appliesTo, isInherit, isAnimatable, parseFunc, computeFunc) {
+        this.name = name;
+        this.ns = ns;
+        this.qname = ns + " " + name;
+        this.inherit = isInherit;
+        this.animatable = isAnimatable;
+        this.initial = initialValue;
+        this.applies = appliesTo;
+        this.parse = parseFunc;
+        this.compute = computeFunc;
+    }
+    return StylingAttributeDefinition;
+}());
+var all = [
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "backgroundColor", "transparent", ["body", "div", "p", "region", "span"], false, true, _utils_js__WEBPACK_IMPORTED_MODULE_1__.parseColor, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "color", "white", ["span"], true, true, _utils_js__WEBPACK_IMPORTED_MODULE_1__.parseColor, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "direction", "ltr", ["p", "span"], true, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "display", "auto", ["body", "div", "p", "region", "span"], false, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "displayAlign", "before", ["region"], false, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "extent", "auto", ["tt", "region"], false, true, function (str) {
+        if (str === "auto") {
+            return str;
+        }
+        else {
+            var s = str.split(" ");
+            if (s.length !== 2)
+                return null;
+            var w = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(s[0]);
+            var h = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(s[1]);
+            if (!h || !w)
+                return null;
+            return { "h": h, "w": w };
+        }
+    }, function (doc, parent, element, attr) {
+        var h;
+        var w;
+        if (attr === "auto") {
+            h = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(0, 1);
+        }
+        else {
+            h = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.h.value, attr.h.unit, null, doc.dimensions.h, null, doc.pxLength.h);
+            if (h === null) {
+                return null;
+            }
+        }
+        if (attr === "auto") {
+            w = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(1, 0);
+        }
+        else {
+            w = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.w.value, attr.w.unit, null, doc.dimensions.w, null, doc.pxLength.w);
+            if (w === null) {
+                return null;
+            }
+        }
+        return { "h": h, "w": w };
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "fontFamily", "default", ["span", "p"], true, true, function (str) {
+        var ffs = str.split(",");
+        var rslt = [];
+        for (var i = 0; i < ffs.length; i++) {
+            ffs[i] = ffs[i].trim();
+            if (ffs[i].charAt(0) !== "'" && ffs[i].charAt(0) !== '"') {
+                if (ffs[i] === "default") {
+                    /* per IMSC1 */
+                    rslt.push("monospaceSerif");
+                }
+                else {
+                    rslt.push(ffs[i]);
+                }
+            }
+            else {
+                rslt.push(ffs[i]);
+            }
+        }
+        return rslt;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "shear", "0%", ["p"], true, true, _utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength, function (doc, parent, element, attr) {
+        var fs;
+        if (attr.unit === "%") {
+            fs = Math.abs(attr.value) > 100 ? Math.sign(attr.value) * 100 : attr.value;
+        }
+        else {
+            return null;
+        }
+        return fs;
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "fontSize", "1c", ["span", "p"], true, true, _utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength, function (doc, parent, element, attr) {
+        var fs = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.value, attr.unit, parent !== null ? parent.styleAttrs[byName.fontSize.qname] : doc.cellLength.h, parent !== null ? parent.styleAttrs[byName.fontSize.qname] : doc.cellLength.h, doc.cellLength.h, doc.pxLength.h);
+        return fs;
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "fontStyle", "normal", ["span", "p"], true, true, function (str) {
+        /* TODO: handle font style */
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "fontWeight", "normal", ["span", "p"], true, true, function (str) {
+        /* TODO: handle font weight */
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "lineHeight", "normal", ["p"], true, true, function (str) {
+        if (str === "normal") {
+            return str;
+        }
+        else {
+            return (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(str);
+        }
+    }, function (doc, parent, element, attr) {
+        var lh;
+        if (attr === "normal") {
+            /* inherit normal per https://github.com/w3c/ttml1/issues/220 */
+            lh = attr;
+        }
+        else {
+            lh = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.value, attr.unit, element.styleAttrs[byName.fontSize.qname], element.styleAttrs[byName.fontSize.qname], doc.cellLength.h, doc.pxLength.h);
+            if (lh === null) {
+                return null;
+            }
+        }
+        /* TODO: create a Length constructor */
+        return lh;
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "opacity", 1.0, ["region"], false, true, parseFloat, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "origin", "auto", ["region"], false, true, function (str) {
+        if (str === "auto") {
+            return str;
+        }
+        else {
+            var s = str.split(" ");
+            if (s.length !== 2)
+                return null;
+            var w = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(s[0]);
+            var h = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(s[1]);
+            if (!h || !w)
+                return null;
+            return { "h": h, "w": w };
+        }
+    }, function (doc, parent, element, attr) {
+        var h;
+        var w;
+        if (attr === "auto") {
+            h = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(0, 0);
+        }
+        else {
+            h = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.h.value, attr.h.unit, null, doc.dimensions.h, null, doc.pxLength.h);
+            if (h === null) {
+                return null;
+            }
+        }
+        if (attr === "auto") {
+            w = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(0, 0);
+        }
+        else {
+            w = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.w.value, attr.w.unit, null, doc.dimensions.w, null, doc.pxLength.w);
+            if (w === null) {
+                return null;
+            }
+        }
+        return { "h": h, "w": w };
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "overflow", "hidden", ["region"], false, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "padding", "0px", ["region"], false, true, function (str) {
+        var s = str.split(" ");
+        if (s.length > 4)
+            return null;
+        var r = [];
+        for (var i = 0; i < s.length; i++) {
+            var l = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(s[i]);
+            if (!l)
+                return null;
+            r.push(l);
+        }
+        return r;
+    }, function (doc, parent, element, attr) {
+        var padding;
+        /* TODO: make sure we are in region */
+        /*
+         * expand padding shortcuts to
+         * [before, end, after, start]
+         *
+         */
+        if (attr.length === 1) {
+            padding = [attr[0], attr[0], attr[0], attr[0]];
+        }
+        else if (attr.length === 2) {
+            padding = [attr[0], attr[1], attr[0], attr[1]];
+        }
+        else if (attr.length === 3) {
+            padding = [attr[0], attr[1], attr[2], attr[1]];
+        }
+        else if (attr.length === 4) {
+            padding = [attr[0], attr[1], attr[2], attr[3]];
+        }
+        else {
+            return null;
+        }
+        /* TODO: take into account tts:direction */
+        /*
+         * transform [before, end, after, start] according to writingMode to
+         * [top,left,bottom,right]
+         *
+         */
+        var dir = element.styleAttrs[byName.writingMode.qname];
+        if (dir === "lrtb" || dir === "lr") {
+            padding = [padding[0], padding[3], padding[2], padding[1]];
+        }
+        else if (dir === "rltb" || dir === "rl") {
+            padding = [padding[0], padding[1], padding[2], padding[3]];
+        }
+        else if (dir === "tblr") {
+            padding = [padding[3], padding[0], padding[1], padding[2]];
+        }
+        else if (dir === "tbrl" || dir === "tb") {
+            padding = [padding[3], padding[2], padding[1], padding[0]];
+        }
+        else {
+            return null;
+        }
+        var out = [];
+        for (var i = 0; i < padding.length; i++) {
+            if (padding[i].value === 0) {
+                out[i] = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(0, 0);
+            }
+            else {
+                out[i] = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(padding[i].value, padding[i].unit, element.styleAttrs[byName.fontSize.qname], i === 0 || i === 2 ? element.styleAttrs[byName.extent.qname].h : element.styleAttrs[byName.extent.qname].w, i === 0 || i === 2 ? doc.cellLength.h : doc.cellLength.w, i === 0 || i === 2 ? doc.pxLength.h : doc.pxLength.w);
+                if (out[i] === null)
+                    return null;
+            }
+        }
+        return out;
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "position", "top left", ["region"], false, true, function (str) {
+        return (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parsePosition)(str);
+    }, function (doc, parent, element, attr) {
+        var h;
+        var w;
+        h = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.v.offset.value, attr.v.offset.unit, null, new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(-element.styleAttrs[byName.extent.qname].h.rw, doc.dimensions.h.rh - element.styleAttrs[byName.extent.qname].h.rh), null, doc.pxLength.h);
+        if (h === null)
+            return null;
+        if (attr.v.edge === "bottom") {
+            h = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(-h.rw - element.styleAttrs[byName.extent.qname].h.rw, doc.dimensions.h.rh - h.rh - element.styleAttrs[byName.extent.qname].h.rh);
+        }
+        w = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.h.offset.value, attr.h.offset.unit, null, new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(doc.dimensions.w.rw - element.styleAttrs[byName.extent.qname].w.rw, -element.styleAttrs[byName.extent.qname].w.rh), null, doc.pxLength.w);
+        if (h === null)
+            return null;
+        if (attr.h.edge === "right") {
+            w = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(doc.dimensions.w.rw - w.rw - element.styleAttrs[byName.extent.qname].w.rw, -w.rh - element.styleAttrs[byName.extent.qname].w.rh);
+        }
+        return { "h": h, "w": w };
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "ruby", "none", ["span"], false, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "rubyAlign", "center", ["span"], true, true, function (str) {
+        if (!(str === "center" || str === "spaceAround")) {
+            return null;
+        }
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "rubyPosition", "outside", ["span"], true, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "rubyReserve", "none", ["p"], true, true, function (str) {
+        var s = str.split(" ");
+        var r = [null, null];
+        if (s.length === 0 || s.length > 2)
+            return null;
+        if (s[0] === "none" ||
+            s[0] === "both" ||
+            s[0] === "after" ||
+            s[0] === "before" ||
+            s[0] === "outside") {
+            r[0] = s[0];
+        }
+        else {
+            return null;
+        }
+        if (s.length === 2 && s[0] !== "none") {
+            var l = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(s[1]);
+            if (l) {
+                r[1] = l;
+            }
+            else {
+                return null;
+            }
+        }
+        return r;
+    }, function (doc, parent, element, attr) {
+        if (attr[0] === "none") {
+            return attr;
+        }
+        var fs = null;
+        if (attr[1] === null) {
+            fs = new _utils_js__WEBPACK_IMPORTED_MODULE_1__.ComputedLength(element.styleAttrs[byName.fontSize.qname].rw * 0.5, element.styleAttrs[byName.fontSize.qname].rh * 0.5);
+        }
+        else {
+            fs = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr[1].value, attr[1].unit, element.styleAttrs[byName.fontSize.qname], element.styleAttrs[byName.fontSize.qname], doc.cellLength.h, doc.pxLength.h);
+        }
+        if (fs === null)
+            return null;
+        return [attr[0], fs];
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "showBackground", "always", ["region"], false, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "textAlign", "start", ["p"], true, true, function (str) {
+        return str;
+    }, function (doc, parent, element, attr) {
+        /* Section 7.16.9 of XSL */
+        if (attr === "left") {
+            return "start";
+        }
+        else if (attr === "right") {
+            return "end";
+        }
+        else {
+            return attr;
+        }
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "textCombine", "none", ["span"], true, true, function (str) {
+        if (str === "none" || str === "all") {
+            return str;
+        }
+        return null;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "textDecoration", "none", ["span"], true, true, function (str) {
+        return str.split(" ");
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "textEmphasis", "none", ["span"], true, true, function (str) {
+        var e = str.split(" ");
+        var rslt = { style: null, symbol: null, color: null, position: null };
+        for (var i = 0; i < e.length; i++) {
+            if (e[i] === "none" || e[i] === "auto") {
+                rslt.style = e[i];
+            }
+            else if (e[i] === "filled" ||
+                e[i] === "open") {
+                rslt.style = e[i];
+            }
+            else if (e[i] === "circle" ||
+                e[i] === "dot" ||
+                e[i] === "sesame") {
+                rslt.symbol = e[i];
+            }
+            else if (e[i] === "current") {
+                rslt.color = e[i];
+            }
+            else if (e[i] === "outside" || e[i] === "before" || e[i] === "after") {
+                rslt.position = e[i];
+            }
+            else {
+                rslt.color = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseColor)(e[i]);
+                if (rslt.color === null)
+                    return null;
+            }
+        }
+        if (rslt.style == null && rslt.symbol == null) {
+            rslt.style = "auto";
+        }
+        else {
+            rslt.symbol = rslt.symbol || "circle";
+            rslt.style = rslt.style || "filled";
+        }
+        rslt.position = rslt.position || "outside";
+        rslt.color = rslt.color || "current";
+        return rslt;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "textOutline", "none", ["span"], true, true, function (str) {
+        /*
+         * returns {c: <color>?, thichness: <length>} | "none"
+         *
+         */
+        if (str === "none") {
+            return str;
+        }
+        else {
+            var r = {};
+            var s = str.split(" ");
+            if (s.length === 0 || s.length > 2)
+                return null;
+            var c = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseColor)(s[0]);
+            r.color = c;
+            if (c !== null)
+                s.shift();
+            if (s.length !== 1)
+                return null;
+            var l = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength)(s[0]);
+            if (!l)
+                return null;
+            r.thickness = l;
+            return r;
+        }
+    }, function (doc, parent, element, attr) {
+        /*
+         * returns {color: <color>, thickness: <norm length>}
+         *
+         */
+        if (attr === "none")
+            return attr;
+        var rslt = {};
+        if (attr.color === null) {
+            rslt.color = element.styleAttrs[byName.color.qname];
+        }
+        else {
+            rslt.color = attr.color;
+        }
+        rslt.thickness = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.thickness.value, attr.thickness.unit, element.styleAttrs[byName.fontSize.qname], element.styleAttrs[byName.fontSize.qname], doc.cellLength.h, doc.pxLength.h);
+        if (rslt.thickness === null)
+            return null;
+        return rslt;
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "textShadow", "none", ["span"], true, true, _utils_js__WEBPACK_IMPORTED_MODULE_1__.parseTextShadow, function (doc, parent, element, attr) {
+        /*
+         * returns [{x_off: <length>, y_off: <length>, b_radius: <length>, color: <color>}*] or "none"
+         *
+         */
+        if (attr === "none")
+            return attr;
+        var r = [];
+        for (var i = 0; i < attr.length; i++) {
+            var shadow = {};
+            shadow.x_off = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr[i][0].value, attr[i][0].unit, null, element.styleAttrs[byName.fontSize.qname], null, doc.pxLength.w);
+            if (shadow.x_off === null)
+                return null;
+            shadow.y_off = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr[i][1].value, attr[i][1].unit, null, element.styleAttrs[byName.fontSize.qname], null, doc.pxLength.h);
+            if (shadow.y_off === null)
+                return null;
+            if (attr[i][2] === null) {
+                shadow.b_radius = 0;
+            }
+            else {
+                shadow.b_radius = (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr[i][2].value, attr[i][2].unit, null, element.styleAttrs[byName.fontSize.qname], null, doc.pxLength.h);
+                if (shadow.b_radius === null)
+                    return null;
+            }
+            if (attr[i][3] === null) {
+                shadow.color = element.styleAttrs[byName.color.qname];
+            }
+            else {
+                shadow.color = attr[i][3];
+            }
+            r.push(shadow);
+        }
+        return r;
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "unicodeBidi", "normal", ["span", "p"], false, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "visibility", "visible", ["body", "div", "p", "region", "span"], true, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "wrapOption", "wrap", ["span"], true, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "writingMode", "lrtb", ["region"], false, true, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_tts, "zIndex", "auto", ["region"], false, true, function (str) {
+        var rslt;
+        if (str === "auto") {
+            rslt = str;
+        }
+        else {
+            rslt = parseInt(str);
+            if (isNaN(rslt)) {
+                rslt = null;
+            }
+        }
+        return rslt;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_ebutts, "linePadding", "0c", ["p"], true, false, _utils_js__WEBPACK_IMPORTED_MODULE_1__.parseLength, function (doc, parent, element, attr) {
+        return (0,_utils_js__WEBPACK_IMPORTED_MODULE_1__.toComputedLength)(attr.value, attr.unit, null, null, doc.cellLength.w, null);
+    }),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_ebutts, "multiRowAlign", "auto", ["p"], true, false, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_smpte, "backgroundImage", null, ["div"], false, false, function (str) {
+        return str;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_itts, "forcedDisplay", "false", ["body", "div", "p", "region", "span"], true, true, function (str) {
+        return str === "true" ? true : false;
+    }, null),
+    new StylingAttributeDefinition(_names_js__WEBPACK_IMPORTED_MODULE_0__.ns_itts, "fillLineGap", "false", ["p"], true, true, function (str) {
+        return str === "true" ? true : false;
+    }, null),
+];
+/* TODO: allow null parse function */
+var byQName = {};
+for (var i in all) {
+    byQName[all[i].qname] = all[i];
+}
+var byName = {};
+for (var j in all) {
+    byName[all[j].name] = all[j];
+}
+//# sourceMappingURL=styles.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/dist/main/utils.js":
+/*!**********************************************!*\
+  !*** ./node_modules/imsc/dist/main/utils.js ***!
+  \**********************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ComputedLength": function() { return /* binding */ ComputedLength; },
+/* harmony export */   "arraysEqual": function() { return /* binding */ arraysEqual; },
+/* harmony export */   "colorMatchesSelector": function() { return /* binding */ colorMatchesSelector; },
+/* harmony export */   "customizeColor": function() { return /* binding */ customizeColor; },
+/* harmony export */   "fromTinycolor": function() { return /* binding */ fromTinycolor; },
+/* harmony export */   "generateAdjustedColor": function() { return /* binding */ generateAdjustedColor; },
+/* harmony export */   "hasOwnProperty": function() { return /* binding */ hasOwnProperty; },
+/* harmony export */   "parseColor": function() { return /* binding */ parseColor; },
+/* harmony export */   "parseLength": function() { return /* binding */ parseLength; },
+/* harmony export */   "parsePosition": function() { return /* binding */ parsePosition; },
+/* harmony export */   "parseTextShadow": function() { return /* binding */ parseTextShadow; },
+/* harmony export */   "toComputedLength": function() { return /* binding */ toComputedLength; },
+/* harmony export */   "toTinycolor": function() { return /* binding */ toTinycolor; }
+/* harmony export */ });
+/* harmony import */ var tinycolor2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tinycolor2 */ "./node_modules/imsc/node_modules/tinycolor2/esm/tinycolor.js");
+/*
+ * Copyright (c) 2016, Pierre-Anthony Lemieux <pal@sandflow.com>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this
+ *   list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/**
+ * @module imscUtils
+ */
+/* Documents the error handler interface */
+/**
+ * @classdesc Generic interface for handling events. The interface exposes four
+ * methods:
+ * * <pre>info</pre>: unusual event that does not result in an inconsistent state
+ * * <pre>warn</pre>: unexpected event that should not result in an inconsistent state
+ * * <pre>error</pre>: unexpected event that may result in an inconsistent state
+ * * <pre>fatal</pre>: unexpected event that results in an inconsistent state
+ *   and termination of processing
+ * Each method takes a single <pre>string</pre> describing the event as argument,
+ * and returns a single <pre>boolean</pre>, which terminates processing if <pre>true</pre>.
+ *
+ * @name ErrorHandler
+ * @class
+ */
+/*
+ * Parses a TTML color expression
+ *
+ */
+var HEX_COLOR_RE = /#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})?/;
+var DEC_COLOR_RE = /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/;
+var DEC_COLORA_RE = /rgba\(\s*(\d+),\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/;
+var NAMED_COLOR = {
+    transparent: [0, 0, 0, 0],
+    black: [0, 0, 0, 255],
+    silver: [192, 192, 192, 255],
+    gray: [128, 128, 128, 255],
+    white: [255, 255, 255, 255],
+    maroon: [128, 0, 0, 255],
+    red: [255, 0, 0, 255],
+    purple: [128, 0, 128, 255],
+    fuchsia: [255, 0, 255, 255],
+    magenta: [255, 0, 255, 255],
+    green: [0, 128, 0, 255],
+    lime: [0, 255, 0, 255],
+    olive: [128, 128, 0, 255],
+    yellow: [255, 255, 0, 255],
+    navy: [0, 0, 128, 255],
+    blue: [0, 0, 255, 255],
+    teal: [0, 128, 128, 255],
+    aqua: [0, 255, 255, 255],
+    cyan: [0, 255, 255, 255],
+};
+function parseColor(str) {
+    var m;
+    var r = null;
+    var nc = NAMED_COLOR[str.toLowerCase()];
+    if (nc !== undefined) {
+        r = nc;
+    }
+    else if ((m = HEX_COLOR_RE.exec(str)) !== null) {
+        r = [parseInt(m[1], 16),
+            parseInt(m[2], 16),
+            parseInt(m[3], 16),
+            (m[4] !== undefined ? parseInt(m[4], 16) : 255)];
+    }
+    else if ((m = DEC_COLOR_RE.exec(str)) !== null) {
+        r = [parseInt(m[1]),
+            parseInt(m[2]),
+            parseInt(m[3]),
+            255];
+    }
+    else if ((m = DEC_COLORA_RE.exec(str)) !== null) {
+        r = [parseInt(m[1]),
+            parseInt(m[2]),
+            parseInt(m[3]),
+            parseInt(m[4])];
+    }
+    return r;
+}
+;
+function toTinycolor(ic) {
+    return (0,tinycolor2__WEBPACK_IMPORTED_MODULE_0__["default"])({
+        r: ic[0],
+        g: ic[1],
+        b: ic[2],
+        a: ic[3] / 255,
+    });
+}
+;
+function fromTinycolor(tc) {
+    var rgb = tc.toRgb();
+    return [rgb.r, rgb.g, rgb.b, rgb.a * 255];
+}
+;
+function customizeColor(inputColor, colorAdjustRules) {
+    var outputColor = inputColor;
+    for (var r = 0; r < colorAdjustRules.length; r++) {
+        var colorAdjustRule = colorAdjustRules[r];
+        var matchResult = colorMatchesSelector(inputColor, colorAdjustRule.colorSelector);
+        if (matchResult.matches) {
+            outputColor = generateAdjustedColor(matchResult, colorAdjustRule.colorGenerator);
+            break;
+        }
+    }
+    return outputColor;
+}
+;
+function arraysEqual(a1, a2) {
+    var rv = a1.length == a2.length;
+    if (rv) {
+        for (var i = 0; (i < a1.length) && rv; i++) {
+            rv = (a1[i] === a2[i]);
+        }
+    }
+    ;
+    return rv;
+}
+;
+function colorMatchesSelector(inputColor, colorSelector) {
+    var rv = {
+        matches: false,
+        color: inputColor,
+    };
+    var parsedColorSelector = parseColor(colorSelector);
+    if (colorSelector === "*") {
+        rv.matches = true;
+    }
+    else if (parsedColorSelector) {
+        rv.matches = arraysEqual(inputColor, parsedColorSelector);
+    }
+    ;
+    return rv;
+}
+;
+function generateAdjustedColor(matchResult, colorGenerator) {
+    var generatedColor = matchResult.color;
+    // TODO: refactor this to be a list of properties mapped to functions
+    // and iterate through that instead of this if ... else if ... else if
+    // pattern.
+    if (colorGenerator.exactColor) {
+        generatedColor = parseColor(colorGenerator.exactColor);
+    }
+    else if (colorGenerator.desaturate) {
+        var desaturatedColor = toTinycolor(generatedColor).desaturate(colorGenerator.desaturate);
+        generatedColor = fromTinycolor(desaturatedColor);
+    }
+    else if (colorGenerator.darken) {
+        var darkenedColor = toTinycolor(generatedColor).darken(colorGenerator.darken);
+        generatedColor = fromTinycolor(darkenedColor);
+    }
+    else if (colorGenerator.spin) {
+        var spinnedColor = toTinycolor(generatedColor).spin(colorGenerator.spin);
+        generatedColor = fromTinycolor(spinnedColor);
+    }
+    ;
+    return generatedColor;
+}
+;
+var LENGTH_RE = /^((?:\+|-)?\d*(?:\.\d+)?)(px|em|c|%|rh|rw)$/;
+function parseLength(str) {
+    var m;
+    var r = null;
+    if ((m = LENGTH_RE.exec(str)) !== null) {
+        r = { value: parseFloat(m[1]), unit: m[2] };
+    }
+    return r;
+}
+;
+function parseTextShadow(str) {
+    var shadows = str.match(/([^(,)]|\([^)]+\))+/g);
+    var r = [];
+    for (var i = 0; i < shadows.length; i++) {
+        var shadow = shadows[i].split(" ");
+        if (shadow.length === 1 && shadow[0] === "none") {
+            return "none";
+        }
+        else if (shadow.length > 1 && shadow.length < 5) {
+            var out_shadow = [null, null, null, null];
+            /* x offset */
+            var l = parseLength(shadow.shift());
+            if (l === null)
+                return null;
+            out_shadow[0] = l;
+            /* y offset */
+            l = parseLength(shadow.shift());
+            if (l === null)
+                return null;
+            out_shadow[1] = l;
+            /* is there a third component */
+            if (shadow.length === 0) {
+                r.push(out_shadow);
+                continue;
+            }
+            l = parseLength(shadow[0]);
+            if (l !== null) {
+                out_shadow[2] = l;
+                shadow.shift();
+            }
+            if (shadow.length === 0) {
+                r.push(out_shadow);
+                continue;
+            }
+            var c = parseColor(shadow[0]);
+            if (c === null)
+                return null;
+            out_shadow[3] = c;
+            r.push(out_shadow);
+        }
+    }
+    return r;
+}
+;
+function parsePosition(str) {
+    /* see https://www.w3.org/TR/ttml2/#style-value-position */
+    var s = str.split(" ");
+    var isKeyword = function (str) {
+        return str === "center" ||
+            str === "left" ||
+            str === "top" ||
+            str === "bottom" ||
+            str === "right";
+    };
+    if (s.length > 4) {
+        return null;
+    }
+    /* initial clean-up pass */
+    for (var j = 0; j < s.length; j++) {
+        if (!isKeyword(s[j])) {
+            var l = parseLength(s[j]);
+            if (l === null)
+                return null;
+            s[j] = l;
+        }
+    }
+    /* position default */
+    var pos = {
+        h: { edge: "left", offset: { value: 50, unit: "%" } },
+        v: { edge: "top", offset: { value: 50, unit: "%" } },
+    };
+    /* update position */
+    for (var i = 0; i < s.length;) {
+        /* extract the current component */
+        var comp = s[i++];
+        if (isKeyword(comp)) {
+            /* we have a keyword */
+            var offset = { value: 0, unit: "%" };
+            /* peek at the next component */
+            if (s.length !== 2 && i < s.length && (!isKeyword(s[i]))) {
+                /* followed by an offset */
+                offset = s[i++];
+            }
+            /* skip if center */
+            if (comp === "right") {
+                pos.h.edge = comp;
+                pos.h.offset = offset;
+            }
+            else if (comp === "bottom") {
+                pos.v.edge = comp;
+                pos.v.offset = offset;
+            }
+            else if (comp === "left") {
+                pos.h.offset = offset;
+            }
+            else if (comp === "top") {
+                pos.v.offset = offset;
+            }
+        }
+        else if (s.length === 1 || s.length === 2) {
+            /* we have a bare value */
+            if (i === 1) {
+                /* assign it to left edge if first bare value */
+                pos.h.offset = comp;
+            }
+            else {
+                /* assign it to top edge if second bare value */
+                pos.v.offset = comp;
+            }
+        }
+        else {
+            /* error condition */
+            return null;
+        }
+    }
+    return pos;
+}
+;
+var ComputedLength = /** @class */ (function () {
+    function ComputedLength(rw, rh) {
+        this.rw = rw;
+        this.rh = rh;
+    }
+    ComputedLength.prototype.toUsedLength = function (width, height) {
+        return width * this.rw + height * this.rh;
+    };
+    ;
+    ComputedLength.prototype.multiply = function (value, factor) {
+        return factor ? value * factor : value;
+    };
+    ;
+    ComputedLength.prototype.isZero = function () {
+        return this.rw === 0 && this.rh === 0;
+    };
+    ;
+    return ComputedLength;
+}());
+
+/**
+ * Computes a specified length to a root container relative length
+ *
+ * @param {number} lengthVal Length value to be computed
+ * @param {string} lengthUnit Units of the length value
+ * @param {number} emScale length of 1em, or null if em is not allowed
+ * @param {number} percentScale length to which , or null if perecentage is not allowed
+ * @param {number} cellScale length of 1c, or null if c is not allowed
+ * @param {number} pxScale length of 1px, or null if px is not allowed
+ * @param {number} direction 0 if the length is computed in the horizontal direction, 1 if the length is computed in the vertical direction
+ * @return {number} Computed length
+ */
+function toComputedLength(lengthVal, lengthUnit, emLength, percentLength, cellLength, pxLength) {
+    if (lengthUnit === "%" && percentLength) {
+        return new ComputedLength(percentLength.rw * lengthVal / 100, percentLength.rh * lengthVal / 100);
+    }
+    else if (lengthUnit === "em" && emLength) {
+        return new ComputedLength(emLength.rw * lengthVal, emLength.rh * lengthVal);
+    }
+    else if (lengthUnit === "c" && cellLength) {
+        return new ComputedLength(lengthVal * cellLength.rw, lengthVal * cellLength.rh);
+    }
+    else if (lengthUnit === "px" && pxLength) {
+        return new ComputedLength(lengthVal * pxLength.rw, lengthVal * pxLength.rh);
+    }
+    else if (lengthUnit === "rh") {
+        return new ComputedLength(0, lengthVal / 100);
+    }
+    else if (lengthUnit === "rw") {
+        return new ComputedLength(lengthVal / 100, 0);
+    }
+    else {
+        return null;
+    }
+}
+function hasOwnProperty(obj, prop) {
+    return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+//# sourceMappingURL=utils.js.map
+
+/***/ }),
+
+/***/ "./node_modules/imsc/node_modules/tinycolor2/esm/tinycolor.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/imsc/node_modules/tinycolor2/esm/tinycolor.js ***!
+  \********************************************************************/
+/***/ (function(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": function() { return /* binding */ tinycolor; }
+/* harmony export */ });
+// This file is autogenerated. It's used to publish ESM to npm.
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+  }, _typeof(obj);
+}
+
+// https://github.com/bgrins/TinyColor
+// Brian Grinstead, MIT License
+
+var trimLeft = /^\s+/;
+var trimRight = /\s+$/;
+function tinycolor(color, opts) {
+  color = color ? color : "";
+  opts = opts || {};
+
+  // If input is already a tinycolor, return itself
+  if (color instanceof tinycolor) {
+    return color;
+  }
+  // If we are called as a function, call using new instead
+  if (!(this instanceof tinycolor)) {
+    return new tinycolor(color, opts);
+  }
+  var rgb = inputToRGB(color);
+  this._originalInput = color, this._r = rgb.r, this._g = rgb.g, this._b = rgb.b, this._a = rgb.a, this._roundA = Math.round(100 * this._a) / 100, this._format = opts.format || rgb.format;
+  this._gradientType = opts.gradientType;
+
+  // Don't let the range of [0,255] come back in [0,1].
+  // Potentially lose a little bit of precision here, but will fix issues where
+  // .5 gets interpreted as half of the total, instead of half of 1
+  // If it was supposed to be 128, this was already taken care of by `inputToRgb`
+  if (this._r < 1) this._r = Math.round(this._r);
+  if (this._g < 1) this._g = Math.round(this._g);
+  if (this._b < 1) this._b = Math.round(this._b);
+  this._ok = rgb.ok;
+}
+tinycolor.prototype = {
+  isDark: function isDark() {
+    return this.getBrightness() < 128;
+  },
+  isLight: function isLight() {
+    return !this.isDark();
+  },
+  isValid: function isValid() {
+    return this._ok;
+  },
+  getOriginalInput: function getOriginalInput() {
+    return this._originalInput;
+  },
+  getFormat: function getFormat() {
+    return this._format;
+  },
+  getAlpha: function getAlpha() {
+    return this._a;
+  },
+  getBrightness: function getBrightness() {
+    //http://www.w3.org/TR/AERT#color-contrast
+    var rgb = this.toRgb();
+    return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+  },
+  getLuminance: function getLuminance() {
+    //http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef
+    var rgb = this.toRgb();
+    var RsRGB, GsRGB, BsRGB, R, G, B;
+    RsRGB = rgb.r / 255;
+    GsRGB = rgb.g / 255;
+    BsRGB = rgb.b / 255;
+    if (RsRGB <= 0.03928) R = RsRGB / 12.92;else R = Math.pow((RsRGB + 0.055) / 1.055, 2.4);
+    if (GsRGB <= 0.03928) G = GsRGB / 12.92;else G = Math.pow((GsRGB + 0.055) / 1.055, 2.4);
+    if (BsRGB <= 0.03928) B = BsRGB / 12.92;else B = Math.pow((BsRGB + 0.055) / 1.055, 2.4);
+    return 0.2126 * R + 0.7152 * G + 0.0722 * B;
+  },
+  setAlpha: function setAlpha(value) {
+    this._a = boundAlpha(value);
+    this._roundA = Math.round(100 * this._a) / 100;
+    return this;
+  },
+  toHsv: function toHsv() {
+    var hsv = rgbToHsv(this._r, this._g, this._b);
+    return {
+      h: hsv.h * 360,
+      s: hsv.s,
+      v: hsv.v,
+      a: this._a
+    };
+  },
+  toHsvString: function toHsvString() {
+    var hsv = rgbToHsv(this._r, this._g, this._b);
+    var h = Math.round(hsv.h * 360),
+      s = Math.round(hsv.s * 100),
+      v = Math.round(hsv.v * 100);
+    return this._a == 1 ? "hsv(" + h + ", " + s + "%, " + v + "%)" : "hsva(" + h + ", " + s + "%, " + v + "%, " + this._roundA + ")";
+  },
+  toHsl: function toHsl() {
+    var hsl = rgbToHsl(this._r, this._g, this._b);
+    return {
+      h: hsl.h * 360,
+      s: hsl.s,
+      l: hsl.l,
+      a: this._a
+    };
+  },
+  toHslString: function toHslString() {
+    var hsl = rgbToHsl(this._r, this._g, this._b);
+    var h = Math.round(hsl.h * 360),
+      s = Math.round(hsl.s * 100),
+      l = Math.round(hsl.l * 100);
+    return this._a == 1 ? "hsl(" + h + ", " + s + "%, " + l + "%)" : "hsla(" + h + ", " + s + "%, " + l + "%, " + this._roundA + ")";
+  },
+  toHex: function toHex(allow3Char) {
+    return rgbToHex(this._r, this._g, this._b, allow3Char);
+  },
+  toHexString: function toHexString(allow3Char) {
+    return "#" + this.toHex(allow3Char);
+  },
+  toHex8: function toHex8(allow4Char) {
+    return rgbaToHex(this._r, this._g, this._b, this._a, allow4Char);
+  },
+  toHex8String: function toHex8String(allow4Char) {
+    return "#" + this.toHex8(allow4Char);
+  },
+  toRgb: function toRgb() {
+    return {
+      r: Math.round(this._r),
+      g: Math.round(this._g),
+      b: Math.round(this._b),
+      a: this._a
+    };
+  },
+  toRgbString: function toRgbString() {
+    return this._a == 1 ? "rgb(" + Math.round(this._r) + ", " + Math.round(this._g) + ", " + Math.round(this._b) + ")" : "rgba(" + Math.round(this._r) + ", " + Math.round(this._g) + ", " + Math.round(this._b) + ", " + this._roundA + ")";
+  },
+  toPercentageRgb: function toPercentageRgb() {
+    return {
+      r: Math.round(bound01(this._r, 255) * 100) + "%",
+      g: Math.round(bound01(this._g, 255) * 100) + "%",
+      b: Math.round(bound01(this._b, 255) * 100) + "%",
+      a: this._a
+    };
+  },
+  toPercentageRgbString: function toPercentageRgbString() {
+    return this._a == 1 ? "rgb(" + Math.round(bound01(this._r, 255) * 100) + "%, " + Math.round(bound01(this._g, 255) * 100) + "%, " + Math.round(bound01(this._b, 255) * 100) + "%)" : "rgba(" + Math.round(bound01(this._r, 255) * 100) + "%, " + Math.round(bound01(this._g, 255) * 100) + "%, " + Math.round(bound01(this._b, 255) * 100) + "%, " + this._roundA + ")";
+  },
+  toName: function toName() {
+    if (this._a === 0) {
+      return "transparent";
+    }
+    if (this._a < 1) {
+      return false;
+    }
+    return hexNames[rgbToHex(this._r, this._g, this._b, true)] || false;
+  },
+  toFilter: function toFilter(secondColor) {
+    var hex8String = "#" + rgbaToArgbHex(this._r, this._g, this._b, this._a);
+    var secondHex8String = hex8String;
+    var gradientType = this._gradientType ? "GradientType = 1, " : "";
+    if (secondColor) {
+      var s = tinycolor(secondColor);
+      secondHex8String = "#" + rgbaToArgbHex(s._r, s._g, s._b, s._a);
+    }
+    return "progid:DXImageTransform.Microsoft.gradient(" + gradientType + "startColorstr=" + hex8String + ",endColorstr=" + secondHex8String + ")";
+  },
+  toString: function toString(format) {
+    var formatSet = !!format;
+    format = format || this._format;
+    var formattedString = false;
+    var hasAlpha = this._a < 1 && this._a >= 0;
+    var needsAlphaFormat = !formatSet && hasAlpha && (format === "hex" || format === "hex6" || format === "hex3" || format === "hex4" || format === "hex8" || format === "name");
+    if (needsAlphaFormat) {
+      // Special case for "transparent", all other non-alpha formats
+      // will return rgba when there is transparency.
+      if (format === "name" && this._a === 0) {
+        return this.toName();
+      }
+      return this.toRgbString();
+    }
+    if (format === "rgb") {
+      formattedString = this.toRgbString();
+    }
+    if (format === "prgb") {
+      formattedString = this.toPercentageRgbString();
+    }
+    if (format === "hex" || format === "hex6") {
+      formattedString = this.toHexString();
+    }
+    if (format === "hex3") {
+      formattedString = this.toHexString(true);
+    }
+    if (format === "hex4") {
+      formattedString = this.toHex8String(true);
+    }
+    if (format === "hex8") {
+      formattedString = this.toHex8String();
+    }
+    if (format === "name") {
+      formattedString = this.toName();
+    }
+    if (format === "hsl") {
+      formattedString = this.toHslString();
+    }
+    if (format === "hsv") {
+      formattedString = this.toHsvString();
+    }
+    return formattedString || this.toHexString();
+  },
+  clone: function clone() {
+    return tinycolor(this.toString());
+  },
+  _applyModification: function _applyModification(fn, args) {
+    var color = fn.apply(null, [this].concat([].slice.call(args)));
+    this._r = color._r;
+    this._g = color._g;
+    this._b = color._b;
+    this.setAlpha(color._a);
+    return this;
+  },
+  lighten: function lighten() {
+    return this._applyModification(_lighten, arguments);
+  },
+  brighten: function brighten() {
+    return this._applyModification(_brighten, arguments);
+  },
+  darken: function darken() {
+    return this._applyModification(_darken, arguments);
+  },
+  desaturate: function desaturate() {
+    return this._applyModification(_desaturate, arguments);
+  },
+  saturate: function saturate() {
+    return this._applyModification(_saturate, arguments);
+  },
+  greyscale: function greyscale() {
+    return this._applyModification(_greyscale, arguments);
+  },
+  spin: function spin() {
+    return this._applyModification(_spin, arguments);
+  },
+  _applyCombination: function _applyCombination(fn, args) {
+    return fn.apply(null, [this].concat([].slice.call(args)));
+  },
+  analogous: function analogous() {
+    return this._applyCombination(_analogous, arguments);
+  },
+  complement: function complement() {
+    return this._applyCombination(_complement, arguments);
+  },
+  monochromatic: function monochromatic() {
+    return this._applyCombination(_monochromatic, arguments);
+  },
+  splitcomplement: function splitcomplement() {
+    return this._applyCombination(_splitcomplement, arguments);
+  },
+  // Disabled until https://github.com/bgrins/TinyColor/issues/254
+  // polyad: function (number) {
+  //   return this._applyCombination(polyad, [number]);
+  // },
+  triad: function triad() {
+    return this._applyCombination(polyad, [3]);
+  },
+  tetrad: function tetrad() {
+    return this._applyCombination(polyad, [4]);
+  }
+};
+
+// If input is an object, force 1 into "1.0" to handle ratios properly
+// String input requires "1.0" as input, so 1 will be treated as 1
+tinycolor.fromRatio = function (color, opts) {
+  if (_typeof(color) == "object") {
+    var newColor = {};
+    for (var i in color) {
+      if (color.hasOwnProperty(i)) {
+        if (i === "a") {
+          newColor[i] = color[i];
+        } else {
+          newColor[i] = convertToPercentage(color[i]);
+        }
+      }
+    }
+    color = newColor;
+  }
+  return tinycolor(color, opts);
+};
+
+// Given a string or object, convert that input to RGB
+// Possible string inputs:
+//
+//     "red"
+//     "#f00" or "f00"
+//     "#ff0000" or "ff0000"
+//     "#ff000000" or "ff000000"
+//     "rgb 255 0 0" or "rgb (255, 0, 0)"
+//     "rgb 1.0 0 0" or "rgb (1, 0, 0)"
+//     "rgba (255, 0, 0, 1)" or "rgba 255, 0, 0, 1"
+//     "rgba (1.0, 0, 0, 1)" or "rgba 1.0, 0, 0, 1"
+//     "hsl(0, 100%, 50%)" or "hsl 0 100% 50%"
+//     "hsla(0, 100%, 50%, 1)" or "hsla 0 100% 50%, 1"
+//     "hsv(0, 100%, 100%)" or "hsv 0 100% 100%"
+//
+function inputToRGB(color) {
+  var rgb = {
+    r: 0,
+    g: 0,
+    b: 0
+  };
+  var a = 1;
+  var s = null;
+  var v = null;
+  var l = null;
+  var ok = false;
+  var format = false;
+  if (typeof color == "string") {
+    color = stringInputToObject(color);
+  }
+  if (_typeof(color) == "object") {
+    if (isValidCSSUnit(color.r) && isValidCSSUnit(color.g) && isValidCSSUnit(color.b)) {
+      rgb = rgbToRgb(color.r, color.g, color.b);
+      ok = true;
+      format = String(color.r).substr(-1) === "%" ? "prgb" : "rgb";
+    } else if (isValidCSSUnit(color.h) && isValidCSSUnit(color.s) && isValidCSSUnit(color.v)) {
+      s = convertToPercentage(color.s);
+      v = convertToPercentage(color.v);
+      rgb = hsvToRgb(color.h, s, v);
+      ok = true;
+      format = "hsv";
+    } else if (isValidCSSUnit(color.h) && isValidCSSUnit(color.s) && isValidCSSUnit(color.l)) {
+      s = convertToPercentage(color.s);
+      l = convertToPercentage(color.l);
+      rgb = hslToRgb(color.h, s, l);
+      ok = true;
+      format = "hsl";
+    }
+    if (color.hasOwnProperty("a")) {
+      a = color.a;
+    }
+  }
+  a = boundAlpha(a);
+  return {
+    ok: ok,
+    format: color.format || format,
+    r: Math.min(255, Math.max(rgb.r, 0)),
+    g: Math.min(255, Math.max(rgb.g, 0)),
+    b: Math.min(255, Math.max(rgb.b, 0)),
+    a: a
+  };
+}
+
+// Conversion Functions
+// --------------------
+
+// `rgbToHsl`, `rgbToHsv`, `hslToRgb`, `hsvToRgb` modified from:
+// <http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript>
+
+// `rgbToRgb`
+// Handle bounds / percentage checking to conform to CSS color spec
+// <http://www.w3.org/TR/css3-color/>
+// *Assumes:* r, g, b in [0, 255] or [0, 1]
+// *Returns:* { r, g, b } in [0, 255]
+function rgbToRgb(r, g, b) {
+  return {
+    r: bound01(r, 255) * 255,
+    g: bound01(g, 255) * 255,
+    b: bound01(b, 255) * 255
+  };
+}
+
+// `rgbToHsl`
+// Converts an RGB color value to HSL.
+// *Assumes:* r, g, and b are contained in [0, 255] or [0, 1]
+// *Returns:* { h, s, l } in [0,1]
+function rgbToHsl(r, g, b) {
+  r = bound01(r, 255);
+  g = bound01(g, 255);
+  b = bound01(b, 255);
+  var max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  var h,
+    s,
+    l = (max + min) / 2;
+  if (max == min) {
+    h = s = 0; // achromatic
+  } else {
+    var d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  return {
+    h: h,
+    s: s,
+    l: l
+  };
+}
+
+// `hslToRgb`
+// Converts an HSL color value to RGB.
+// *Assumes:* h is contained in [0, 1] or [0, 360] and s and l are contained [0, 1] or [0, 100]
+// *Returns:* { r, g, b } in the set [0, 255]
+function hslToRgb(h, s, l) {
+  var r, g, b;
+  h = bound01(h, 360);
+  s = bound01(s, 100);
+  l = bound01(l, 100);
+  function hue2rgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    return p;
+  }
+  if (s === 0) {
+    r = g = b = l; // achromatic
+  } else {
+    var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    var p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1 / 3);
+    g = hue2rgb(p, q, h);
+    b = hue2rgb(p, q, h - 1 / 3);
+  }
+  return {
+    r: r * 255,
+    g: g * 255,
+    b: b * 255
+  };
+}
+
+// `rgbToHsv`
+// Converts an RGB color value to HSV
+// *Assumes:* r, g, and b are contained in the set [0, 255] or [0, 1]
+// *Returns:* { h, s, v } in [0,1]
+function rgbToHsv(r, g, b) {
+  r = bound01(r, 255);
+  g = bound01(g, 255);
+  b = bound01(b, 255);
+  var max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  var h,
+    s,
+    v = max;
+  var d = max - min;
+  s = max === 0 ? 0 : d / max;
+  if (max == min) {
+    h = 0; // achromatic
+  } else {
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  return {
+    h: h,
+    s: s,
+    v: v
+  };
+}
+
+// `hsvToRgb`
+// Converts an HSV color value to RGB.
+// *Assumes:* h is contained in [0, 1] or [0, 360] and s and v are contained in [0, 1] or [0, 100]
+// *Returns:* { r, g, b } in the set [0, 255]
+function hsvToRgb(h, s, v) {
+  h = bound01(h, 360) * 6;
+  s = bound01(s, 100);
+  v = bound01(v, 100);
+  var i = Math.floor(h),
+    f = h - i,
+    p = v * (1 - s),
+    q = v * (1 - f * s),
+    t = v * (1 - (1 - f) * s),
+    mod = i % 6,
+    r = [v, q, p, p, t, v][mod],
+    g = [t, v, v, q, p, p][mod],
+    b = [p, p, t, v, v, q][mod];
+  return {
+    r: r * 255,
+    g: g * 255,
+    b: b * 255
+  };
+}
+
+// `rgbToHex`
+// Converts an RGB color to hex
+// Assumes r, g, and b are contained in the set [0, 255]
+// Returns a 3 or 6 character hex
+function rgbToHex(r, g, b, allow3Char) {
+  var hex = [pad2(Math.round(r).toString(16)), pad2(Math.round(g).toString(16)), pad2(Math.round(b).toString(16))];
+
+  // Return a 3 character hex if possible
+  if (allow3Char && hex[0].charAt(0) == hex[0].charAt(1) && hex[1].charAt(0) == hex[1].charAt(1) && hex[2].charAt(0) == hex[2].charAt(1)) {
+    return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
+  }
+  return hex.join("");
+}
+
+// `rgbaToHex`
+// Converts an RGBA color plus alpha transparency to hex
+// Assumes r, g, b are contained in the set [0, 255] and
+// a in [0, 1]. Returns a 4 or 8 character rgba hex
+function rgbaToHex(r, g, b, a, allow4Char) {
+  var hex = [pad2(Math.round(r).toString(16)), pad2(Math.round(g).toString(16)), pad2(Math.round(b).toString(16)), pad2(convertDecimalToHex(a))];
+
+  // Return a 4 character hex if possible
+  if (allow4Char && hex[0].charAt(0) == hex[0].charAt(1) && hex[1].charAt(0) == hex[1].charAt(1) && hex[2].charAt(0) == hex[2].charAt(1) && hex[3].charAt(0) == hex[3].charAt(1)) {
+    return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0) + hex[3].charAt(0);
+  }
+  return hex.join("");
+}
+
+// `rgbaToArgbHex`
+// Converts an RGBA color to an ARGB Hex8 string
+// Rarely used, but required for "toFilter()"
+function rgbaToArgbHex(r, g, b, a) {
+  var hex = [pad2(convertDecimalToHex(a)), pad2(Math.round(r).toString(16)), pad2(Math.round(g).toString(16)), pad2(Math.round(b).toString(16))];
+  return hex.join("");
+}
+
+// `equals`
+// Can be called with any tinycolor input
+tinycolor.equals = function (color1, color2) {
+  if (!color1 || !color2) return false;
+  return tinycolor(color1).toRgbString() == tinycolor(color2).toRgbString();
+};
+tinycolor.random = function () {
+  return tinycolor.fromRatio({
+    r: Math.random(),
+    g: Math.random(),
+    b: Math.random()
+  });
+};
+
+// Modification Functions
+// ----------------------
+// Thanks to less.js for some of the basics here
+// <https://github.com/cloudhead/less.js/blob/master/lib/less/functions.js>
+
+function _desaturate(color, amount) {
+  amount = amount === 0 ? 0 : amount || 10;
+  var hsl = tinycolor(color).toHsl();
+  hsl.s -= amount / 100;
+  hsl.s = clamp01(hsl.s);
+  return tinycolor(hsl);
+}
+function _saturate(color, amount) {
+  amount = amount === 0 ? 0 : amount || 10;
+  var hsl = tinycolor(color).toHsl();
+  hsl.s += amount / 100;
+  hsl.s = clamp01(hsl.s);
+  return tinycolor(hsl);
+}
+function _greyscale(color) {
+  return tinycolor(color).desaturate(100);
+}
+function _lighten(color, amount) {
+  amount = amount === 0 ? 0 : amount || 10;
+  var hsl = tinycolor(color).toHsl();
+  hsl.l += amount / 100;
+  hsl.l = clamp01(hsl.l);
+  return tinycolor(hsl);
+}
+function _brighten(color, amount) {
+  amount = amount === 0 ? 0 : amount || 10;
+  var rgb = tinycolor(color).toRgb();
+  rgb.r = Math.max(0, Math.min(255, rgb.r - Math.round(255 * -(amount / 100))));
+  rgb.g = Math.max(0, Math.min(255, rgb.g - Math.round(255 * -(amount / 100))));
+  rgb.b = Math.max(0, Math.min(255, rgb.b - Math.round(255 * -(amount / 100))));
+  return tinycolor(rgb);
+}
+function _darken(color, amount) {
+  amount = amount === 0 ? 0 : amount || 10;
+  var hsl = tinycolor(color).toHsl();
+  hsl.l -= amount / 100;
+  hsl.l = clamp01(hsl.l);
+  return tinycolor(hsl);
+}
+
+// Spin takes a positive or negative amount within [-360, 360] indicating the change of hue.
+// Values outside of this range will be wrapped into this range.
+function _spin(color, amount) {
+  var hsl = tinycolor(color).toHsl();
+  var hue = (hsl.h + amount) % 360;
+  hsl.h = hue < 0 ? 360 + hue : hue;
+  return tinycolor(hsl);
+}
+
+// Combination Functions
+// ---------------------
+// Thanks to jQuery xColor for some of the ideas behind these
+// <https://github.com/infusion/jQuery-xcolor/blob/master/jquery.xcolor.js>
+
+function _complement(color) {
+  var hsl = tinycolor(color).toHsl();
+  hsl.h = (hsl.h + 180) % 360;
+  return tinycolor(hsl);
+}
+function polyad(color, number) {
+  if (isNaN(number) || number <= 0) {
+    throw new Error("Argument to polyad must be a positive number");
+  }
+  var hsl = tinycolor(color).toHsl();
+  var result = [tinycolor(color)];
+  var step = 360 / number;
+  for (var i = 1; i < number; i++) {
+    result.push(tinycolor({
+      h: (hsl.h + i * step) % 360,
+      s: hsl.s,
+      l: hsl.l
+    }));
+  }
+  return result;
+}
+function _splitcomplement(color) {
+  var hsl = tinycolor(color).toHsl();
+  var h = hsl.h;
+  return [tinycolor(color), tinycolor({
+    h: (h + 72) % 360,
+    s: hsl.s,
+    l: hsl.l
+  }), tinycolor({
+    h: (h + 216) % 360,
+    s: hsl.s,
+    l: hsl.l
+  })];
+}
+function _analogous(color, results, slices) {
+  results = results || 6;
+  slices = slices || 30;
+  var hsl = tinycolor(color).toHsl();
+  var part = 360 / slices;
+  var ret = [tinycolor(color)];
+  for (hsl.h = (hsl.h - (part * results >> 1) + 720) % 360; --results;) {
+    hsl.h = (hsl.h + part) % 360;
+    ret.push(tinycolor(hsl));
+  }
+  return ret;
+}
+function _monochromatic(color, results) {
+  results = results || 6;
+  var hsv = tinycolor(color).toHsv();
+  var h = hsv.h,
+    s = hsv.s,
+    v = hsv.v;
+  var ret = [];
+  var modification = 1 / results;
+  while (results--) {
+    ret.push(tinycolor({
+      h: h,
+      s: s,
+      v: v
+    }));
+    v = (v + modification) % 1;
+  }
+  return ret;
+}
+
+// Utility Functions
+// ---------------------
+
+tinycolor.mix = function (color1, color2, amount) {
+  amount = amount === 0 ? 0 : amount || 50;
+  var rgb1 = tinycolor(color1).toRgb();
+  var rgb2 = tinycolor(color2).toRgb();
+  var p = amount / 100;
+  var rgba = {
+    r: (rgb2.r - rgb1.r) * p + rgb1.r,
+    g: (rgb2.g - rgb1.g) * p + rgb1.g,
+    b: (rgb2.b - rgb1.b) * p + rgb1.b,
+    a: (rgb2.a - rgb1.a) * p + rgb1.a
+  };
+  return tinycolor(rgba);
+};
+
+// Readability Functions
+// ---------------------
+// <http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef (WCAG Version 2)
+
+// `contrast`
+// Analyze the 2 colors and returns the color contrast defined by (WCAG Version 2)
+tinycolor.readability = function (color1, color2) {
+  var c1 = tinycolor(color1);
+  var c2 = tinycolor(color2);
+  return (Math.max(c1.getLuminance(), c2.getLuminance()) + 0.05) / (Math.min(c1.getLuminance(), c2.getLuminance()) + 0.05);
+};
+
+// `isReadable`
+// Ensure that foreground and background color combinations meet WCAG2 guidelines.
+// The third argument is an optional Object.
+//      the 'level' property states 'AA' or 'AAA' - if missing or invalid, it defaults to 'AA';
+//      the 'size' property states 'large' or 'small' - if missing or invalid, it defaults to 'small'.
+// If the entire object is absent, isReadable defaults to {level:"AA",size:"small"}.
+
+// *Example*
+//    tinycolor.isReadable("#000", "#111") => false
+//    tinycolor.isReadable("#000", "#111",{level:"AA",size:"large"}) => false
+tinycolor.isReadable = function (color1, color2, wcag2) {
+  var readability = tinycolor.readability(color1, color2);
+  var wcag2Parms, out;
+  out = false;
+  wcag2Parms = validateWCAG2Parms(wcag2);
+  switch (wcag2Parms.level + wcag2Parms.size) {
+    case "AAsmall":
+    case "AAAlarge":
+      out = readability >= 4.5;
+      break;
+    case "AAlarge":
+      out = readability >= 3;
+      break;
+    case "AAAsmall":
+      out = readability >= 7;
+      break;
+  }
+  return out;
+};
+
+// `mostReadable`
+// Given a base color and a list of possible foreground or background
+// colors for that base, returns the most readable color.
+// Optionally returns Black or White if the most readable color is unreadable.
+// *Example*
+//    tinycolor.mostReadable(tinycolor.mostReadable("#123", ["#124", "#125"],{includeFallbackColors:false}).toHexString(); // "#112255"
+//    tinycolor.mostReadable(tinycolor.mostReadable("#123", ["#124", "#125"],{includeFallbackColors:true}).toHexString();  // "#ffffff"
+//    tinycolor.mostReadable("#a8015a", ["#faf3f3"],{includeFallbackColors:true,level:"AAA",size:"large"}).toHexString(); // "#faf3f3"
+//    tinycolor.mostReadable("#a8015a", ["#faf3f3"],{includeFallbackColors:true,level:"AAA",size:"small"}).toHexString(); // "#ffffff"
+tinycolor.mostReadable = function (baseColor, colorList, args) {
+  var bestColor = null;
+  var bestScore = 0;
+  var readability;
+  var includeFallbackColors, level, size;
+  args = args || {};
+  includeFallbackColors = args.includeFallbackColors;
+  level = args.level;
+  size = args.size;
+  for (var i = 0; i < colorList.length; i++) {
+    readability = tinycolor.readability(baseColor, colorList[i]);
+    if (readability > bestScore) {
+      bestScore = readability;
+      bestColor = tinycolor(colorList[i]);
+    }
+  }
+  if (tinycolor.isReadable(baseColor, bestColor, {
+    level: level,
+    size: size
+  }) || !includeFallbackColors) {
+    return bestColor;
+  } else {
+    args.includeFallbackColors = false;
+    return tinycolor.mostReadable(baseColor, ["#fff", "#000"], args);
+  }
+};
+
+// Big List of Colors
+// ------------------
+// <https://www.w3.org/TR/css-color-4/#named-colors>
+var names = tinycolor.names = {
+  aliceblue: "f0f8ff",
+  antiquewhite: "faebd7",
+  aqua: "0ff",
+  aquamarine: "7fffd4",
+  azure: "f0ffff",
+  beige: "f5f5dc",
+  bisque: "ffe4c4",
+  black: "000",
+  blanchedalmond: "ffebcd",
+  blue: "00f",
+  blueviolet: "8a2be2",
+  brown: "a52a2a",
+  burlywood: "deb887",
+  burntsienna: "ea7e5d",
+  cadetblue: "5f9ea0",
+  chartreuse: "7fff00",
+  chocolate: "d2691e",
+  coral: "ff7f50",
+  cornflowerblue: "6495ed",
+  cornsilk: "fff8dc",
+  crimson: "dc143c",
+  cyan: "0ff",
+  darkblue: "00008b",
+  darkcyan: "008b8b",
+  darkgoldenrod: "b8860b",
+  darkgray: "a9a9a9",
+  darkgreen: "006400",
+  darkgrey: "a9a9a9",
+  darkkhaki: "bdb76b",
+  darkmagenta: "8b008b",
+  darkolivegreen: "556b2f",
+  darkorange: "ff8c00",
+  darkorchid: "9932cc",
+  darkred: "8b0000",
+  darksalmon: "e9967a",
+  darkseagreen: "8fbc8f",
+  darkslateblue: "483d8b",
+  darkslategray: "2f4f4f",
+  darkslategrey: "2f4f4f",
+  darkturquoise: "00ced1",
+  darkviolet: "9400d3",
+  deeppink: "ff1493",
+  deepskyblue: "00bfff",
+  dimgray: "696969",
+  dimgrey: "696969",
+  dodgerblue: "1e90ff",
+  firebrick: "b22222",
+  floralwhite: "fffaf0",
+  forestgreen: "228b22",
+  fuchsia: "f0f",
+  gainsboro: "dcdcdc",
+  ghostwhite: "f8f8ff",
+  gold: "ffd700",
+  goldenrod: "daa520",
+  gray: "808080",
+  green: "008000",
+  greenyellow: "adff2f",
+  grey: "808080",
+  honeydew: "f0fff0",
+  hotpink: "ff69b4",
+  indianred: "cd5c5c",
+  indigo: "4b0082",
+  ivory: "fffff0",
+  khaki: "f0e68c",
+  lavender: "e6e6fa",
+  lavenderblush: "fff0f5",
+  lawngreen: "7cfc00",
+  lemonchiffon: "fffacd",
+  lightblue: "add8e6",
+  lightcoral: "f08080",
+  lightcyan: "e0ffff",
+  lightgoldenrodyellow: "fafad2",
+  lightgray: "d3d3d3",
+  lightgreen: "90ee90",
+  lightgrey: "d3d3d3",
+  lightpink: "ffb6c1",
+  lightsalmon: "ffa07a",
+  lightseagreen: "20b2aa",
+  lightskyblue: "87cefa",
+  lightslategray: "789",
+  lightslategrey: "789",
+  lightsteelblue: "b0c4de",
+  lightyellow: "ffffe0",
+  lime: "0f0",
+  limegreen: "32cd32",
+  linen: "faf0e6",
+  magenta: "f0f",
+  maroon: "800000",
+  mediumaquamarine: "66cdaa",
+  mediumblue: "0000cd",
+  mediumorchid: "ba55d3",
+  mediumpurple: "9370db",
+  mediumseagreen: "3cb371",
+  mediumslateblue: "7b68ee",
+  mediumspringgreen: "00fa9a",
+  mediumturquoise: "48d1cc",
+  mediumvioletred: "c71585",
+  midnightblue: "191970",
+  mintcream: "f5fffa",
+  mistyrose: "ffe4e1",
+  moccasin: "ffe4b5",
+  navajowhite: "ffdead",
+  navy: "000080",
+  oldlace: "fdf5e6",
+  olive: "808000",
+  olivedrab: "6b8e23",
+  orange: "ffa500",
+  orangered: "ff4500",
+  orchid: "da70d6",
+  palegoldenrod: "eee8aa",
+  palegreen: "98fb98",
+  paleturquoise: "afeeee",
+  palevioletred: "db7093",
+  papayawhip: "ffefd5",
+  peachpuff: "ffdab9",
+  peru: "cd853f",
+  pink: "ffc0cb",
+  plum: "dda0dd",
+  powderblue: "b0e0e6",
+  purple: "800080",
+  rebeccapurple: "663399",
+  red: "f00",
+  rosybrown: "bc8f8f",
+  royalblue: "4169e1",
+  saddlebrown: "8b4513",
+  salmon: "fa8072",
+  sandybrown: "f4a460",
+  seagreen: "2e8b57",
+  seashell: "fff5ee",
+  sienna: "a0522d",
+  silver: "c0c0c0",
+  skyblue: "87ceeb",
+  slateblue: "6a5acd",
+  slategray: "708090",
+  slategrey: "708090",
+  snow: "fffafa",
+  springgreen: "00ff7f",
+  steelblue: "4682b4",
+  tan: "d2b48c",
+  teal: "008080",
+  thistle: "d8bfd8",
+  tomato: "ff6347",
+  turquoise: "40e0d0",
+  violet: "ee82ee",
+  wheat: "f5deb3",
+  white: "fff",
+  whitesmoke: "f5f5f5",
+  yellow: "ff0",
+  yellowgreen: "9acd32"
+};
+
+// Make it easy to access colors via `hexNames[hex]`
+var hexNames = tinycolor.hexNames = flip(names);
+
+// Utilities
+// ---------
+
+// `{ 'name1': 'val1' }` becomes `{ 'val1': 'name1' }`
+function flip(o) {
+  var flipped = {};
+  for (var i in o) {
+    if (o.hasOwnProperty(i)) {
+      flipped[o[i]] = i;
+    }
+  }
+  return flipped;
+}
+
+// Return a valid alpha value [0,1] with all invalid values being set to 1
+function boundAlpha(a) {
+  a = parseFloat(a);
+  if (isNaN(a) || a < 0 || a > 1) {
+    a = 1;
+  }
+  return a;
+}
+
+// Take input from [0, n] and return it as [0, 1]
+function bound01(n, max) {
+  if (isOnePointZero(n)) n = "100%";
+  var processPercent = isPercentage(n);
+  n = Math.min(max, Math.max(0, parseFloat(n)));
+
+  // Automatically convert percentage into number
+  if (processPercent) {
+    n = parseInt(n * max, 10) / 100;
+  }
+
+  // Handle floating point rounding errors
+  if (Math.abs(n - max) < 0.000001) {
+    return 1;
+  }
+
+  // Convert into [0, 1] range if it isn't already
+  return n % max / parseFloat(max);
+}
+
+// Force a number between 0 and 1
+function clamp01(val) {
+  return Math.min(1, Math.max(0, val));
+}
+
+// Parse a base-16 hex value into a base-10 integer
+function parseIntFromHex(val) {
+  return parseInt(val, 16);
+}
+
+// Need to handle 1.0 as 100%, since once it is a number, there is no difference between it and 1
+// <http://stackoverflow.com/questions/7422072/javascript-how-to-detect-number-as-a-decimal-including-1-0>
+function isOnePointZero(n) {
+  return typeof n == "string" && n.indexOf(".") != -1 && parseFloat(n) === 1;
+}
+
+// Check to see if string passed in is a percentage
+function isPercentage(n) {
+  return typeof n === "string" && n.indexOf("%") != -1;
+}
+
+// Force a hex value to have 2 characters
+function pad2(c) {
+  return c.length == 1 ? "0" + c : "" + c;
+}
+
+// Replace a decimal with it's percentage value
+function convertToPercentage(n) {
+  if (n <= 1) {
+    n = n * 100 + "%";
+  }
+  return n;
+}
+
+// Converts a decimal to a hex value
+function convertDecimalToHex(d) {
+  return Math.round(parseFloat(d) * 255).toString(16);
+}
+// Converts a hex value to a decimal
+function convertHexToDecimal(h) {
+  return parseIntFromHex(h) / 255;
+}
+var matchers = function () {
+  // <http://www.w3.org/TR/css3-values/#integers>
+  var CSS_INTEGER = "[-\\+]?\\d+%?";
+
+  // <http://www.w3.org/TR/css3-values/#number-value>
+  var CSS_NUMBER = "[-\\+]?\\d*\\.\\d+%?";
+
+  // Allow positive/negative integer/number.  Don't capture the either/or, just the entire outcome.
+  var CSS_UNIT = "(?:" + CSS_NUMBER + ")|(?:" + CSS_INTEGER + ")";
+
+  // Actual matching.
+  // Parentheses and commas are optional, but not required.
+  // Whitespace can take the place of commas or opening paren
+  var PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
+  var PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
+  return {
+    CSS_UNIT: new RegExp(CSS_UNIT),
+    rgb: new RegExp("rgb" + PERMISSIVE_MATCH3),
+    rgba: new RegExp("rgba" + PERMISSIVE_MATCH4),
+    hsl: new RegExp("hsl" + PERMISSIVE_MATCH3),
+    hsla: new RegExp("hsla" + PERMISSIVE_MATCH4),
+    hsv: new RegExp("hsv" + PERMISSIVE_MATCH3),
+    hsva: new RegExp("hsva" + PERMISSIVE_MATCH4),
+    hex3: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+    hex6: /^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
+    hex4: /^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+    hex8: /^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
+  };
+}();
+
+// `isValidCSSUnit`
+// Take in a single string / number and check to see if it looks like a CSS unit
+// (see `matchers` above for definition).
+function isValidCSSUnit(color) {
+  return !!matchers.CSS_UNIT.exec(color);
+}
+
+// `stringInputToObject`
+// Permissive string parsing.  Take in a number of formats, and output an object
+// based on detected format.  Returns `{ r, g, b }` or `{ h, s, l }` or `{ h, s, v}`
+function stringInputToObject(color) {
+  color = color.replace(trimLeft, "").replace(trimRight, "").toLowerCase();
+  var named = false;
+  if (names[color]) {
+    color = names[color];
+    named = true;
+  } else if (color == "transparent") {
+    return {
+      r: 0,
+      g: 0,
+      b: 0,
+      a: 0,
+      format: "name"
+    };
+  }
+
+  // Try to match string input using regular expressions.
+  // Keep most of the number bounding out of this function - don't worry about [0,1] or [0,100] or [0,360]
+  // Just return an object and let the conversion functions handle that.
+  // This way the result will be the same whether the tinycolor is initialized with string or object.
+  var match;
+  if (match = matchers.rgb.exec(color)) {
+    return {
+      r: match[1],
+      g: match[2],
+      b: match[3]
+    };
+  }
+  if (match = matchers.rgba.exec(color)) {
+    return {
+      r: match[1],
+      g: match[2],
+      b: match[3],
+      a: match[4]
+    };
+  }
+  if (match = matchers.hsl.exec(color)) {
+    return {
+      h: match[1],
+      s: match[2],
+      l: match[3]
+    };
+  }
+  if (match = matchers.hsla.exec(color)) {
+    return {
+      h: match[1],
+      s: match[2],
+      l: match[3],
+      a: match[4]
+    };
+  }
+  if (match = matchers.hsv.exec(color)) {
+    return {
+      h: match[1],
+      s: match[2],
+      v: match[3]
+    };
+  }
+  if (match = matchers.hsva.exec(color)) {
+    return {
+      h: match[1],
+      s: match[2],
+      v: match[3],
+      a: match[4]
+    };
+  }
+  if (match = matchers.hex8.exec(color)) {
+    return {
+      r: parseIntFromHex(match[1]),
+      g: parseIntFromHex(match[2]),
+      b: parseIntFromHex(match[3]),
+      a: convertHexToDecimal(match[4]),
+      format: named ? "name" : "hex8"
+    };
+  }
+  if (match = matchers.hex6.exec(color)) {
+    return {
+      r: parseIntFromHex(match[1]),
+      g: parseIntFromHex(match[2]),
+      b: parseIntFromHex(match[3]),
+      format: named ? "name" : "hex"
+    };
+  }
+  if (match = matchers.hex4.exec(color)) {
+    return {
+      r: parseIntFromHex(match[1] + "" + match[1]),
+      g: parseIntFromHex(match[2] + "" + match[2]),
+      b: parseIntFromHex(match[3] + "" + match[3]),
+      a: convertHexToDecimal(match[4] + "" + match[4]),
+      format: named ? "name" : "hex8"
+    };
+  }
+  if (match = matchers.hex3.exec(color)) {
+    return {
+      r: parseIntFromHex(match[1] + "" + match[1]),
+      g: parseIntFromHex(match[2] + "" + match[2]),
+      b: parseIntFromHex(match[3] + "" + match[3]),
+      format: named ? "name" : "hex"
+    };
+  }
+  return false;
+}
+function validateWCAG2Parms(parms) {
+  // return valid WCAG2 parms for isReadable.
+  // If input parms are invalid, return {"level":"AA", "size":"small"}
+  var level, size;
+  parms = parms || {
+    level: "AA",
+    size: "small"
+  };
+  level = (parms.level || "AA").toUpperCase();
+  size = (parms.size || "small").toLowerCase();
+  if (level !== "AA" && level !== "AAA") {
+    level = "AA";
+  }
+  if (size !== "small" && size !== "large") {
+    size = "small";
+  }
+  return {
+    level: level,
+    size: size
+  };
+}
+
+
+
 
 /***/ }),
 
