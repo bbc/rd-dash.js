@@ -26743,8 +26743,7 @@ function CatchupController() {
       var currentLiveLatency = playbackController.getCurrentLiveLatency();
       var targetLiveDelay = playbackController.getLiveDelay();
       var stepSettings = mediaPlayerModel.getCatchupStepSettings();
-      var ratio = Math.abs(currentLiveLatency / targetLiveDelay);
-      console.log("Ratio: ".concat(Math.round(ratio * 100) / 100, " Speed:").concat(playbackController.getPlaybackRate(), " Params: < ").concat(stepSettings.start.min, " | ").concat(stepSettings.stop.min, " - ").concat(stepSettings.stop.max, " | ").concat(stepSettings.start.max, " >")); //If latency is outside of the acceptable window, consider a new speed
+      var ratio = Math.abs(currentLiveLatency / targetLiveDelay); //If latency is outside of the acceptable window, consider a new speed
 
       if (ratio < stepSettings.start.min || ratio > stepSettings.start.max) {
         return true;
