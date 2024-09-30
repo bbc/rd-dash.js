@@ -353,8 +353,6 @@ function CatchupController() {
 
             const ratio = Math.abs(currentLiveLatency / targetLiveDelay);
 
-            console.log(`Ratio: ${Math.round(ratio * 100) / 100} Speed:${playbackController.getPlaybackRate()} Params: < ${stepSettings.start.min} | ${stepSettings.stop.min} - ${stepSettings.stop.max} | ${stepSettings.start.max} >`)
-
             //If latency is outside of the acceptable window, consider a new speed
             if (ratio < stepSettings.start.min || ratio > stepSettings.start.max) {
                 return true;
