@@ -367,7 +367,7 @@ function FetchLoader(cfg) {
                                     // Same structure as https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequestEventTarget/
                                     let calculatedTime = null;
                                     if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
-                                        ({calculatedTime} = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url));
+                                        calculatedTime = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url).calculatedTime;
                                     }
                                     else if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
                                         calculatedTime = calculateDownloadedTime(downloadedData, bytesReceived);
@@ -464,7 +464,7 @@ function FetchLoader(cfg) {
                                 // Need to keep track of LastTraceTime as event.time is the time between events whilst the calculatedTime represents the total calculated time up to this point. 
                                 let calculatedTime = null;
                                 if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
-                                    ({calculatedTime} = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url));
+                                    calculatedTime = calculateThroughputByChunkData(startTimeData, endTimeData, downloadedData, httpRequest.url).calculatedTime;
                                 }
                                 else if (calculationMode === Constants.ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
                                     calculatedTime = calculateDownloadedTime(downloadedData, bytesReceived);
