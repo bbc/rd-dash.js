@@ -243,7 +243,7 @@ function HTTPLoader(cfg) {
                 }, settings.get().streaming.fragmentRequestProgressTimeout);
             }
 
-            if (config.progress && event) {
+            if (config.progress && event && !event.traceonly) {
                 config.progress(event);
             }
         };
