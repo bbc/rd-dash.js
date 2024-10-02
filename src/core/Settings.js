@@ -1036,7 +1036,8 @@ function Settings() {
                     abandonRequestsRule: {
                         graceTimeThreshold: 500,
                         abandonMultiplier: 1.8,
-                        minLengthToAverage: 5
+                        minLengthToAverage: 5,
+                        mode: 'bytes'
                     }
                 },
                 bandwidthSafetyFactor: 0.9,
@@ -1068,7 +1069,8 @@ function Settings() {
                     audio: true,
                     video: true
                 },
-                fetchThroughputCalculationMode: Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING
+                fetchThroughputCalculationMode: Constants.ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING,
+                chunkTimerConf: 0
             },
             cmcd: {
                 enabled: false,

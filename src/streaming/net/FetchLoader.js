@@ -121,7 +121,7 @@ function FetchLoader(cfg) {
         let chunkTimerConf = 0;
         // Only activate chunk timer for Adaptation Sets with more than one rep
         if (httpRequest.request.mediaInfo.bitrateList.length > 0) {
-            chunkTimerConf = settings.get().streaming.chunkTimerConf;
+            chunkTimerConf = settings.get().streaming.abr.chunkTimerConf;
         }
         const requestTime = Date.now();
         let throughputCapacityDelayMS = 0;
