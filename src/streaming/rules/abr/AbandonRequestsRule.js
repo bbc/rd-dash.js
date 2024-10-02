@@ -110,7 +110,6 @@ function AbandonRequestsRule(config) {
 
             const fragmentInfo = fragmentDict[mediaType][req.index];
             logger.debug('[' + mediaType + '] Examining: frag id',req.index, 'bufferLevel:',bufferLevel, 'stableBufferTime:', stableBufferTime, 'fragmentInfo', fragmentInfo, 'req.firstByteDate', req.firstByteDate, 'abandonDict.hasOwnProperty(fragmentInfo.id))', abandonDict.hasOwnProperty(fragmentInfo.id),'now',now);
-//            'playback.getTime()', mediaPlayerModel.getPlaybackController().getTime(), 'diff', now/1000-mediaPlayerModel.getPlaybackController().getTime());
             
             if (fragmentInfo === null || abandonDict.hasOwnProperty(fragmentInfo.id)) {
                 return switchRequest;
@@ -208,7 +207,7 @@ function AbandonRequestsRule(config) {
                 //Original abandonRequestLogic
                 fragmentInfo.estimatedTimeOfDownload = ((fragmentInfo.bytesTotal * 8 / fragmentInfo.measuredBandwidthInKbps) / 1000).toFixed(2);
 
-                if (fragmentInfo.estimatedTimeOfDownload < fragmentInfo.segmentDuration * ABANDON_MULTIPLIER || rulesContext.getRepresentationInfo().quality === 0 ) {
+                if (fragmentInfo.estimatedTimeOfDownload < fragmentInfo.segmentDuration * settings.get().streaming.abr.abrRulesParameters.abandonRequestsRule.abandonMultiplier || rulesContext.getRepresentationInfo().quality === 0 ) {
                     return switchRequest;
                 } else if (!abandonDict.hasOwnProperty(fragmentInfo.id)) {
 
