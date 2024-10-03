@@ -228,6 +228,39 @@ function PlaybackController() {
         videoModel.setCurrentTime(time, stickToBuffered);
     }
 
+
+    //    function seek(time, stickToBuffered = false, internal = false, adjustLiveDelay = false) {
+
+    /**
+     * Seeks back to the live edge but only does so on a segment boundary
+     * @param {boolean} stickToBuffered
+     * @param {boolean} internal
+     * @param {boolean} adjustLiveDelay
+     */
+    function seekToSafeLive(stickToBuffered = false, internal = false, adjustLiveDelay = false) {
+        const dvrWindowEnd = _getDvrWindowEnd();
+
+        if (dvrWindowEnd === 0) {
+            return;
+        }
+
+        liveDelay = originalLiveDelay;
+        const seektime = dvrWindowEnd - liveDelay;
+        const seektimeQuantised = 3.84 * (1 + parseInt(seektime / 3.84))
+
+        const sleepTime = parseInt((seektimeQuantised - seektime) * 1000);
+
+        if (sleepTime > 0) {
+            setTimeout(function () {
+                seek(seektimeQuantised, stickToBuffered, internal, adjustLiveDelay);
+            }, sleepTime);
+        }
+        else {
+            seek(seektimeQuantised, stickToBuffered, internal, adjustLiveDelay);
+        }
+
+    }
+
     /**
      * Seeks back to the live edge as defined by the originally calculated live delay
      * @param {boolean} stickToBuffered
@@ -915,6 +948,7 @@ function PlaybackController() {
         isSeeking,
         getStreamEndTime,
         seek,
+        seekToSafeLive,
         seekToOriginalLive,
         seekToCurrentLive,
         reset,

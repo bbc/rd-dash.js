@@ -646,6 +646,17 @@ function MediaPlayer() {
     }
 
     /**
+     * Seeks back to the live edge safely (on a segment boundary)
+     */
+    function seekToSafeLive() {
+        if (!playbackInitialized || !isDynamic()) {
+            return;
+        }
+
+        playbackController.seekToSafeLive();
+    }
+
+    /**
      * Seeks back to the original live edge (live edge as calculated at playback start). Only applies to live streams, for VoD streams this call will be ignored.
      */
     function seekToOriginalLive() {
@@ -2496,6 +2507,7 @@ function MediaPlayer() {
         isDynamic,
         getLowLatencyModeEnabled,
         seek,
+        seekToSafeLive,
         seekToOriginalLive,
         setPlaybackRate,
         getPlaybackRate,

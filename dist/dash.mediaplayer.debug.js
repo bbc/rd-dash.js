@@ -17392,6 +17392,18 @@ function MediaPlayer() {
     playbackController.seek(s, false, false, true);
   }
   /**
+   * Seeks back to the live edge safely (on a segment boundary)
+   */
+
+
+  function seekToSafeLive() {
+    if (!playbackInitialized || !isDynamic()) {
+      return;
+    }
+
+    playbackController.seekToSafeLive();
+  }
+  /**
    * Seeks back to the original live edge (live edge as calculated at playback start). Only applies to live streams, for VoD streams this call will be ignored.
    */
 
@@ -19362,6 +19374,7 @@ function MediaPlayer() {
     isDynamic: isDynamic,
     getLowLatencyModeEnabled: getLowLatencyModeEnabled,
     seek: seek,
+    seekToSafeLive: seekToSafeLive,
     seekToOriginalLive: seekToOriginalLive,
     setPlaybackRate: setPlaybackRate,
     getPlaybackRate: getPlaybackRate,
@@ -29301,6 +29314,39 @@ function PlaybackController() {
     }
 
     videoModel.setCurrentTime(time, stickToBuffered);
+  } //    function seek(time, stickToBuffered = false, internal = false, adjustLiveDelay = false) {
+
+  /**
+   * Seeks back to the live edge but only does so on a segment boundary
+   * @param {boolean} stickToBuffered
+   * @param {boolean} internal
+   * @param {boolean} adjustLiveDelay
+   */
+
+
+  function seekToSafeLive() {
+    var stickToBuffered = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    var internal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var adjustLiveDelay = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    var dvrWindowEnd = _getDvrWindowEnd();
+
+    if (dvrWindowEnd === 0) {
+      return;
+    }
+
+    liveDelay = originalLiveDelay;
+    var seektime = dvrWindowEnd - liveDelay;
+    var seektimeQuantised = 3.84 * (1 + parseInt(seektime / 3.84));
+    var sleepTime = parseInt((seektimeQuantised - seektime) * 1000);
+
+    if (sleepTime > 0) {
+      setTimeout(function () {
+        seek(seektimeQuantised, stickToBuffered, internal, adjustLiveDelay);
+      }, sleepTime);
+    } else {
+      seek(seektimeQuantised, stickToBuffered, internal, adjustLiveDelay);
+    }
   }
   /**
    * Seeks back to the live edge as defined by the originally calculated live delay
@@ -30036,6 +30082,7 @@ function PlaybackController() {
     isSeeking: isSeeking,
     getStreamEndTime: getStreamEndTime,
     seek: seek,
+    seekToSafeLive: seekToSafeLive,
     seekToOriginalLive: seekToOriginalLive,
     seekToCurrentLive: seekToCurrentLive,
     reset: reset,

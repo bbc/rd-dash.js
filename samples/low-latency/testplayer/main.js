@@ -122,6 +122,16 @@ App.prototype._applyParameters = function () {
     });
 }
 
+
+App.prototype._seekToSafeLive = function () {
+
+    if (!this.player) {
+        return;
+    }
+
+    this.player.seekToSafeLive()
+}
+
 App.prototype._exportSettings = function () {
     var settings = this._getCurrentSettings();
     var url = document.location.origin + document.location.pathname;
@@ -421,6 +431,10 @@ App.prototype._registerEventHandler = function () {
             showConfirmButton: false,
             timer: 1500
         })
+    })
+
+    document.getElementById('live-edge-button').addEventListener('click', function () {
+        self._seekToSafeLive()
     })
 
     document.getElementById('load-button').addEventListener('click', function () {
