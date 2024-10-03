@@ -29435,7 +29435,7 @@ var LIVE_UPDATE_PLAYBACK_TIME_INTERVAL_MS = 500;
 function PlaybackController() {
   var context = this.context;
   var eventBus = (0,_core_EventBus__WEBPACK_IMPORTED_MODULE_1__["default"])(context).getInstance();
-  var instance, logger, streamController, serviceDescriptionController, dashMetrics, adapter, videoModel, timelineConverter, wallclockTimeIntervalId, liveDelay, originalLiveDelay, streamInfo, isDynamic, playOnceInitialized, lastLivePlaybackTime, lastLiveUpdateTime, availabilityStartTime, availabilityTimeComplete, lowLatencyModeEnabled, seekTarget, internalSeek, playbackStalled, manifestUpdateInProgress, initialCatchupModeActivated, settings;
+  var instance, logger, streamController, serviceDescriptionController, dashMetrics, adapter, videoModel, timelineConverter, wallclockTimeIntervalId, liveDelay, originalLiveDelay, streamInfo, isDynamic, playOnceInitialized, lastLivePlaybackTime, lastLiveUpdateTime, availabilityStartTime, availabilityTimeComplete, lowLatencyModeEnabled, seekTarget, internalSeek, playbackStalled, manifestUpdateInProgress, initialCatchupModeActivated, seekTimeout, settings;
 
   function setup() {
     logger = (0,_core_Debug__WEBPACK_IMPORTED_MODULE_4__["default"])(context).getInstance().getLogger(instance);
@@ -29632,10 +29632,15 @@ function PlaybackController() {
     var seektime = dvrWindowEnd - liveDelay;
     var seektimeQuantised = 3.84 * (1 + parseInt(seektime / 3.84));
     var sleepTime = parseInt((seektimeQuantised - seektime) * 1000);
-    console.log("Seeking safely. Seek Time: ".concat(seektime, ", Seek Time Quantised: ").concat(seektimeQuantised, ", Sleep Time ").concat(sleepTime, "ms"));
+    console.log("Seeking safely. Seek Time: ".concat(seektime, ", Seek Time Quantised: ").concat(seektimeQuantised));
+
+    if (seekTimeout) {
+      clearTimeout(seekTimeout);
+    }
 
     if (sleepTime > 0) {
-      setTimeout(function () {
+      seekTimeout = setTimeout(function () {
+        console.log("Seeking now, waited ".concat(sleepTime, "ms"));
         seek(seektimeQuantised, stickToBuffered, internal, adjustLiveDelay);
       }, sleepTime);
     } else {
