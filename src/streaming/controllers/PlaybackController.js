@@ -247,9 +247,9 @@ function PlaybackController() {
         liveDelay = originalLiveDelay;
         const seektime = dvrWindowEnd - liveDelay;
         const seektimeQuantised = 3.84 * (1 + parseInt(seektime / 3.84))
-
         const sleepTime = parseInt((seektimeQuantised - seektime) * 1000);
 
+        console.log(`Seeking safely. Seek Time: ${seektime}, Seek Time Quantised: ${seektimeQuantised}, Sleep Time ${sleepTime}ms`)
         if (sleepTime > 0) {
             setTimeout(function () {
                 seek(seektimeQuantised, stickToBuffered, internal, adjustLiveDelay);
