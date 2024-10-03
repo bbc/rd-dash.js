@@ -29632,6 +29632,7 @@ function PlaybackController() {
     var seektime = dvrWindowEnd - liveDelay;
     var seektimeQuantised = 3.84 * (1 + parseInt(seektime / 3.84));
     var sleepTime = parseInt((seektimeQuantised - seektime) * 1000);
+    console.log("Seeking safely. Seek Time: ".concat(seektime, ", Seek Time Quantised: ").concat(seektimeQuantised, ", Sleep Time ").concat(sleepTime, "ms"));
 
     if (sleepTime > 0) {
       setTimeout(function () {
