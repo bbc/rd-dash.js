@@ -513,7 +513,9 @@ function DashMetrics(config) {
     function updatePlayListTraceMetrics(traceToUpdate) {
         if (playListTraceMetrics) {
             for (let field in playListTraceMetrics) {
-                playListTraceMetrics[field] = traceToUpdate[field];
+                if (traceToUpdate[field]) {
+                    playListTraceMetrics[field] = traceToUpdate[field];
+                }
             }
         }
     }
