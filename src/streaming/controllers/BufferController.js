@@ -863,10 +863,10 @@ function BufferController(config) {
         // No need to check buffer if type is not audio or video (for example if several errors occur during text parsing, so that the buffer cannot be filled, no error must occur on video playback)
         if (type !== Constants.AUDIO && type !== Constants.VIDEO) return;
 
-        if (((bufferLevel < settings.get().streaming.buffer.stallThreshold) || bufferLevel === 0) && !isBufferingCompleted) {
+        if ((bufferLevel < settings.get().streaming.buffer.stallThreshold) && !isBufferingCompleted) {
             _notifyBufferStateChanged(MetricsConstants.BUFFER_EMPTY);
         } else {
-            if (isBufferingCompleted || bufferLevel >= settings.get().streaming.buffer.stallThreshold || (playbackController.getLowLatencyModeEnabled() && bufferLevel > 0)) {
+            if (isBufferingCompleted || bufferLevel >= settings.get().streaming.buffer.stallThreshold) {
                 _notifyBufferStateChanged(MetricsConstants.BUFFER_LOADED);
             }
         }
