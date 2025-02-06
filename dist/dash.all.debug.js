@@ -3527,7 +3527,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * Enable/disable subtitle rendering by default.
  * @property {boolean} [extendSegmentedCues=true]
  * Enable/disable patching of segmented cues in order to merge as a single cue by extending cue end time.
- * @property {object} [webvtt={customRenderingEnabled=false}]
+ * @property {boolean} [imsc.displayForcedOnlyMode=false]
+ * Enable/disable forced only mode in IMSC captions.
+ * When true, only those captions where itts:forcedDisplay="true" will be displayed.
+ * @property {boolean} [imsc.enableRollUp=true]
+ * Enable/disable rollUp style display of IMSC captions.
+ * @property {number} [imsc.options.sizeAdjust=1]
+ * IMSC styling options - adjust text size, scales the text size and line padding 
+ * @property {number} [imsc.options.lineHeightAdjust=1]
+ * IMSC styling options - scales the line height 
+ * @property {number} [imsc.options.backgroundOpacityScale=1]
+ * IMSC styling options - scales the backgroundColor opacity 
+ * @property {object} [webvtt.customRenderingEnabled=false]
  * Enables the custom rendering for WebVTT captions. For details refer to the "Subtitles and Captions" sample section of dash.js.
  * Custom WebVTT rendering requires the external library vtt.js that can be found in the contrib folder.
  */
@@ -4019,6 +4030,15 @@ function Settings() {
       text: {
         defaultEnabled: true,
         extendSegmentedCues: true,
+        imsc: {
+          displayForcedOnlyMode: false,
+          enableRollUp: true,
+          options: {
+            sizeAdjust: 1,
+            lineHeightAdjust: 1,
+            backgroundOpacityScale: 1
+          }
+        },
         webvtt: {
           customRenderingEnabled: false
         }
@@ -7338,7 +7358,9 @@ function DashMetrics(config) {
   function updatePlayListTraceMetrics(traceToUpdate) {
     if (playListTraceMetrics) {
       for (var field in playListTraceMetrics) {
-        playListTraceMetrics[field] = traceToUpdate[field];
+        if (traceToUpdate[field]) {
+          playListTraceMetrics[field] = traceToUpdate[field];
+        }
       }
     }
   }
@@ -26241,14 +26263,12 @@ function BufferController(config) {
 
   function checkIfSufficientBuffer() {
     // No need to check buffer if type is not audio or video (for example if several errors occur during text parsing, so that the buffer cannot be filled, no error must occur on video playback)
-    if (type !== _constants_Constants__WEBPACK_IMPORTED_MODULE_0__["default"].AUDIO && type !== _constants_Constants__WEBPACK_IMPORTED_MODULE_0__["default"].VIDEO) return; // When the player is working in low latency mode, the buffer is often below STALL_THRESHOLD.
-    // So, when in low latency mode, change dash.js behavior so it notifies a stall just when
-    // buffer reach 0 seconds
+    if (type !== _constants_Constants__WEBPACK_IMPORTED_MODULE_0__["default"].AUDIO && type !== _constants_Constants__WEBPACK_IMPORTED_MODULE_0__["default"].VIDEO) return;
 
-    if ((!playbackController.getLowLatencyModeEnabled() && bufferLevel < settings.get().streaming.buffer.stallThreshold || bufferLevel === 0) && !isBufferingCompleted) {
+    if (bufferLevel < settings.get().streaming.buffer.stallThreshold && !isBufferingCompleted) {
       _notifyBufferStateChanged(_constants_MetricsConstants__WEBPACK_IMPORTED_MODULE_1__["default"].BUFFER_EMPTY);
     } else {
-      if (isBufferingCompleted || bufferLevel >= settings.get().streaming.buffer.stallThreshold || playbackController.getLowLatencyModeEnabled() && bufferLevel > 0) {
+      if (isBufferingCompleted || bufferLevel >= settings.get().streaming.buffer.stallThreshold) {
         _notifyBufferStateChanged(_constants_MetricsConstants__WEBPACK_IMPORTED_MODULE_1__["default"].BUFFER_LOADED);
       }
     }
@@ -30978,6 +30998,7 @@ function StreamController() {
     eventBus.on(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].PLAYBACK_ENDED, _onPlaybackEnded, instance);
     eventBus.on(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].METRIC_ADDED, _onMetricAdded, instance);
     eventBus.on(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].MANIFEST_VALIDITY_CHANGED, _onManifestValidityChanged, instance);
+    eventBus.on(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].BUFFER_EMPTY, _onBufferEmpty, instance);
     eventBus.on(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].BUFFER_LEVEL_UPDATED, _onBufferLevelUpdated, instance);
     eventBus.on(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].QUALITY_CHANGE_REQUESTED, _onQualityChanged, instance);
 
@@ -31002,6 +31023,7 @@ function StreamController() {
     eventBus.off(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].PLAYBACK_ENDED, _onPlaybackEnded, instance);
     eventBus.off(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].METRIC_ADDED, _onMetricAdded, instance);
     eventBus.off(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].MANIFEST_VALIDITY_CHANGED, _onManifestValidityChanged, instance);
+    eventBus.off(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].BUFFER_EMPTY, _onBufferEmpty, instance);
     eventBus.off(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].BUFFER_LEVEL_UPDATED, _onBufferLevelUpdated, instance);
     eventBus.off(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_10__["default"].QUALITY_CHANGE_REQUESTED, _onQualityChanged, instance);
 
@@ -32288,6 +32310,19 @@ function StreamController() {
 
   function _createPlaylistMetrics(startReason) {
     dashMetrics.createPlaylistMetrics(playbackController.getTime() * 1000, startReason);
+  }
+  /**
+   * If playback has stalled send any PlayList metrics
+   * @return {boolean}
+   */
+
+
+  function _onBufferEmpty(e) {
+    logger.debug('[onBufferEmpty]');
+
+    if (e.mediaType === _constants_Constants__WEBPACK_IMPORTED_MODULE_0__["default"].AUDIO || e.mediaType === _constants_Constants__WEBPACK_IMPORTED_MODULE_0__["default"].VIDEO) {
+      _flushPlaylistMetrics(_vo_metrics_PlayList__WEBPACK_IMPORTED_MODULE_7__.PlayListTrace.REBUFFERING_REASON);
+    }
   }
 
   function _onPlaybackError(e) {
@@ -53314,13 +53349,10 @@ function TextTracks(config) {
       captionContainer.appendChild(finalCue);
       previousISDState = (0,imsc__WEBPACK_IMPORTED_MODULE_6__.renderHTML)(cue.isd, finalCue, function (src) {
         return _resolveImageSrc(cue, src);
-      }, captionContainer.clientHeight, captionContainer.clientWidth, false
-      /*displayForcedOnlyMode*/
-      , function (err) {
-        logger.info('renderCaption :', err); //TODO add ErrorHandler management
-      }, previousISDState, true
-      /*enableRollUp*/
-      );
+      }, captionContainer.clientHeight, captionContainer.clientWidth, settings.get().streaming.text.imsc.displayForcedOnlyMode, function (err) {
+        logger.info('renderCaption :', err);
+        /*TODO: add ErrorHandler management*/
+      }, previousISDState, settings.get().streaming.text.imsc.enableRollUp, settings.get().streaming.text.imsc.options);
       finalCue.id = cue.cueID;
       eventBus.trigger(_streaming_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_3__["default"].CAPTION_RENDERED, {
         captionDiv: finalCue,
@@ -65768,7 +65800,7 @@ module.exports = function equal(a, b) {
      * @returns {Object} Opaque in-memory representation of an IMSC1 document
      */
 
-    imscDoc.fromXML = function (xmlstring, errorHandler, metadataHandler) {
+    imscDoc.fromXML = function (xmlstring, errorHandler, metadataHandler, preparse) {
         var p = sax.parser(true, {xmlns: true});
         var estack = [];
         var xmllangstack = [];
@@ -65777,8 +65809,10 @@ module.exports = function equal(a, b) {
         var doc = null;
 
         p.onclosetag = function (node) {
+            if (preparse && typeof preparse.onclosetag === "function") {
+                preparse.onclosetag(node);
+            }
 
-            
             if (estack[0] instanceof Region) {
 
                 /* merge referenced styles */
@@ -65878,6 +65912,9 @@ module.exports = function equal(a, b) {
         };
 
         p.ontext = function (str) {
+            if (preparse && typeof preparse.ontext === "function") {
+                preparse.ontext(str);
+            }
 
             if (estack[0] === undefined) {
 
@@ -65922,6 +65959,9 @@ module.exports = function equal(a, b) {
 
 
         p.onopentag = function (node) {
+            if (preparse && typeof preparse.onopentag === "function") {
+                preparse.onopentag(node);
+            }
 
             // maintain the xml:space stack
 
@@ -65968,6 +66008,21 @@ module.exports = function equal(a, b) {
 
             }
 
+            function rewriteNamespace(obj) {
+                if (imscNames.ttaf_map[obj.uri]) {
+                    obj.uri = imscNames.ttaf_map[obj.uri];
+                }
+            }
+
+            // Make ttaf1 namespaces ttml ones.
+            rewriteNamespace(node);
+            if (node.attributes) {
+                for (var attr in node.attributes) {
+                    if (node.attributes.hasOwnProperty(attr)) {
+                        rewriteNamespace(node.attributes[attr]);
+                    }
+                }
+            }
 
             /* process the element */
 
@@ -66275,12 +66330,14 @@ module.exports = function equal(a, b) {
                     var attrs = [];
 
                     for (var a in node.attributes) {
-                        attrs[node.attributes[a].uri + " " + node.attributes[a].local] =
+                        if (node.attributes.hasOwnProperty(a)) {
+                            attrs[node.attributes[a].uri + " " + node.attributes[a].local] =
                                 {
                                     uri: node.attributes[a].uri,
                                     local: node.attributes[a].local,
                                     value: node.attributes[a].value
                                 };
+                        }
                     }
 
                     metadataHandler.onOpenTag(node.uri, node.local, attrs);
@@ -66306,7 +66363,6 @@ module.exports = function equal(a, b) {
         /* AFAIK the only way to determine whether an object has members */
 
         for (var i in doc.head.layout.regions) {
-
             if (doc.head.layout.regions.hasOwnProperty(i)) {
                 hasRegions = true;
                 break;
@@ -66318,7 +66374,7 @@ module.exports = function equal(a, b) {
 
             /* create default region */
 
-            var dr = Region.prototype.createDefaultRegion(doc.lang);
+            var dr = Region.prototype.createDefaultRegion(doc, errorHandler);
 
             doc.head.layout.regions[dr.id] = dr;
 
@@ -66346,8 +66402,35 @@ module.exports = function equal(a, b) {
             cleanRubyContainers(doc.body);
         }
 
+        if (doc.body) {
+            pushBackgroundColorDown(doc.body);
+        }
+
         return doc;
     };
+
+    // Background colours on body or div look bad. As a post-parse step, move them to spans below (when undefined in the P)
+    function pushBackgroundColorDown(node, lastBG) {
+        var currentBG = node.styleAttrs && node.styleAttrs["http://www.w3.org/ns/ttml#styling backgroundColor"];
+
+        if (node.kind === "span") {
+            if (!currentBG && lastBG) {
+                if (!node.styleAttrs) {
+                    node.styleAttrs = {};
+                }
+                node.styleAttrs["http://www.w3.org/ns/ttml#styling backgroundColor"] = lastBG;
+            }
+        } else {
+            if (currentBG) {
+                delete node.styleAttrs["http://www.w3.org/ns/ttml#styling backgroundColor"];
+            }
+            if (node.contents) {
+                for (var i = 0; i < node.contents.length; i++) {
+                    pushBackgroundColorDown(node.contents[i], currentBG || lastBG);
+                }
+            }
+        }
+    }
 
     function cleanRubyContainers(element) {
         
@@ -66418,7 +66501,6 @@ module.exports = function equal(a, b) {
         if ("sets" in element) {
 
             for (var set_i = 0; set_i < element.sets.length; set_i++) {
-
                 resolveTiming(doc, element.sets[set_i], s, element);
 
                 if (element.timeContainer === "seq") {
@@ -66458,7 +66540,6 @@ module.exports = function equal(a, b) {
         } else if ("contents" in element) {
  
             for (var content_i = 0; content_i < element.contents.length; content_i++) {
-
                 resolveTiming(doc, element.contents[content_i], s, element);
 
                 if (element.timeContainer === "seq") {
@@ -66472,7 +66553,6 @@ module.exports = function equal(a, b) {
                 }
 
                 s = element.contents[content_i];
-
             }
 
         }
@@ -66686,15 +66766,15 @@ module.exports = function equal(a, b) {
         this.styleAttrs = {};
         
         for (var i in node.attributes) {
-
-            if (node.attributes[i].uri === imscNames.ns_itts ||
-                node.attributes[i].uri === imscNames.ns_ebutts ||
-                node.attributes[i].uri === imscNames.ns_tts) {
+            if (node.attributes.hasOwnProperty(i)) {
+                if (node.attributes[i].uri === imscNames.ns_itts ||
+                    node.attributes[i].uri === imscNames.ns_ebutts ||
+                    node.attributes[i].uri === imscNames.ns_tts) {
                 
-                var qname = node.attributes[i].uri + " " + node.attributes[i].local;
+                    var qname = node.attributes[i].uri + " " + node.attributes[i].local;
                 
-                this.styleAttrs[qname] = node.attributes[i].value;
-
+                    this.styleAttrs[qname] = node.attributes[i].value;
+                }
             }
         }
         
@@ -66762,7 +66842,28 @@ module.exports = function equal(a, b) {
     }
 
     LayoutElement.prototype.initFromNode = function (doc, parent, node, errorHandler) {
-        this.regionID = elementGetRegionID(node);
+        var region = elementGetRegionID(node);
+        if (region) {
+            if (doc.head.layout.regions[region]) {
+                this.regionID = region;
+            } else {
+                var defaultRegion;
+                for (var r in doc.head.layout.regions) {
+                    if (doc.head.layout.regions.hasOwnProperty(r) && doc.head.layout.regions[r].isDefaultRegion) {
+                        defaultRegion = doc.head.layout.regions[r];
+                        break;
+                    }
+                }
+                if (!defaultRegion) {
+                    defaultRegion = Region.prototype.createDefaultRegion(doc, errorHandler);
+                    doc.head.layout.regions[defaultRegion.id] = defaultRegion;
+                }
+
+                reportError(errorHandler, "Cannot find specified region: " + region);
+
+                //Leave regionID unset to use this default region.
+            }
+        }
     };
 
     function StyledElement(styleAttrs) {
@@ -66926,16 +67027,66 @@ module.exports = function equal(a, b) {
     function Region() {
     }
 
-    Region.prototype.createDefaultRegion = function (xmllang) {
+    Region.prototype.createDefaultRegion = function (doc, errorHandler) {
         var r = new Region();
+        var defaultRegionAttr = {
+            "tts:displayAlign":{
+                "name":"tts:displayAlign",
+                "value":"after",
+                "prefix":"tts",
+                "local":"displayAlign",
+                "uri":"http://www.w3.org/ns/ttml#styling"
+            },
+            "tts:extent":{
+                "name":"tts:extent",
+                "value":"80% 20%",
+                "prefix":"tts",
+                "local":"extent",
+                "uri":"http://www.w3.org/ns/ttml#styling"
+            },
+            "tts:origin":{
+                "name":"tts:origin",
+                "value":"10% 70%",
+                "prefix":"tts",
+                "local":"origin",
+                "uri":"http://www.w3.org/ns/ttml#styling"
+            },
+            "tts:overflow":{
+                "name":"tts:overflow",
+                "value":"visible",
+                "prefix":"tts",
+                "local":"overflow",
+                "uri":"http://www.w3.org/ns/ttml#styling"
+            }
+        };
+        var defaultRegionNode = {
+            "name": "region",
+            "attributes": defaultRegionAttr,
+            "ns": {
+                "": "http://www.w3.org/ns/ttml",
+                "ebuttm": "urn:ebu:tt:metadata",
+                "ebutts": "urn:ebu:tt:style",
+                "ittp": "http://www.w3.org/ns/ttml/profile/imsc1#parameter",
+                "itts": "http://www.w3.org/ns/ttml/profile/imsc1#styling",
+                "ttm": "http://www.w3.org/ns/ttml#metadata",
+                "ttp": "http://www.w3.org/ns/ttml#parameter",
+                "tts": "http://www.w3.org/ns/ttml#styling",
+                "xml": "http://www.w3.org/XML/1998/namespace"
+            },
+            "prefix": "",
+            "local": "region",
+            "uri": "http://www.w3.org/ns/ttml",
+            "isSelfClosing": true
+        };
 
         IdentifiedElement.call(r, '');
-        StyledElement.call(r, {});
+        StyledElement.prototype.initFromNode.call(r, doc, null, defaultRegionNode, errorHandler);
         AnimatedElement.call(r, []);
         TimedElement.call(r, 0, Number.POSITIVE_INFINITY, null);
 
-        this.lang = xmllang;
+        this.lang = doc.xmllang;
 
+        r.isDefaultRegion = true;
         return r;
     };
 
@@ -66975,11 +67126,10 @@ module.exports = function equal(a, b) {
         this.value = null;
 
         for (var qname in styles) {
-
             if (! styles.hasOwnProperty(qname)) continue;
 
             if (this.qname) {
-
+                    
                 reportError(errorHandler, "More than one style specified on set");
                 break;
 
@@ -66987,7 +67137,6 @@ module.exports = function equal(a, b) {
 
             this.qname = qname;
             this.value = styles[qname];
-
         }
 
     };
@@ -66999,7 +67148,14 @@ module.exports = function equal(a, b) {
 
 
     function elementGetXMLID(node) {
-        return node && 'xml:id' in node.attributes ? node.attributes['xml:id'].value || null : null;
+        var ret = null;
+        if (node) {
+            var idAttribute = node.attributes['xml:id'] || node.attributes.id;
+            if (idAttribute) {
+                ret = idAttribute.value || null;
+            }
+        }
+        return ret;
     }
 
     function elementGetRegionID(node) {
@@ -67041,31 +67197,31 @@ module.exports = function equal(a, b) {
         if (node !== null) {
 
             for (var i in node.attributes) {
+                if (node.attributes.hasOwnProperty(i)) {
+                    var qname = node.attributes[i].uri + " " + node.attributes[i].local;
 
-                var qname = node.attributes[i].uri + " " + node.attributes[i].local;
+                    var sa = imscStyles.byQName[qname];
 
-                var sa = imscStyles.byQName[qname];
+                    if (sa !== undefined) {
 
-                if (sa !== undefined) {
+                        var val = sa.parse(node.attributes[i].value);
 
-                    var val = sa.parse(node.attributes[i].value);
+                        if (val !== null) {
 
-                    if (val !== null) {
+                            s[qname] = val;
 
-                        s[qname] = val;
+                            /* TODO: consider refactoring errorHandler into parse and compute routines */
 
-                        /* TODO: consider refactoring errorHandler into parse and compute routines */
+                            if (sa === imscStyles.byName.zIndex) {
+                                reportWarning(errorHandler, "zIndex attribute present but not used by IMSC1 since regions do not overlap");
+                            }
 
-                        if (sa === imscStyles.byName.zIndex) {
-                            reportWarning(errorHandler, "zIndex attribute present but not used by IMSC1 since regions do not overlap");
+                        } else {
+
+                            reportError(errorHandler, "Cannot parse styling attribute " + qname + " --> " + node.attributes[i].value);
+
                         }
-
-                    } else {
-
-                        reportError(errorHandler, "Cannot parse styling attribute " + qname + " --> " + node.attributes[i].value);
-
                     }
-
                 }
 
             }
@@ -67077,11 +67233,12 @@ module.exports = function equal(a, b) {
 
     function findAttribute(node, ns, name) {
         for (var i in node.attributes) {
-
-            if (node.attributes[i].uri === ns &&
+            if (node.attributes.hasOwnProperty(i)) {
+                if (node.attributes[i].uri === ns &&
                     node.attributes[i].local === name) {
 
-                return node.attributes[i].value;
+                    return node.attributes[i].value;
+                }
             }
         }
 
@@ -67455,7 +67612,6 @@ module.exports = function equal(a, b) {
     function mergeStylesIfNotPresent(from_styles, into_styles) {
 
         for (var sname in from_styles) {
-
             if (! from_styles.hasOwnProperty(sname)) continue;
 
             if (sname in into_styles)
@@ -67592,10 +67748,11 @@ module.exports = function equal(a, b) {
  * @module imscHTML
  */
 
+var backgroundColorAdjustSuffix = "BackgroundColorAdjust";
+
 var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
-;
-(function (imscHTML, imscNames, imscStyles) {
+(function (imscHTML, imscNames, imscStyles, imscUtils) {
 
     /**
      * Function that maps <pre>smpte:background</pre> URIs to URLs resolving to image resource
@@ -67621,6 +67778,18 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
      * is called for the next ISD, otherwise <code>previousISDState</code> should be set to 
      * <code>null</code>.
      * 
+     * The <pre>options</pre> parameter can be used to configure adjustments
+     * that change the presentation away from the document defaults:
+     * <pre>sizeAdjust: {number}</pre> scales the text size and line padding
+     * <pre>lineHeightAdjust: {number}</pre> scales the line height
+     * <pre>backgroundOpacityScale: {number}</pre> scales the backgroundColor opacity
+     * <pre>fontFamily: {string}</pre> comma-separated list of font family values to use, if present.
+     * <pre>colorAdjust: {documentColor: replaceColor*}</pre> map of document colors and the value with which to replace them
+     * <pre>colorOpacityScale: {number}</pre> opacity override on text color (ignored if zero)
+     * <pre>regionOpacityScale: {number}</pre> scales the region opacity
+     * <pre>textOutline: {string}</pre> textOutline value to use, if present
+     * <pre>[span|p|div|body|region]BackgroundColorAdjust: {documentColor: replaceColor*}</pre> map of backgroundColors and the value with which to replace them for each element type
+     * 
      * @param {Object} isd ISD to be rendered
      * @param {Object} element Element into which the ISD is rendered
      * @param {?IMGResolver} imgResolver Resolve <pre>smpte:background</pre> URIs into URLs.
@@ -67633,6 +67802,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
      * @param {?module:imscUtils.ErrorHandler} errorHandler Error callback
      * @param {Object} previousISDState State saved during processing of the previous ISD, or null if initial call
      * @param {?boolean} enableRollUp Enables roll-up animations (see CEA 708)
+     * @param {?Object} options Configuration options
      * @return {Object} ISD state to be provided when this funtion is called for the next ISD
      */
 
@@ -67644,7 +67814,8 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             displayForcedOnlyMode,
             errorHandler,
             previousISDState,
-            enableRollUp
+            enableRollUp,
+            options
             ) {
 
         /* maintain aspect ratio if specified */
@@ -67699,8 +67870,25 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             bpd: null, /* block progression direction (lr, rl, tb) */
             ruby: null, /* is ruby present in a <p> */
             textEmphasis: null, /* is textEmphasis present in a <p> */
-            rubyReserve: null /* is rubyReserve applicable to a <p> */
+            rubyReserve: null, /* is rubyReserve applicable to a <p> */
+            options: Object.assign({}, options) || {}, /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign#deep_clone : */
+            /* this isn't a get-out-of-jail for avoiding mutation of the incoming options if we ever put an object reference into options */
         };
+
+        /* canonicalise and copy colour adjustment maps */
+        if (context.options.colorAdjust)
+            context.options.colorAdjust = preprocessColorMapOptions(context.options.colorAdjust);
+        
+        var bgcColorElements = ['region', 'body', 'div', 'p', 'span'];
+        var propName;
+        for (var bgcei in bgcColorElements) {
+            if (bgcColorElements.hasOwnProperty(bgcei)) {
+                propName = bgcColorElements[bgcei] + backgroundColorAdjustSuffix;
+                if (context.options[propName]) {
+                    context.options[propName] = preprocessColorMapOptions(context.options[propName]);
+                }
+            }
+        }
 
         element.appendChild(rootcontainer);
 
@@ -67718,8 +67906,22 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
     };
 
-    function processElement(context, dom_parent, isd_element, isd_parent) {
+    function preprocessColorMapOptions(colorAdjustMap) {
+        var canonicalColorMap = {};
+        var colorAdjustMapEntries = Object.entries(colorAdjustMap);
+        for (var i in colorAdjustMapEntries) {
+            if (colorAdjustMapEntries.hasOwnProperty(i)) {
+                var fromColor = imscUtils.parseColor(colorAdjustMapEntries[i][0]);
+                var toColor = imscUtils.parseColor(colorAdjustMapEntries[i][1]);
+                if (fromColor && toColor) {
+                    canonicalColorMap[fromColor.toString()] = toColor;
+                }
+            }
+        };
+        return canonicalColorMap;
+    }
 
+    function processElement(context, dom_parent, isd_element, isd_parent) {
         var e;
 
         if (isd_element.kind === 'region') {
@@ -67765,7 +67967,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
             } else if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "base") {
 
-                e = document.createElement("span"); // rb element is deprecated in HTML
+                e = document.createElement("rb");
 
             } else if (isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "text") {
 
@@ -67889,7 +68091,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
         if (lp && (! lp.isZero())) {
 
-            var plength = lp.toUsedLength(context.w, context.h);
+            var plength = lp.multiply(lp.toUsedLength(context.w, context.h), context.options.sizeAdjust);
 
 
             if (plength > 0) {
@@ -67909,7 +68111,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                     proc_e.style.paddingBottom = padmeasure;
 
                 }
-
+                context.removePaddingElement=proc_e;
                 context.lp = lp;
             }
         }
@@ -67967,7 +68169,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
                 /* ignore tate-chu-yoku since line break cannot happen within */
                 e.textContent = isd_element.text;
-                e._isd_element = isd_element;
 
                 if (te) {
 
@@ -68084,13 +68285,22 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
             if (context.lp) {
 
-                applyLinePadding(linelist, context.lp.toUsedLength(context.w, context.h), context);
+                applyLinePadding(linelist, context.lp.multiply(context.lp.toUsedLength(context.w, context.h), context.options.sizeAdjust), context);
+
+                if (context.bpd === "tb") {
+                    // should this actually be remove?
+                    context.removePaddingElement.style.paddingLeft=0;
+                    context.removePaddingElement.style.paddingRight=0;
+                } else {
+                    context.removePaddingElement.style.paddingTop=0;
+                    context.removePaddingElement.style.paddingBottom=0;
+                }
 
                 context.lp = null;
 
             }
 
-            mergeSpans(linelist, context); // The earlier we can do this the less processing there will be.
+            mergeSpans(linelist); // The earlier we can do this the less processing there will be.
 
             /* fill line gaps linepadding */
 
@@ -68150,10 +68360,8 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         }
     }
 
-    function mergeSpans(lineList, context) {
-
+    function mergeSpans(lineList) {
         for (var i = 0; i < lineList.length; i++) {
-
             var line = lineList[i];
 
             for (var j = 1; j < line.elements.length;) {
@@ -68161,7 +68369,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                 var previous = line.elements[j - 1];
                 var span = line.elements[j];
 
-                if (spanMerge(previous.node, span.node, context)) {
+                if (spanMerge(previous.node, span.node)) {
 
                     //removed from DOM by spanMerge(), remove from the list too.
                     line.elements.splice(j, 1);
@@ -68200,6 +68408,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             clearTheseBackgrounds[bi].style.backgroundColor = "";
 
         }
+
     }
 
     function getSpanAncestorColor(element, ancestorList, isAncestor) {
@@ -68215,11 +68424,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
         } else {
 
-            if (element.parentElement.nodeName === "SPAN" ||
-                element.parentElement.nodeName === "RUBY" ||
-                element.parentElement.nodeName === "RBC" ||
-                element.parentElement.nodeName === "RTC" ||
-                element.parentElement.nodeName === "RT") {
+            if (element.parentElement.nodeName === "SPAN") {
 
                 return getSpanAncestorColor(element.parentElement, ancestorList, true);
 
@@ -68230,16 +68435,11 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         return undefined;
     }
 
-    function spanMerge(first, second, context) {
+    function spanMerge(first, second) {
 
         if (first.tagName === "SPAN" &&
             second.tagName === "SPAN" &&
             first._isd_element === second._isd_element) {
-                if (! first._isd_element) {
-                    /* we should never get here since every span should have a source ISD element */
-                    reportError(context.errorHandler, "Internal error: HTML span is not linked to a source element; cannot merge spans.");
-                    return false;
-                }
 
                 first.textContent += second.textContent;
 
@@ -68297,44 +68497,38 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
                 // Start element
                 if (context.ipd === "lr") {
-
                     se.node.style.marginLeft = negpadpxlen;
                     se.node.style.paddingLeft = pospadpxlen;
 
                 } else if (context.ipd === "rl") {
-
-                    se.node.style.paddingRight = pospadpxlen;
                     se.node.style.marginRight = negpadpxlen;
+                    se.node.style.paddingRight = pospadpxlen;
 
                 } else if (context.ipd === "tb") {
-
-                    se.node.style.paddingTop = pospadpxlen;
                     se.node.style.marginTop = negpadpxlen;
+                    se.node.style.paddingTop = pospadpxlen;
 
                 }
 
                 // End element
                 if (context.ipd === "lr") {
-
-                    // Firefox has a problem with line-breaking when a negative margin is applied.
-                    // The positioning will be wrong but don't apply when on firefox.
-                    // https://bugzilla.mozilla.org/show_bug.cgi?id=1502610
+                    //Firefox has a problem with line-breaking when a negative margin is applied.
+                    //The positioning will be wrong but don't apply when on firefox.
+                    //https://bugzilla.mozilla.org/show_bug.cgi?id=1502610
                     if (!browserIsFirefox) {
                         ee.node.style.marginRight = negpadpxlen;
                     }
                     ee.node.style.paddingRight = pospadpxlen;
 
                 } else if (context.ipd === "rl") {
-
-                    ee.node.style.paddingLeft = pospadpxlen;
                     if (!browserIsFirefox) {
                         ee.node.style.marginLeft = negpadpxlen;
                     }
+                    ee.node.style.paddingLeft = pospadpxlen;
 
                 } else if (context.ipd === "tb") {
-
-                    ee.node.style.paddingBottom = pospadpxlen;
                     ee.node.style.marginBottom = negpadpxlen;
+                    ee.node.style.paddingBottom = pospadpxlen;
 
                 }
 
@@ -68459,7 +68653,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
             var ruby = document.createElement("ruby");
 
-            var rb = document.createElement("span");  // rb element is deprecated in HTML
+            var rb = document.createElement("rb");
             rb.textContent = "\u200B";
 
             ruby.appendChild(rb);
@@ -68592,13 +68786,9 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                             thisNode.node.style.paddingBottom = padding;
 
                         }
-
                     }
-
                 }
-
             }
-
             /* after line */
             if (i < lineList.length) {
 
@@ -68621,7 +68811,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
                     }
                 }
-
             }
 
         }
@@ -68714,7 +68903,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                     });
 
                 } else {
-
                     /* positive for BPD = lr and tb, negative for BPD = rl */
                     var bpd_dir = Math.sign(edges.after - edges.before);
 
@@ -68804,7 +68992,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
     }
 
     function isSameLine(before1, after1, before2, after2) {
-
         return ((after1 < after2) && (before1 > before2)) || ((after2 <= after1) && (before2 >= before1));
 
     }
@@ -68868,26 +69055,54 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                 "http://www.w3.org/ns/ttml#styling backgroundColor",
                 function (context, dom_element, isd_element, attr) {
 
+                    var backgroundColorAdjustMap =
+                        context.options[isd_element.kind + backgroundColorAdjustSuffix];
+                    
+                    var map_attr = backgroundColorAdjustMap && backgroundColorAdjustMap[attr.toString()];
+                    if (map_attr)
+                        attr = map_attr;
+
+                    var opacity = attr[3];
+
                     /* skip if transparent */
-                    if (attr[3] === 0)
+                    if (opacity === 0)
                         return;
+
+                    /* make sure that we allow a multiplier of 0 here*/
+                    if (context.options.backgroundOpacityScale != undefined)
+                        opacity = opacity * context.options.backgroundOpacityScale;
+
+                    opacity = opacity / 255;
 
                     dom_element.style.backgroundColor = "rgba(" +
                             attr[0].toString() + "," +
                             attr[1].toString() + "," +
                             attr[2].toString() + "," +
-                            (attr[3] / 255).toString() +
+                            opacity.toString() +
                             ")";
                 }
         ),
         new HTMLStylingMapDefinition(
                 "http://www.w3.org/ns/ttml#styling color",
                 function (context, dom_element, isd_element, attr) {
+                    /*
+                     * <pre>colorAdjust: {documentColor: replaceColor*}</pre> map of document colors and the value with which to replace them
+                     * <pre>colorOpacityScale: {number}</pre> opacity multiplier on text color (ignored if zero)
+                     */
+                    var opacityMultiplier = context.options.colorOpacityScale || 1;
+
+                    var colorAdjustMap = context.options.colorAdjust;
+                    if (colorAdjustMap != undefined) {
+                        var map_attr = colorAdjustMap[attr.toString()];
+                        if (map_attr)
+                            attr = map_attr;
+                    }
+
                     dom_element.style.color = "rgba(" +
                             attr[0].toString() + "," +
                             attr[1].toString() + "," +
                             attr[2].toString() + "," +
-                            (attr[3] / 255).toString() +
+                            (opacityMultiplier * attr[3] / 255).toString() +
                             ")";
                 }
         ),
@@ -68972,6 +69187,10 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
                     /* per IMSC1 */
 
+                    if (context.options.fontFamily) {
+                        attr = context.options.fontFamily.split(",");
+                    }
+
                     for (var i = 0; i < attr.length; i++) {
                         attr[i] = attr[i].trim();
 
@@ -68982,7 +69201,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                             rslt.push("Courier");
                             rslt.push("monospace");
 
-                        } else if (attr[i] === "proportionalSansSerif") {
+                        } else if (attr[i] === "proportionalSansSerif" || attr[i] === "default") {
 
                             rslt.push("Arial");
                             rslt.push("Helvetica");
@@ -69068,7 +69287,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         new HTMLStylingMapDefinition(
                 "http://www.w3.org/ns/ttml#styling fontSize",
                 function (context, dom_element, isd_element, attr) {
-                    dom_element.style.fontSize = attr.toUsedLength(context.w, context.h) + "px";
+                    dom_element.style.fontSize = attr.multiply(attr.toUsedLength(context.w, context.h), context.options.sizeAdjust) + "px";
                 }
         ),
 
@@ -69093,14 +69312,28 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
                     } else {
 
-                        dom_element.style.lineHeight = attr.toUsedLength(context.w, context.h) + "px";
+                        dom_element.style.lineHeight = 
+                            attr.multiply(
+                                attr.multiply(
+                                    attr.toUsedLength(context.w, context.h), context.options.sizeAdjust),
+                                context.options.lineHeightAdjust) + "px";
                     }
                 }
         ),
         new HTMLStylingMapDefinition(
                 "http://www.w3.org/ns/ttml#styling opacity",
                 function (context, dom_element, isd_element, attr) {
-                    dom_element.style.opacity = attr;
+                    /*
+                     * Customisable using <pre>regionOpacityScale: {number}</pre>
+                     * which acts as a multiplier.
+                     */
+                    var opacity = attr;
+
+                    if (context.options.regionOpacityScale != undefined) {
+                        opacity = opacity * context.options.regionOpacityScale;
+                    }
+
+                    dom_element.style.opacity = opacity;
                 }
         ),
         new HTMLStylingMapDefinition(
@@ -69236,6 +69469,38 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                 function (context, dom_element, isd_element, attr) {
 
                     var txto = isd_element.styleAttrs[imscStyles.byName.textOutline.qname];
+                    var otxto = context.options.textOutline;
+                    if (otxto) {
+                        if (otxto === "none") {
+
+                            txto = otxto;
+
+                        } else {
+                            var r = {};
+                            var os = otxto.split(" ");
+                            if (os.length !== 0 && os.length <= 2)
+                            {
+                                var c = imscUtils.parseColor(os[0]);
+
+                                r.color = c;
+
+                                if (c !== null)
+                                    os.shift();
+
+                                if (os.length === 1)
+                                {
+                                    var l = imscUtils.parseLength(os[0]);
+
+                                    if (l)
+                                    {
+                                        r.thickness = l;
+
+                                        txto = r;
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     if (attr === "none" && txto === "none") {
 
@@ -69269,18 +69534,16 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
                             for (var i = 0; i < attr.length; i++) {
 
-
                                 s.push(attr[i].x_off.toUsedLength(context.w, context.h) + "px " +
-                                        attr[i].y_off.toUsedLength(context.w, context.h) + "px " +
-                                        attr[i].b_radius.toUsedLength(context.w, context.h) + "px " +
-                                        "rgba(" +
-                                        attr[i].color[0].toString() + "," +
-                                        attr[i].color[1].toString() + "," +
-                                        attr[i].color[2].toString() + "," +
-                                        (attr[i].color[3] / 255).toString() +
-                                        ")"
-                                        );
-
+                                    attr[i].y_off.toUsedLength(context.w, context.h) + "px " +
+                                    attr[i].b_radius.toUsedLength(context.w, context.h) + "px " +
+                                    "rgba(" +
+                                    attr[i].color[0].toString() + "," +
+                                    attr[i].color[1].toString() + "," +
+                                    attr[i].color[2].toString() + "," +
+                                    (attr[i].color[3] / 255).toString() +
+                                    ")"
+                                );
                             }
 
                         }
@@ -69402,6 +69665,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
     for (var i = 0; i < STYLING_MAP_DEFS.length; i++) {
 
         STYLMAP_BY_QNAME[STYLING_MAP_DEFS[i].qname] = STYLING_MAP_DEFS[i];
+
     }
 
     /* CSS property names */
@@ -69560,7 +69824,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         } else {
             body = null;
         }
-
         /* rewritten TTML will always have a default - this covers it. because the region is defaulted to "" */
         if (activeRegions[""] !== undefined) {
             activeRegions[""] = true;
@@ -69574,9 +69837,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                 var c = isdProcessContentElement(tt, offset, tt.head.layout.regions[regionID], body, null, '', tt.head.layout.regions[regionID], errorHandler, context);
 
                 if (c !== null) {
-
-                    /* add the region to the ISD */
-
                     isd.contents.push(c.element);
                 }
             }
@@ -69638,7 +69898,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
         if ("sets" in elem) {
             for (var i = 0; i < elem.sets.length; i++) {
-
                 if (offset < elem.sets[i].begin || offset >= elem.sets[i].end)
                     continue;
 
@@ -69655,7 +69914,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         var spec_attr = {};
 
         for (var qname in isd_element.styleAttrs) {
-
             if (! isd_element.styleAttrs.hasOwnProperty(qname)) continue;
 
             spec_attr[qname] = true;
@@ -69678,10 +69936,9 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                 } else if (wm === "rltb" || wm === "rl") {
 
                     isd_element.styleAttrs[imscStyles.byName.direction.qname] = "rtl";
-
                 }
-
             }
+
         }
 
         /* inherited styling */
@@ -69689,7 +69946,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         if (parent !== null) {
 
             for (var j = 0; j < imscStyles.all.length; j++) {
-
                 var sa = imscStyles.all[j];
 
                 /* textDecoration has special inheritance rules */
@@ -69744,9 +70000,9 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                     !(sa.qname in isd_element.styleAttrs) &&
                     isd_element.kind === 'span' &&
                     isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "textContainer") {
-                    
+
                     /* special inheritance rule for ruby text container font size */
-                    
+
                     var ruby_fs = parent.styleAttrs[imscStyles.byName.fontSize.qname];
 
                     isd_element.styleAttrs[sa.qname] = new imscUtils.ComputedLength(
@@ -69757,28 +70013,27 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                     !(sa.qname in isd_element.styleAttrs) &&
                     isd_element.kind === 'span' &&
                     isd_element.styleAttrs[imscStyles.byName.ruby.qname] === "text") {
-                    
+
                     /* special inheritance rule for ruby text font size */
-                    
+
                     var parent_fs = parent.styleAttrs[imscStyles.byName.fontSize.qname];
-                    
+
                     if (parent.styleAttrs[imscStyles.byName.ruby.qname] === "textContainer") {
-                        
+
                         isd_element.styleAttrs[sa.qname] = parent_fs;
-                        
+
                     } else {
-                        
+
                         isd_element.styleAttrs[sa.qname] = new imscUtils.ComputedLength(
                             0.5 * parent_fs.rw,
                             0.5 * parent_fs.rh);
                     }
-                    
+
                 } else if (sa.inherit &&
                     (sa.qname in parent.styleAttrs) &&
                     !(sa.qname in isd_element.styleAttrs)) {
 
                     isd_element.styleAttrs[sa.qname] = parent.styleAttrs[sa.qname];
-
                 }
 
             }
@@ -69790,8 +70045,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         for (var k = 0; k < imscStyles.all.length; k++) {
             
             var ivs = imscStyles.all[k];
-
-            /* skip if value is already specified */
 
             if (ivs.qname in isd_element.styleAttrs) continue;
 
@@ -69806,9 +70059,9 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             if (ivs.qname === imscStyles.byName.origin.qname &&
                 imscStyles.byName.position.qname in isd_element.styleAttrs)
                 continue;
-            
+
             /* determine initial value */
-            
+
             var iv = doc.head.styling.initials[ivs.qname] || ivs.initial;
 
             if (iv === null) {
@@ -69836,7 +70089,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                     reportError(errorHandler, "Invalid initial value for '" + ivs.qname + "' on element '" + isd_element.kind);
 
                 }
-
             }
 
         }
@@ -69859,12 +70111,12 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
                     isd_element,
                     isd_element.styleAttrs[cs.qname],
                     context
-                    );
+                );
 
                 if (cstyle !== null) {
 
                     isd_element.styleAttrs[cs.qname] = cstyle;
-                    
+
                 } else {
                     /* if the style cannot be computed, replace it by its initial value */
 
@@ -69911,13 +70163,11 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             }
 
         } else if ('contents' in elem) {
-
             contents = elem.contents;
 
         }
 
         for (var x = 0; contents !== null && x < contents.length; x++) {
-
             var c = isdProcessContentElement(doc, offset, region, body, isd_element, associated_region_id, contents[x], errorHandler, context);
 
             /* 
@@ -69928,7 +70178,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             if (c !== null) {
 
                 isd_element.contents.push(c.element);
-
             }
 
         }
@@ -69937,8 +70186,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
 
         for (var qnameb in isd_element.styleAttrs) {
             if (!isd_element.styleAttrs.hasOwnProperty(qnameb)) continue;
-
-            /* true if not applicable */
 
             var na = false;
 
@@ -69969,7 +70216,7 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             }
 
             /* normal applicability */
-            
+
             if (! na) {
 
                 var da = imscStyles.byQName[qnameb];
@@ -69986,7 +70233,6 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
             if (na) {
                 delete isd_element.styleAttrs[qnameb];
             }
-
         }
 
         /* trim whitespace around explicit line breaks */
@@ -70100,32 +70346,29 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
     }
 
     function constructSpanList(element, elist) {
-
         if (! ("contents" in element)) {
             return;
         }
 
         for (var i = 0; i < element.contents.length; i++) {
-
             var child = element.contents[i];
             var ruby = child.styleAttrs[imscStyles.byName.ruby.qname];
 
             if (child.kind === 'span' && (ruby === "textContainer" || ruby === "text")) {
 
                 /* skip ruby text and text containers, which are handled on their own */
-            
+
                 continue;
 
             } else if ('contents' in child) {
-    
+
                 constructSpanList(child, elist);
-    
+
             } else if ((child.kind === 'span' && child.text.length !== 0) || child.kind === 'br') {
 
                 /* skip empty spans */
 
                 elist.push(child);
-
             }
 
         }
@@ -70185,11 +70428,9 @@ var browserIsFirefox = /firefox/i.test(navigator.userAgent);
         this.styleAttrs = {};
 
         for (var sname in ttelem.styleAttrs) {
-
             if (! ttelem.styleAttrs.hasOwnProperty(sname)) continue;
 
-            this.styleAttrs[sname] =
-                ttelem.styleAttrs[sname];
+            this.styleAttrs[sname] = ttelem.styleAttrs[sname];
         }
         
         /* copy src and type if image */
@@ -70355,6 +70596,12 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
     imscNames.ns_ittp = "http://www.w3.org/ns/ttml/profile/imsc1#parameter";
     imscNames.ns_smpte = "http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt";
     imscNames.ns_ebutts = "urn:ebu:tt:style";
+
+    imscNames.ttaf_map = {
+        "http://www.w3.org/2006/10/ttaf1": imscNames.ns_tt,
+        "http://www.w3.org/2006/10/ttaf1#style": imscNames.ns_tts,
+        "http://www.w3.org/2006/10/ttaf1#parameter": imscNames.ns_ttp
+    };
     
 })( false ? 0 : exports);
 
@@ -71129,7 +71376,7 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
         new StylingAttributeDefinition(
             imscNames.ns_tts,
             "showBackground",
-            "always",
+            "whenActive",
             ['region'],
             false,
             true,
@@ -71373,7 +71620,7 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
                         element.styleAttrs[imscStyles.byName.fontSize.qname],
                         null,
                         doc.pxLength.w
-                        );
+                    );
 
                     if (shadow.x_off === null)
                         return null;
@@ -71385,7 +71632,7 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
                         element.styleAttrs[imscStyles.byName.fontSize.qname],
                         null,
                         doc.pxLength.h
-                        );
+                    );
 
                     if (shadow.y_off === null)
                         return null;
@@ -71403,7 +71650,7 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
                             element.styleAttrs[imscStyles.byName.fontSize.qname],
                             null,
                             doc.pxLength.h
-                            );
+                        );
 
                         if (shadow.b_radius === null)
                             return null;
@@ -71421,7 +71668,6 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
                     }
 
                     r.push(shadow);
-
                 }
 
                 return r;
@@ -71557,7 +71803,7 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
         new StylingAttributeDefinition(
             imscNames.ns_itts,
             "fillLineGap",
-            "false",
+            "true",
             ['p'],
             true,
             true,
@@ -71572,14 +71818,16 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
 
     imscStyles.byQName = {};
     for (var i in imscStyles.all) {
-
-        imscStyles.byQName[imscStyles.all[i].qname] = imscStyles.all[i];
+        if (imscStyles.all.hasOwnProperty(i)) {
+            imscStyles.byQName[imscStyles.all[i].qname] = imscStyles.all[i];
+        }
     }
 
     imscStyles.byName = {};
     for (var j in imscStyles.all) {
-
-        imscStyles.byName[imscStyles.all[j].name] = imscStyles.all[j];
+        if (imscStyles.all.hasOwnProperty(j)) {
+            imscStyles.byName[imscStyles.all[j].name] = imscStyles.all[j];
+        }
     }
 
 
@@ -71840,7 +72088,6 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
 
                 s[j] = l;
             }
-
         }
 
         /* position default */
@@ -71941,6 +72188,10 @@ exports.renderHTML = __webpack_require__(/*! ./html */ "./node_modules/imsc/src/
 
     imscUtils.ComputedLength.prototype.toUsedLength = function (width, height) {
         return width * this.rw + height * this.rh;
+    };
+
+    imscUtils.ComputedLength.prototype.multiply = function (value, factor) {
+        return factor ? value * factor: value;
     };
 
     imscUtils.ComputedLength.prototype.isZero = function () {
@@ -72900,27 +73151,13 @@ SafeBuffer.allocUnsafeSlow = function (size) {
     return Stream.prototype.on.call(me, ev, handler)
   }
 
-  // character classes and tokens
-  var whitespace = '\r\n\t '
-
   // this really needs to be replaced with character classes.
   // XML allows all manner of ridiculous numbers and digits.
-  var number = '0124356789'
-  var letter = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-  // (Letter | "_" | ":")
-  var quote = '\'"'
-  var attribEnd = whitespace + '>'
   var CDATA = '[CDATA['
   var DOCTYPE = 'DOCTYPE'
   var XML_NAMESPACE = 'http://www.w3.org/XML/1998/namespace'
   var XMLNS_NAMESPACE = 'http://www.w3.org/2000/xmlns/'
   var rootNS = { xml: XML_NAMESPACE, xmlns: XMLNS_NAMESPACE }
-
-  // turn all the string character sets into character class objects.
-  whitespace = charClass(whitespace)
-  number = charClass(number)
-  letter = charClass(letter)
 
   // http://www.w3.org/TR/REC-xml/#NT-NameStartChar
   // This implementation works on strings, a single character at a time
@@ -72930,31 +73167,29 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   // is left as an exercise for the reader.
   var nameStart = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
 
-  var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040\.\d-]/
+  var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
 
   var entityStart = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/
-  var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040\.\d-]/
+  var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/
 
-  quote = charClass(quote)
-  attribEnd = charClass(attribEnd)
-
-  function charClass (str) {
-    return str.split('').reduce(function (s, c) {
-      s[c] = true
-      return s
-    }, {})
+  function isWhitespace (c) {
+    return c === ' ' || c === '\n' || c === '\r' || c === '\t'
   }
 
-  function isRegExp (c) {
-    return Object.prototype.toString.call(c) === '[object RegExp]'
+  function isQuote (c) {
+    return c === '"' || c === '\''
   }
 
-  function is (charclass, c) {
-    return isRegExp(charclass) ? !!c.match(charclass) : charclass[c]
+  function isAttribEnd (c) {
+    return c === '>' || isWhitespace(c)
   }
 
-  function not (charclass, c) {
-    return !is(charclass, c)
+  function isMatch (regex, c) {
+    return regex.test(c)
+  }
+
+  function notMatch (regex, c) {
+    return !isMatch(regex, c)
   }
 
   var S = 0
@@ -73587,7 +73822,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
       }
     }
     entity = entity.replace(/^0+/, '')
-    if (numStr.toLowerCase() !== entity) {
+    if (isNaN(num) || numStr.toLowerCase() !== entity) {
       strictFail(parser, 'Invalid character entity')
       return '&' + parser.entity + ';'
     }
@@ -73599,7 +73834,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
     if (c === '<') {
       parser.state = S.OPEN_WAKA
       parser.startTagPosition = parser.position
-    } else if (not(whitespace, c)) {
+    } else if (!isWhitespace(c)) {
       // have to process this as a text node.
       // weird, but happens.
       strictFail(parser, 'Non-whitespace before first tag.')
@@ -73636,9 +73871,11 @@ SafeBuffer.allocUnsafeSlow = function (size) {
     while (true) {
       c = charAt(chunk, i++)
       parser.c = c
+
       if (!c) {
         break
       }
+
       if (parser.trackPosition) {
         parser.position++
         if (c === '\n') {
@@ -73648,6 +73885,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           parser.column++
         }
       }
+
       switch (parser.state) {
         case S.BEGIN:
           parser.state = S.BEGIN_WHITESPACE
@@ -73682,7 +73920,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             parser.state = S.OPEN_WAKA
             parser.startTagPosition = parser.position
           } else {
-            if (not(whitespace, c) && (!parser.sawRoot || parser.closedRoot)) {
+            if (!isWhitespace(c) && (!parser.sawRoot || parser.closedRoot)) {
               strictFail(parser, 'Text data outside of root node.')
             }
             if (c === '&') {
@@ -73716,9 +73954,9 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           if (c === '!') {
             parser.state = S.SGML_DECL
             parser.sgmlDecl = ''
-          } else if (is(whitespace, c)) {
+          } else if (isWhitespace(c)) {
             // wait for it...
-          } else if (is(nameStart, c)) {
+          } else if (isMatch(nameStart, c)) {
             parser.state = S.OPEN_TAG
             parser.tagName = c
           } else if (c === '/') {
@@ -73761,7 +73999,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             emitNode(parser, 'onsgmldeclaration', parser.sgmlDecl)
             parser.sgmlDecl = ''
             parser.state = S.TEXT
-          } else if (is(quote, c)) {
+          } else if (isQuote(c)) {
             parser.state = S.SGML_DECL_QUOTED
             parser.sgmlDecl += c
           } else {
@@ -73786,7 +74024,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             parser.doctype += c
             if (c === '[') {
               parser.state = S.DOCTYPE_DTD
-            } else if (is(quote, c)) {
+            } else if (isQuote(c)) {
               parser.state = S.DOCTYPE_QUOTED
               parser.q = c
             }
@@ -73805,7 +74043,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           parser.doctype += c
           if (c === ']') {
             parser.state = S.DOCTYPE
-          } else if (is(quote, c)) {
+          } else if (isQuote(c)) {
             parser.state = S.DOCTYPE_DTD_QUOTED
             parser.q = c
           }
@@ -73889,7 +74127,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
         case S.PROC_INST:
           if (c === '?') {
             parser.state = S.PROC_INST_ENDING
-          } else if (is(whitespace, c)) {
+          } else if (isWhitespace(c)) {
             parser.state = S.PROC_INST_BODY
           } else {
             parser.procInstName += c
@@ -73897,7 +74135,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           continue
 
         case S.PROC_INST_BODY:
-          if (!parser.procInstBody && is(whitespace, c)) {
+          if (!parser.procInstBody && isWhitespace(c)) {
             continue
           } else if (c === '?') {
             parser.state = S.PROC_INST_ENDING
@@ -73921,7 +74159,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           continue
 
         case S.OPEN_TAG:
-          if (is(nameBody, c)) {
+          if (isMatch(nameBody, c)) {
             parser.tagName += c
           } else {
             newTag(parser)
@@ -73930,7 +74168,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             } else if (c === '/') {
               parser.state = S.OPEN_TAG_SLASH
             } else {
-              if (not(whitespace, c)) {
+              if (!isWhitespace(c)) {
                 strictFail(parser, 'Invalid character in tag name')
               }
               parser.state = S.ATTRIB
@@ -73950,13 +74188,13 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
         case S.ATTRIB:
           // haven't read the attribute name yet.
-          if (is(whitespace, c)) {
+          if (isWhitespace(c)) {
             continue
           } else if (c === '>') {
             openTag(parser)
           } else if (c === '/') {
             parser.state = S.OPEN_TAG_SLASH
-          } else if (is(nameStart, c)) {
+          } else if (isMatch(nameStart, c)) {
             parser.attribName = c
             parser.attribValue = ''
             parser.state = S.ATTRIB_NAME
@@ -73973,9 +74211,9 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             parser.attribValue = parser.attribName
             attrib(parser)
             openTag(parser)
-          } else if (is(whitespace, c)) {
+          } else if (isWhitespace(c)) {
             parser.state = S.ATTRIB_NAME_SAW_WHITE
-          } else if (is(nameBody, c)) {
+          } else if (isMatch(nameBody, c)) {
             parser.attribName += c
           } else {
             strictFail(parser, 'Invalid attribute name')
@@ -73985,7 +74223,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
         case S.ATTRIB_NAME_SAW_WHITE:
           if (c === '=') {
             parser.state = S.ATTRIB_VALUE
-          } else if (is(whitespace, c)) {
+          } else if (isWhitespace(c)) {
             continue
           } else {
             strictFail(parser, 'Attribute without value')
@@ -73998,7 +74236,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             parser.attribName = ''
             if (c === '>') {
               openTag(parser)
-            } else if (is(nameStart, c)) {
+            } else if (isMatch(nameStart, c)) {
               parser.attribName = c
               parser.state = S.ATTRIB_NAME
             } else {
@@ -74009,9 +74247,9 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           continue
 
         case S.ATTRIB_VALUE:
-          if (is(whitespace, c)) {
+          if (isWhitespace(c)) {
             continue
-          } else if (is(quote, c)) {
+          } else if (isQuote(c)) {
             parser.q = c
             parser.state = S.ATTRIB_VALUE_QUOTED
           } else {
@@ -74036,13 +74274,13 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           continue
 
         case S.ATTRIB_VALUE_CLOSED:
-          if (is(whitespace, c)) {
+          if (isWhitespace(c)) {
             parser.state = S.ATTRIB
           } else if (c === '>') {
             openTag(parser)
           } else if (c === '/') {
             parser.state = S.OPEN_TAG_SLASH
-          } else if (is(nameStart, c)) {
+          } else if (isMatch(nameStart, c)) {
             strictFail(parser, 'No whitespace between attributes')
             parser.attribName = c
             parser.attribValue = ''
@@ -74053,7 +74291,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           continue
 
         case S.ATTRIB_VALUE_UNQUOTED:
-          if (not(attribEnd, c)) {
+          if (!isAttribEnd(c)) {
             if (c === '&') {
               parser.state = S.ATTRIB_VALUE_ENTITY_U
             } else {
@@ -74071,9 +74309,9 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
         case S.CLOSE_TAG:
           if (!parser.tagName) {
-            if (is(whitespace, c)) {
+            if (isWhitespace(c)) {
               continue
-            } else if (not(nameStart, c)) {
+            } else if (notMatch(nameStart, c)) {
               if (parser.script) {
                 parser.script += '</' + c
                 parser.state = S.SCRIPT
@@ -74085,14 +74323,14 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             }
           } else if (c === '>') {
             closeTag(parser)
-          } else if (is(nameBody, c)) {
+          } else if (isMatch(nameBody, c)) {
             parser.tagName += c
           } else if (parser.script) {
             parser.script += '</' + parser.tagName
             parser.tagName = ''
             parser.state = S.SCRIPT
           } else {
-            if (not(whitespace, c)) {
+            if (!isWhitespace(c)) {
               strictFail(parser, 'Invalid tagname in closing tag')
             }
             parser.state = S.CLOSE_TAG_SAW_WHITE
@@ -74100,7 +74338,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
           continue
 
         case S.CLOSE_TAG_SAW_WHITE:
-          if (is(whitespace, c)) {
+          if (isWhitespace(c)) {
             continue
           }
           if (c === '>') {
@@ -74136,7 +74374,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
             parser[buffer] += parseEntity(parser)
             parser.entity = ''
             parser.state = returnState
-          } else if (is(parser.entity.length ? entityBody : entityStart, c)) {
+          } else if (isMatch(parser.entity.length ? entityBody : entityStart, c)) {
             parser.entity += c
           } else {
             strictFail(parser, 'Invalid character in entity name')
@@ -74159,6 +74397,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   }
 
   /*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
+  /* istanbul ignore next */
   if (!String.fromCodePoint) {
     (function () {
       var stringFromCharCode = String.fromCharCode
@@ -74200,6 +74439,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
         }
         return result
       }
+      /* istanbul ignore next */
       if (Object.defineProperty) {
         Object.defineProperty(String, 'fromCodePoint', {
           value: fromCodePoint,
