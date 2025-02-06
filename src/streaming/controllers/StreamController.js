@@ -129,6 +129,7 @@ function StreamController() {
         eventBus.on(MediaPlayerEvents.PLAYBACK_ENDED, _onPlaybackEnded, instance);
         eventBus.on(MediaPlayerEvents.METRIC_ADDED, _onMetricAdded, instance);
         eventBus.on(MediaPlayerEvents.MANIFEST_VALIDITY_CHANGED, _onManifestValidityChanged, instance);
+        eventBus.on(MediaPlayerEvents.BUFFER_EMPTY, _onBufferEmpty, instance);
         eventBus.on(MediaPlayerEvents.BUFFER_LEVEL_UPDATED, _onBufferLevelUpdated, instance);
         eventBus.on(MediaPlayerEvents.QUALITY_CHANGE_REQUESTED, _onQualityChanged, instance);
 
@@ -153,6 +154,7 @@ function StreamController() {
         eventBus.off(MediaPlayerEvents.PLAYBACK_ENDED, _onPlaybackEnded, instance);
         eventBus.off(MediaPlayerEvents.METRIC_ADDED, _onMetricAdded, instance);
         eventBus.off(MediaPlayerEvents.MANIFEST_VALIDITY_CHANGED, _onManifestValidityChanged, instance);
+        eventBus.off(MediaPlayerEvents.BUFFER_EMPTY, _onBufferEmpty, instance);
         eventBus.off(MediaPlayerEvents.BUFFER_LEVEL_UPDATED, _onBufferLevelUpdated, instance);
         eventBus.off(MediaPlayerEvents.QUALITY_CHANGE_REQUESTED, _onQualityChanged, instance);
 
@@ -1358,6 +1360,17 @@ function StreamController() {
 
     function _createPlaylistMetrics(startReason) {
         dashMetrics.createPlaylistMetrics(playbackController.getTime() * 1000, startReason);
+    }
+
+    /**
+     * If playback has stalled send any PlayList metrics
+     * @return {boolean}
+     */
+    function _onBufferEmpty(e) {
+        logger.debug('[onBufferEmpty]');
+        if (e.mediaType === Constants.AUDIO || e.mediaType === Constants.VIDEO) {
+            _flushPlaylistMetrics(PlayListTrace.REBUFFERING_REASON);
+        }
     }
 
     function _onPlaybackError(e) {
