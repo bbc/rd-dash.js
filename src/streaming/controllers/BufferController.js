@@ -732,12 +732,13 @@ function BufferController(config) {
     }
 
     function _onPlaybackWaiting() {
-        if (settings.get().buffer.phantomStallHandling && bufferLevel > settings.get().streaming.buffer.stallThreshold && isBufferingCompleted) {
+        if (settings.get().streaming.buffer.phantomStallHandling && bufferLevel > settings.get().streaming.buffer.stallThreshold && isBufferingCompleted) {
 
             // There's a stall from the video element by the buffer looks healthy, start the timer.
-            const timeout = settings.get().buffer.phantomStallTimeout
+            const timeout = settings.get().streaming.buffer.phantomStallTimeout
             phantomStallTimer = setTimeout(()=>{
-                console.log('BOOM')
+                logger.info( 'A Phantom stall has been detected, seeking to current time in an attempt to recover.');
+                playbackController.seek(playbackController.getTime() + 0.001, false, true);
             },timeout)
         }
     }
