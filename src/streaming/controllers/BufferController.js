@@ -80,6 +80,7 @@ function BufferController(config) {
         bufferState,
         appendedBytesInfo,
         wallclockTicked,
+        phantomStallTimer,
         isPruningInProgress,
         isQuotaExceeded,
         initCache,
@@ -105,7 +106,7 @@ function BufferController(config) {
         eventBus.on(Events.INIT_FRAGMENT_LOADED, _onInitFragmentLoaded, instance);
         eventBus.on(Events.MEDIA_FRAGMENT_LOADED, _onMediaFragmentLoaded, instance);
         eventBus.on(Events.WALLCLOCK_TIME_UPDATED, _onWallclockTimeUpdated, instance);
-
+        eventBus.on(MediaPlayerEvents.PLAYBACK_WAITING, _onPlaybackWaiting, instance);
         eventBus.on(MediaPlayerEvents.PLAYBACK_PLAYING, _onPlaybackPlaying, instance);
         eventBus.on(MediaPlayerEvents.PLAYBACK_PROGRESS, _onPlaybackProgression, instance);
         eventBus.on(MediaPlayerEvents.PLAYBACK_TIME_UPDATED, _onPlaybackProgression, instance);
@@ -729,7 +730,24 @@ function BufferController(config) {
         checkIfSufficientBuffer();
     }
 
+    function _onPlaybackWaiting() {
+        if (settings.get().buffer.phantomStallHandling && bufferLevel > settings.get().streaming.buffer.stallThreshold && isBufferingCompleted) {
+
+            // There's a stall from the video element by the buffer looks healthy, start the timer.
+            const timeout = settings.get().buffer.phantomStallTimeout
+            phantomStallTimer = setTimeout(()=>{
+                console.log('BOOM')
+            },timeout)
+        }
+    }
+
     function _onPlaybackPlaying() {
+
+        //Stop the phantom stall dead man function from triggering
+        if(phantomStallTimer){
+            clearTimeout(phantomStallTimer)
+            phantomStallTimer = null;
+        }
         checkIfSufficientBuffer();
         seekTarget = NaN;
     }
@@ -1232,6 +1250,7 @@ function BufferController(config) {
         eventBus.off(Events.MEDIA_FRAGMENT_LOADED, _onMediaFragmentLoaded, this);
         eventBus.off(Events.WALLCLOCK_TIME_UPDATED, _onWallclockTimeUpdated, this);
 
+        eventBus.off(MediaPlayerEvents.PLAYBACK_WAITING, _onPlaybackWaiting, this);
         eventBus.off(MediaPlayerEvents.PLAYBACK_PLAYING, _onPlaybackPlaying, this);
         eventBus.off(MediaPlayerEvents.PLAYBACK_PROGRESS, _onPlaybackProgression, this);
         eventBus.off(MediaPlayerEvents.PLAYBACK_TIME_UPDATED, _onPlaybackProgression, this);

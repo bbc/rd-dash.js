@@ -96,6 +96,8 @@ import Events from './events/Events';
  *                enableSeekDecorrelationFix: false,
  *                fastSwitchEnabled: true,
  *                flushBufferAtTrackSwitch: false,
+ *                phantomStallHandling: false,
+ *                phantomStallTimeout: 5000,
  *                reuseExistingSourceBuffers: true,
  *                bufferPruningInterval: 10,
  *                bufferToKeep: 20,
@@ -316,6 +318,10 @@ import Events from './events/Events';
  * This can be required on some devices like GoogleCast devices to make track switching functional.
  *
  * Otherwise track switching will be effective only once after previous buffered track is fully consumed.
+ * @property {boolean} [phantomStallHandling=false]
+ * Handling waiting events that result in stalled playback when the buffer is healthy
+ * @property {boolean} [phantomStallTimeout=5000]
+ * How long to wait before declaring a stall with healthy buffer a "phantom stall" and taking action
  * @property {boolean} [reuseExistingSourceBuffers=true]
  * Enable reuse of existing MediaSource Sourcebuffers during period transition.
  * @property {number} [bufferPruningInterval=10]
@@ -973,6 +979,8 @@ function Settings() {
                 enableSeekDecorrelationFix: false,
                 fastSwitchEnabled: true,
                 flushBufferAtTrackSwitch: false,
+                phantomStallHandling: false,
+                phantomStallTimeout: 5000,
                 reuseExistingSourceBuffers: true,
                 bufferPruningInterval: 10,
                 bufferToKeep: 20,
