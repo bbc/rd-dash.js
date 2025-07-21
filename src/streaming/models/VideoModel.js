@@ -261,7 +261,7 @@ function VideoModel() {
                 logger.debug(`emitting synthetic waiting event and halting playback with playback rate 0`);
 
                 previousPlaybackRate = element.playbackRate;
-                setPlaybackRate(0, true);
+                setPlaybackRate(0, settings.get().streaming.buffer.syntheticStallEvents.ignoreReadyState);
 
                 const event = document.createEvent('Event');
                 event.initEvent('waiting', true, false);
