@@ -29,6 +29,8 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
+import MediaPlayerEvents from '../MediaPlayerEvents';
+import EventBus from '../../core/EventBus';
 import FactoryMaker from '../../core/FactoryMaker';
 import Settings from '../../core/Settings';
 import Constants from '../constants/Constants';
@@ -48,6 +50,7 @@ function FetchLoader(cfg) {
     const lowLatencyThroughputModel = cfg.lowLatencyThroughputModel;
     const boxParser = cfg.boxParser;
     const settings = Settings(context).getInstance();
+    const eventBus = EventBus(context).getInstance();
     let instance, dashMetrics;
 
     function setup(cfg) {
@@ -317,6 +320,25 @@ function FetchLoader(cfg) {
                                     data = new Uint8Array(remaining.subarray(0, end));
                                     remaining = remaining.subarray(end);
                                 }
+
+                                if(endTimeData.length === 4){
+                                    const chunkTimingData = []
+                                    const urlParts = httpRequest.url.split('/')
+                                    const semgmentParts = urlParts[urlParts.length-1].split('.')
+
+                                    for(let i = 0; i<4; i++){
+                                        
+                                        chunkTimingData.push({
+                                            start: startTimeData[i],
+                                            end: endTimeData[i],
+                                            duration: endTimeData[i].ts - startTimeData[i].ts,
+                                            bytes: endTimeData[i].bytes - startTimeData[i].bytes
+                                        })
+                                    }
+
+                                    eventBus.trigger(MediaPlayerEvents.CHUNK_TIMING_INFORMATION, { chunkTimingData, segment: parseInt(semgmentParts[0]), repId: urlParts[urlParts.length-2], ending: semgmentParts[1] });
+                                }
+
                                 // Announce progress but don't track traces. Throughput measures are quite unstable
                                 // when they are based in small amount of data
                                 httpRequest.progress({

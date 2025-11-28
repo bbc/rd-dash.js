@@ -88,6 +88,12 @@ class MediaPlayerEvents extends EventsBase {
         this.BUFFER_LEVEL_UPDATED = 'bufferLevelUpdated';
 
         /**
+         * Triggered when a segment is finished loading using fetch, passes detailed timing information
+         * @event MediaPlayerEvents#CHUNK_TIMING_INFORMATION
+         */
+        this.CHUNK_TIMING_INFORMATION = 'chunkTimingInformation';
+
+        /**
          * Triggered when a dynamic stream changed to static (transition phase between Live and On-Demand).
          * @event MediaPlayerEvents#DYNAMIC_TO_STATIC
          */
