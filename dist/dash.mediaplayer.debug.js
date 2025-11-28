@@ -37745,6 +37745,9 @@ function FetchLoader(cfg) {
 
                 for (var i = 0; i < 4; i++) {
                   chunkTimingData.push({
+                    repId: urlParts[urlParts.length - 2],
+                    segment: parseInt(semgmentParts[0]),
+                    chunk: parseInt(semgmentParts[0]) + (i + 1) / 10,
                     start: startTimeData[i],
                     end: endTimeData[i],
                     duration: endTimeData[i].ts - startTimeData[i].ts,
@@ -37752,12 +37755,7 @@ function FetchLoader(cfg) {
                   });
                 }
 
-                eventBus.trigger(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_0__["default"].CHUNK_TIMING_INFORMATION, {
-                  chunkTimingData: chunkTimingData,
-                  segment: parseInt(semgmentParts[0]),
-                  repId: urlParts[urlParts.length - 2],
-                  ending: semgmentParts[1]
-                });
+                eventBus.trigger(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_0__["default"].CHUNK_TIMING_INFORMATION, chunkTimingData);
               } // Announce progress but don't track traces. Throughput measures are quite unstable
               // when they are based in small amount of data
 

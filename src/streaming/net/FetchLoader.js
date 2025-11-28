@@ -327,8 +327,10 @@ function FetchLoader(cfg) {
                                     const semgmentParts = urlParts[urlParts.length-1].split('.')
 
                                     for(let i = 0; i<4; i++){
-                                        
                                         chunkTimingData.push({
+                                            repId: urlParts[urlParts.length-2], 
+                                            segment: parseInt(semgmentParts[0]),
+                                            chunk: parseInt(semgmentParts[0]) + ((i+1)/10),
                                             start: startTimeData[i],
                                             end: endTimeData[i],
                                             duration: endTimeData[i].ts - startTimeData[i].ts,
@@ -336,7 +338,7 @@ function FetchLoader(cfg) {
                                         })
                                     }
 
-                                    eventBus.trigger(MediaPlayerEvents.CHUNK_TIMING_INFORMATION, { chunkTimingData, segment: parseInt(semgmentParts[0]), repId: urlParts[urlParts.length-2], ending: semgmentParts[1] });
+                                    eventBus.trigger(MediaPlayerEvents.CHUNK_TIMING_INFORMATION, chunkTimingData);
                                 }
 
                                 // Announce progress but don't track traces. Throughput measures are quite unstable
