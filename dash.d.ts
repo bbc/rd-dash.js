@@ -1192,6 +1192,8 @@ declare namespace dashjs {
 
         on(type: CaptionContainerResizeEvent['type'], listener: (e: CaptionContainerResizeEvent) => void, scope?: object): void;
 
+        on(type: ChunkTimingInformation['type'], listener: (e: ChunkTimingInformation) => void, scope?: object): void;
+
         on(type: DynamicToStaticEvent['type'], listener: (e: DynamicToStaticEvent) => void, scope?: object): void;
 
         on(type: ErrorEvent['type'], listener: (e: ErrorEvent) => void, scope?: object): void;
@@ -1531,7 +1533,7 @@ declare namespace dashjs {
         CAN_PLAY_THROUGH: 'canPlayThrough';
         CAPTION_RENDERED: 'captionRendered';
         CAPTION_CONTAINER_RESIZE: 'captionContainerResize';
-        CONFORMANCE_VIOLATION: 'conformanceViolation';
+        CONFORMANCE_VIOLATION: 'conformanceViolation'
         CHUNK_TIMING_INFORMATION: 'chunkTimingInformation';
         DYNAMIC_TO_STATIC: 'dynamicToStatic';
         ERROR: 'error';
