@@ -240,6 +240,23 @@ function FetchLoader(cfg) {
 
                     const processResult = function ({ value, done }) { // Bug fix Parse whenever data is coming [value] better than 1ms looking that increase CPU
                         if (done) {
+                            const chunkTimingData = []
+                            const urlParts = httpRequest.url.split('/')
+                            const semgmentParts = urlParts[urlParts.length-1].split('.')
+
+                            for(let i = 0; i<endTimeData.length; i++){
+                                chunkTimingData.push({
+                                    repId: urlParts[urlParts.length-2], 
+                                    segment: parseInt(semgmentParts[0]),
+                                    chunk: parseInt(semgmentParts[0]) + ((i+1)/10),
+                                    start: startTimeData[i],
+                                    end: endTimeData[i],
+                                    duration: endTimeData[i].ts - startTimeData[i].ts,
+                                    bytes: endTimeData[i].bytes - startTimeData[i].bytes
+                                })
+                            }
+                            eventBus.trigger(MediaPlayerEvents.CHUNK_TIMING_INFORMATION, chunkTimingData);
+
                             if (remaining) {
                                 if (calculationMode !== Constants.ABR_FETCH_THROUGHPUT_CALCULATION_AAST) {
                                     // If there is pending data, call progress so network metrics
@@ -319,26 +336,6 @@ function FetchLoader(cfg) {
                                 } else {
                                     data = new Uint8Array(remaining.subarray(0, end));
                                     remaining = remaining.subarray(end);
-                                }
-
-                                if(endTimeData.length === 4){
-                                    const chunkTimingData = []
-                                    const urlParts = httpRequest.url.split('/')
-                                    const semgmentParts = urlParts[urlParts.length-1].split('.')
-
-                                    for(let i = 0; i<4; i++){
-                                        chunkTimingData.push({
-                                            repId: urlParts[urlParts.length-2], 
-                                            segment: parseInt(semgmentParts[0]),
-                                            chunk: parseInt(semgmentParts[0]) + ((i+1)/10),
-                                            start: startTimeData[i],
-                                            end: endTimeData[i],
-                                            duration: endTimeData[i].ts - startTimeData[i].ts,
-                                            bytes: endTimeData[i].bytes - startTimeData[i].bytes
-                                        })
-                                    }
-
-                                    eventBus.trigger(MediaPlayerEvents.CHUNK_TIMING_INFORMATION, chunkTimingData);
                                 }
 
                                 // Announce progress but don't track traces. Throughput measures are quite unstable
