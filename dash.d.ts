@@ -1531,7 +1531,8 @@ declare namespace dashjs {
         CAN_PLAY_THROUGH: 'canPlayThrough';
         CAPTION_RENDERED: 'captionRendered';
         CAPTION_CONTAINER_RESIZE: 'captionContainerResize';
-        CONFORMANCE_VIOLATION: 'conformanceViolation'
+        CONFORMANCE_VIOLATION: 'conformanceViolation';
+        CHUNK_TIMING_INFORMATION: 'chunkTimingInformation';
         DYNAMIC_TO_STATIC: 'dynamicToStatic';
         ERROR: 'error';
         EVENT_MODE_ON_RECEIVE: 'eventModeOnReceive';
@@ -1740,6 +1741,10 @@ declare namespace dashjs {
 
     export interface CaptionContainerResizeEvent extends Event {
         type: MediaPlayerEvents['CAPTION_CONTAINER_RESIZE'];
+    }
+
+    export interface ChunkTimingInformation extends Event {
+        type: MediaPlayerEvents['CHUNK_TIMING_INFORMATION'];
     }
 
     export interface DynamicToStaticEvent extends Event {
@@ -4271,6 +4276,7 @@ declare namespace dashjs {
         CAPTION_RENDERED: 'captionRendered';
         CAPTION_CONTAINER_RESIZE: 'captionContainerResize';
         CONFORMANCE_VIOLATION: 'conformanceViolation'
+        CHUNK_TIMING_INFORMATION: 'chunkTimingInformation';
         DYNAMIC_TO_STATIC: 'dynamicToStatic';
         ERROR: 'error';
         EVENT_MODE_ON_RECEIVE: 'eventModeOnReceive';

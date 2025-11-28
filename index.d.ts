@@ -1192,6 +1192,8 @@ declare namespace dashjs {
 
         on(type: CaptionContainerResizeEvent['type'], listener: (e: CaptionContainerResizeEvent) => void, scope?: object): void;
 
+        on(type: ChunkTimingInformation['type'], listener: (e: ChunkTimingInformation) => void, scope?: object): void;
+
         on(type: DynamicToStaticEvent['type'], listener: (e: DynamicToStaticEvent) => void, scope?: object): void;
 
         on(type: ErrorEvent['type'], listener: (e: ErrorEvent) => void, scope?: object): void;
@@ -1532,6 +1534,7 @@ declare namespace dashjs {
         CAPTION_RENDERED: 'captionRendered';
         CAPTION_CONTAINER_RESIZE: 'captionContainerResize';
         CONFORMANCE_VIOLATION: 'conformanceViolation'
+        CHUNK_TIMING_INFORMATION: 'chunkTimingInformation';
         DYNAMIC_TO_STATIC: 'dynamicToStatic';
         ERROR: 'error';
         EVENT_MODE_ON_RECEIVE: 'eventModeOnReceive';
@@ -1740,6 +1743,10 @@ declare namespace dashjs {
 
     export interface CaptionContainerResizeEvent extends Event {
         type: MediaPlayerEvents['CAPTION_CONTAINER_RESIZE'];
+    }
+
+    export interface ChunkTimingInformation extends Event {
+        type: MediaPlayerEvents['CHUNK_TIMING_INFORMATION'];
     }
 
     export interface DynamicToStaticEvent extends Event {
@@ -4271,6 +4278,7 @@ declare namespace dashjs {
         CAPTION_RENDERED: 'captionRendered';
         CAPTION_CONTAINER_RESIZE: 'captionContainerResize';
         CONFORMANCE_VIOLATION: 'conformanceViolation'
+        CHUNK_TIMING_INFORMATION: 'chunkTimingInformation';
         DYNAMIC_TO_STATIC: 'dynamicToStatic';
         ERROR: 'error';
         EVENT_MODE_ON_RECEIVE: 'eventModeOnReceive';
