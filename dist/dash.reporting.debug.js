@@ -804,7 +804,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *            },
  *            timeShiftBuffer: {
  *                calcFromSegmentTimeline: false,
- *                fallbackToSegmentTimeline: true
+ *                fallbackToSegmentTimeline: true,
+ *                maxDecoderRate: NaN
  *            },
  *            metrics: {
  *              maxListDepth: 100
@@ -833,8 +834,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *                hybridSwitchBufferTime: NaN,
  *                longFormContentDurationThreshold: 600,
  *                stallThreshold: 0.3,
+ *                lowLatencyStallThreshold: 0.3,
  *                useAppendWindow: true,
  *                setStallState: true,
+ *                videoFramesNotAdvancing: {
+ *                   enabled: false
+ *                   thresholdInSeconds: 5,
+ *                },
  *                avoidCurrentTimeRangePruning: false,
  *                useChangeTypeForTrackSwitch: true,
  *                mediaSourceDurationInfinity: true,
@@ -889,7 +895,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *                  stop: { min: NaN, max: NaN }
  *                },
  *                playbackBufferMin: 0.5,
- *                liveThreshold: 30,
+ *                liveThreshold: -1,
  *                enabled: null,
  *                mode: Constants.LIVE_CATCHUP_MODE_DEFAULT
  *            },
@@ -989,9 +995,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @typedef {Object} TimeShiftBuffer
  * @property {boolean} [calcFromSegmentTimeline=false]
  * Enable calculation of the DVR window for SegmentTimeline manifests based on the entries in \<SegmentTimeline\>.
- *  * @property {boolean} [fallbackToSegmentTimeline=true]
+ * @property {boolean} [fallbackToSegmentTimeline=true]
  * In case the MPD uses \<SegmentTimeline\ and no segment is found within the DVR window the DVR window is calculated based on the entries in \<SegmentTimeline\>.
- */
+ * @property {number} [maxDecoderRate=NaN]
+ * The maximum rate your decoder can run at, can be used to overshoot the startup seek in anticpation of delay in hardware e.g.) TVs
+*/
 
 /**
  * @typedef {Object} LiveDelay
@@ -1070,12 +1078,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * When the time is set higher than the default you will have to wait longer to see automatic bitrate switches but will have a larger buffer which will increase stability.
  * @property {number} [stallThreshold=0.3]
  * Stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune.
+ * @property {number} [lowLatencyStallThreshold=0.3]
+ * Low Latency stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune. 
  * @property {boolean} [useAppendWindow=true]
  * Specifies if the appendWindow attributes of the MSE SourceBuffers should be set according to content duration from manifest.
  * @property {boolean} [setStallState=true]
  * Specifies if we record stalled streams once the stall threshold is reached
  * @property {module:Settings~SyntheticStallSettings} [syntheticStallEvents]
  * Specified if we fire manual stall events once the stall threshold is reached
+ * 
+ * @property {number} [videoFramesNotAdvancing={enabled:false,thresholdInSeconds:5}]
+ * Controls a mechanism for handling situations where the player is playing but stops advancing its total frame count to handle https://issues.chromium.org/issues/41243192. 
+ * 
+ * The 'enabled' property signifies whether we attempt to handle the bug should it occur by seeking to the current time.
+ * The 'thresholdInSeconds' a time in seconds that determines how long the issue must be occuring before the handler is triggered, it can be used to control the sensitivity of the mechanism.
  * @property {boolean} [avoidCurrentTimeRangePruning=false]
  * Avoids pruning of the buffered range that contains the current playback time.
  *
@@ -1236,7 +1252,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * Enable/disable subtitle rendering by default.
  * @property {boolean} [extendSegmentedCues=true]
  * Enable/disable patching of segmented cues in order to merge as a single cue by extending cue end time.
- * @property {object} [webvtt={customRenderingEnabled=false}]
+ * @property {boolean} [imsc.displayForcedOnlyMode=false]
+ * Enable/disable forced only mode in IMSC captions.
+ * When true, only those captions where itts:forcedDisplay="true" will be displayed.
+ * @property {boolean} [imsc.enableRollUp=true]
+ * Enable/disable rollUp style display of IMSC captions.
+ * @property {object} [imsc.options]
+ * IMSC styling options - See the renderHtml function of imscJS for full details 
+ * @property {number} [imsc.options.sizeAdjust]
+ * IMSC styling option - scales the text size and line padding
+ * @property {number} [imsc.options.lineHeightAdjust]
+ * IMSC styling option - scales the line height
+ * @property {number} [imsc.options.backgroundOpacityScale]
+ * IMSC styling option - scales the backgroundColor opacity
+ * @property {string} [imsc.options.fontFamily]
+ * IMSC styling option - comma-separated list of font family values to use, if present.
+ * @property {number} [imsc.options.colorOpacityScale]
+ * IMSC styling option - opacity override on text color
+ * @property {number} [imsc.options.regionOpacityScale]
+ * IMSC styling option - scales the region opacity
+ * @property {string} [imsc.options.textOutline]
+ * IMSC styling option - textOutline value to use, if present
+ * @property {object} [webvtt.customRenderingEnabled=false]
  * Enables the custom rendering for WebVTT captions. For details refer to the "Subtitles and Captions" sample section of dash.js.
  * Custom WebVTT rendering requires the external library vtt.js that can be found in the contrib folder.
  */
@@ -1282,7 +1319,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @property {number} [playbackBufferMin=0.5]
  * Use this parameter to specify the minimum buffer which is used for LoL+ based playback rate reduction.
  *
- * @property {boolean} [liveThreshold=30]
+ * @property {boolean} [liveThreshold=-1]
  * How far in seconds the client has to be behind the absolute target for the catchup controller to attempt catching up. Disabled by setting to -1
  *
  * @property {boolean} [enabled=null]
@@ -1658,7 +1695,8 @@ function Settings() {
       },
       timeShiftBuffer: {
         calcFromSegmentTimeline: false,
-        fallbackToSegmentTimeline: true
+        fallbackToSegmentTimeline: true,
+        maxDecoderRate: null
       },
       metrics: {
         maxListDepth: 100
@@ -1687,8 +1725,13 @@ function Settings() {
         hybridSwitchBufferTime: NaN,
         longFormContentDurationThreshold: 600,
         stallThreshold: 0.3,
+        lowLatencyStallThreshold: 0.3,
         useAppendWindow: true,
         setStallState: true,
+        videoFramesNotAdvancing: {
+          enabled: false,
+          thresholdInSeconds: 5
+        },
         avoidCurrentTimeRangePruning: false,
         useChangeTypeForTrackSwitch: true,
         mediaSourceDurationInfinity: true,
@@ -1730,6 +1773,19 @@ function Settings() {
       text: {
         defaultEnabled: true,
         extendSegmentedCues: true,
+        imsc: {
+          displayForcedOnlyMode: false,
+          enableRollUp: true,
+          options: {
+            sizeAdjust: 1,
+            lineHeightAdjust: 1,
+            backgroundOpacityScale: null,
+            fontFamily: null,
+            colorOpacityScale: 1,
+            regionOpacityScale: null,
+            textOutline: null
+          }
+        },
         webvtt: {
           customRenderingEnabled: false
         }
@@ -1751,7 +1807,7 @@ function Settings() {
           }
         },
         playbackBufferMin: 0.5,
-        liveThreshold: 30,
+        liveThreshold: -1,
         enabled: null,
         mode: _streaming_constants_Constants__WEBPACK_IMPORTED_MODULE_3__["default"].LIVE_CATCHUP_MODE_DEFAULT
       },
@@ -2652,6 +2708,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
 
     _this.BUFFER_LEVEL_UPDATED = 'bufferLevelUpdated';
     /**
+     * Triggered when a segment is finished loading using fetch, passes detailed timing information
+     * @event MediaPlayerEvents#CHUNK_TIMING_INFORMATION
+     */
+
+    _this.CHUNK_TIMING_INFORMATION = 'chunkTimingInformation';
+    /**
      * Triggered when a dynamic stream changed to static (transition phase between Live and On-Demand).
      * @event MediaPlayerEvents#DYNAMIC_TO_STATIC
      */
@@ -2942,6 +3004,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
      */
 
     _this.PLAYBACK_STALLED = 'playbackStalled';
+    /**
+     * Sent when a stall in playback has occured but the reason for it is unclear.
+     * @event MediaPlayerEvents#PLAYBACK_FROZEN
+     */
+
+    _this.PLAYBACK_FROZEN = "playbackFrozen";
     /**
      * Sent when playback of the media starts after having been paused;
      * that is, when playback is resumed after a prior pause event.
@@ -4285,7 +4353,11 @@ function BufferLevelHandler(config) {
 
   function handleNewMetric(metric, vo, type) {
     if (metric === metricsConstants.BUFFER_LEVEL) {
-      storedVOs[type] = vo;
+      if (vo.level < 0) {
+        delete storedVOs[type];
+      } else {
+        storedVOs[type] = vo;
+      }
     }
   }
 
@@ -4961,6 +5033,12 @@ function DVBErrorsTranslator(config) {
     });
   }
 
+  function onPlaybackStallCauseUnknown() {
+    report({
+      errorcode: _vo_DVBErrors__WEBPACK_IMPORTED_MODULE_0__["default"].PLAYBACK_FROZEN
+    });
+  }
+
   function handleHttpMetric(vo) {
     if (vo.responsecode === 0 || // connection failure - unknown
     vo.responsecode == null || // Generated on .catch() and when uninitialized
@@ -5016,6 +5094,7 @@ function DVBErrorsTranslator(config) {
     eventBus.on(Events.METRIC_ADDED, onMetricEvent, instance);
     eventBus.on(Events.METRIC_UPDATED, onMetricEvent, instance);
     eventBus.on(Events.PLAYBACK_ERROR, onPlaybackError, instance);
+    eventBus.on(Events.PLAYBACK_FROZEN, onPlaybackStallCauseUnknown, instance);
     eventBus.on(_MetricsReportingEvents__WEBPACK_IMPORTED_MODULE_1__["default"].BECAME_REPORTING_PLAYER, onBecameReporter, instance);
   }
 
@@ -5025,6 +5104,7 @@ function DVBErrorsTranslator(config) {
     eventBus.off(Events.METRIC_ADDED, onMetricEvent, instance);
     eventBus.off(Events.METRIC_UPDATED, onMetricEvent, instance);
     eventBus.off(Events.PLAYBACK_ERROR, onPlaybackError, instance);
+    eventBus.off(Events.PLAYBACK_FROZEN, onPlaybackStallCauseUnknown, instance);
     eventBus.off(_MetricsReportingEvents__WEBPACK_IMPORTED_MODULE_1__["default"].BECAME_REPORTING_PLAYER, onBecameReporter, instance);
   }
 
@@ -5526,19 +5606,20 @@ var DVBErrors = function DVBErrors() {
   // ErrorType column below the value is as described in the
   // Value column.
   //
-  // ErrorType                                            Value
-  // ---------                                            -----
-  // HTTP error status code                               HTTP status code
-  // Unknown HTTP status code                             HTTP status code
-  // SSL connection failed                                "SSL" followed by SSL alert value
-  // DNS resolution failed                                "C00"
-  // Host unreachable                                     "C01"
-  // Connection refused                                   "C02"
-  // Connection error – Not otherwise specified           "C03"
-  // Corrupt media – ISO BMFF container cannot be parsed  "M00"
-  // Corrupt media – Not otherwise specified              "M01"
-  // Changing Base URL in use due to errors               "F00"
-  // Becoming an error reporting Player                   "S00"
+  // ErrorType                                                    Value
+  // ---------                                                    -----
+  // HTTP error status code                                       HTTP status code
+  // Unknown HTTP status code                                     HTTP status code
+  // SSL connection failed                                        "SSL" followed by SSL alert value
+  // DNS resolution failed                                        "C00"
+  // Host unreachable                                             "C01"
+  // Connection refused                                           "C02"
+  // Connection error – Not otherwise specified                   "C03"
+  // Corrupt media – ISO BMFF container cannot be parsed          "M00"
+  // Corrupt media – Not otherwise specified                      "M01"
+  // Changing Base URL in use due to errors                       "F00"
+  // Becoming an error reporting Player                           "S00"
+  // Playback error has occured, the cause is unknown             "P00"
 
   this.terror = null; // Real-Time - Date and time at which error occurred in UTC,
   // formatted as a combined date and time according to ISO 8601.
@@ -5570,6 +5651,7 @@ DVBErrors.CORRUPT_MEDIA_ISOBMFF = 'M00';
 DVBErrors.CORRUPT_MEDIA_OTHER = 'M01';
 DVBErrors.BASE_URL_CHANGED = 'F00';
 DVBErrors.BECAME_REPORTER = 'S00';
+DVBErrors.PLAYBACK_FROZEN = 'P00';
 /* harmony default export */ __webpack_exports__["default"] = (DVBErrors);
 
 /***/ }),

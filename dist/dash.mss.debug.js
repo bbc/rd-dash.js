@@ -4741,6 +4741,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
 
     _this.BUFFER_LEVEL_UPDATED = 'bufferLevelUpdated';
     /**
+     * Triggered when a segment is finished loading using fetch, passes detailed timing information
+     * @event MediaPlayerEvents#CHUNK_TIMING_INFORMATION
+     */
+
+    _this.CHUNK_TIMING_INFORMATION = 'chunkTimingInformation';
+    /**
      * Triggered when a dynamic stream changed to static (transition phase between Live and On-Demand).
      * @event MediaPlayerEvents#DYNAMIC_TO_STATIC
      */
@@ -5031,6 +5037,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
      */
 
     _this.PLAYBACK_STALLED = 'playbackStalled';
+    /**
+     * Sent when a stall in playback has occured but the reason for it is unclear.
+     * @event MediaPlayerEvents#PLAYBACK_FROZEN
+     */
+
+    _this.PLAYBACK_FROZEN = "playbackFrozen";
     /**
      * Sent when playback of the media starts after having been paused;
      * that is, when playback is resumed after a prior pause event.

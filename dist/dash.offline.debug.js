@@ -1365,7 +1365,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *            },
  *            timeShiftBuffer: {
  *                calcFromSegmentTimeline: false,
- *                fallbackToSegmentTimeline: true
+ *                fallbackToSegmentTimeline: true,
+ *                maxDecoderRate: NaN
  *            },
  *            metrics: {
  *              maxListDepth: 100
@@ -1394,8 +1395,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *                hybridSwitchBufferTime: NaN,
  *                longFormContentDurationThreshold: 600,
  *                stallThreshold: 0.3,
+ *                lowLatencyStallThreshold: 0.3,
  *                useAppendWindow: true,
  *                setStallState: true,
+ *                videoFramesNotAdvancing: {
+ *                   enabled: false
+ *                   thresholdInSeconds: 5,
+ *                },
  *                avoidCurrentTimeRangePruning: false,
  *                useChangeTypeForTrackSwitch: true,
  *                mediaSourceDurationInfinity: true,
@@ -1450,7 +1456,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *                  stop: { min: NaN, max: NaN }
  *                },
  *                playbackBufferMin: 0.5,
- *                liveThreshold: 30,
+ *                liveThreshold: -1,
  *                enabled: null,
  *                mode: Constants.LIVE_CATCHUP_MODE_DEFAULT
  *            },
@@ -1550,9 +1556,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @typedef {Object} TimeShiftBuffer
  * @property {boolean} [calcFromSegmentTimeline=false]
  * Enable calculation of the DVR window for SegmentTimeline manifests based on the entries in \<SegmentTimeline\>.
- *  * @property {boolean} [fallbackToSegmentTimeline=true]
+ * @property {boolean} [fallbackToSegmentTimeline=true]
  * In case the MPD uses \<SegmentTimeline\ and no segment is found within the DVR window the DVR window is calculated based on the entries in \<SegmentTimeline\>.
- */
+ * @property {number} [maxDecoderRate=NaN]
+ * The maximum rate your decoder can run at, can be used to overshoot the startup seek in anticpation of delay in hardware e.g.) TVs
+*/
 
 /**
  * @typedef {Object} LiveDelay
@@ -1631,12 +1639,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * When the time is set higher than the default you will have to wait longer to see automatic bitrate switches but will have a larger buffer which will increase stability.
  * @property {number} [stallThreshold=0.3]
  * Stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune.
+ * @property {number} [lowLatencyStallThreshold=0.3]
+ * Low Latency stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune. 
  * @property {boolean} [useAppendWindow=true]
  * Specifies if the appendWindow attributes of the MSE SourceBuffers should be set according to content duration from manifest.
  * @property {boolean} [setStallState=true]
  * Specifies if we record stalled streams once the stall threshold is reached
  * @property {module:Settings~SyntheticStallSettings} [syntheticStallEvents]
  * Specified if we fire manual stall events once the stall threshold is reached
+ * 
+ * @property {number} [videoFramesNotAdvancing={enabled:false,thresholdInSeconds:5}]
+ * Controls a mechanism for handling situations where the player is playing but stops advancing its total frame count to handle https://issues.chromium.org/issues/41243192. 
+ * 
+ * The 'enabled' property signifies whether we attempt to handle the bug should it occur by seeking to the current time.
+ * The 'thresholdInSeconds' a time in seconds that determines how long the issue must be occuring before the handler is triggered, it can be used to control the sensitivity of the mechanism.
  * @property {boolean} [avoidCurrentTimeRangePruning=false]
  * Avoids pruning of the buffered range that contains the current playback time.
  *
@@ -1797,7 +1813,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * Enable/disable subtitle rendering by default.
  * @property {boolean} [extendSegmentedCues=true]
  * Enable/disable patching of segmented cues in order to merge as a single cue by extending cue end time.
- * @property {object} [webvtt={customRenderingEnabled=false}]
+ * @property {boolean} [imsc.displayForcedOnlyMode=false]
+ * Enable/disable forced only mode in IMSC captions.
+ * When true, only those captions where itts:forcedDisplay="true" will be displayed.
+ * @property {boolean} [imsc.enableRollUp=true]
+ * Enable/disable rollUp style display of IMSC captions.
+ * @property {object} [imsc.options]
+ * IMSC styling options - See the renderHtml function of imscJS for full details 
+ * @property {number} [imsc.options.sizeAdjust]
+ * IMSC styling option - scales the text size and line padding
+ * @property {number} [imsc.options.lineHeightAdjust]
+ * IMSC styling option - scales the line height
+ * @property {number} [imsc.options.backgroundOpacityScale]
+ * IMSC styling option - scales the backgroundColor opacity
+ * @property {string} [imsc.options.fontFamily]
+ * IMSC styling option - comma-separated list of font family values to use, if present.
+ * @property {number} [imsc.options.colorOpacityScale]
+ * IMSC styling option - opacity override on text color
+ * @property {number} [imsc.options.regionOpacityScale]
+ * IMSC styling option - scales the region opacity
+ * @property {string} [imsc.options.textOutline]
+ * IMSC styling option - textOutline value to use, if present
+ * @property {object} [webvtt.customRenderingEnabled=false]
  * Enables the custom rendering for WebVTT captions. For details refer to the "Subtitles and Captions" sample section of dash.js.
  * Custom WebVTT rendering requires the external library vtt.js that can be found in the contrib folder.
  */
@@ -1843,7 +1880,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @property {number} [playbackBufferMin=0.5]
  * Use this parameter to specify the minimum buffer which is used for LoL+ based playback rate reduction.
  *
- * @property {boolean} [liveThreshold=30]
+ * @property {boolean} [liveThreshold=-1]
  * How far in seconds the client has to be behind the absolute target for the catchup controller to attempt catching up. Disabled by setting to -1
  *
  * @property {boolean} [enabled=null]
@@ -2219,7 +2256,8 @@ function Settings() {
       },
       timeShiftBuffer: {
         calcFromSegmentTimeline: false,
-        fallbackToSegmentTimeline: true
+        fallbackToSegmentTimeline: true,
+        maxDecoderRate: null
       },
       metrics: {
         maxListDepth: 100
@@ -2248,8 +2286,13 @@ function Settings() {
         hybridSwitchBufferTime: NaN,
         longFormContentDurationThreshold: 600,
         stallThreshold: 0.3,
+        lowLatencyStallThreshold: 0.3,
         useAppendWindow: true,
         setStallState: true,
+        videoFramesNotAdvancing: {
+          enabled: false,
+          thresholdInSeconds: 5
+        },
         avoidCurrentTimeRangePruning: false,
         useChangeTypeForTrackSwitch: true,
         mediaSourceDurationInfinity: true,
@@ -2291,6 +2334,19 @@ function Settings() {
       text: {
         defaultEnabled: true,
         extendSegmentedCues: true,
+        imsc: {
+          displayForcedOnlyMode: false,
+          enableRollUp: true,
+          options: {
+            sizeAdjust: 1,
+            lineHeightAdjust: 1,
+            backgroundOpacityScale: null,
+            fontFamily: null,
+            colorOpacityScale: 1,
+            regionOpacityScale: null,
+            textOutline: null
+          }
+        },
         webvtt: {
           customRenderingEnabled: false
         }
@@ -2312,7 +2368,7 @@ function Settings() {
           }
         },
         playbackBufferMin: 0.5,
-        liveThreshold: 30,
+        liveThreshold: -1,
         enabled: null,
         mode: _streaming_constants_Constants__WEBPACK_IMPORTED_MODULE_3__["default"].LIVE_CATCHUP_MODE_DEFAULT
       },
@@ -12793,6 +12849,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
 
     _this.BUFFER_LEVEL_UPDATED = 'bufferLevelUpdated';
     /**
+     * Triggered when a segment is finished loading using fetch, passes detailed timing information
+     * @event MediaPlayerEvents#CHUNK_TIMING_INFORMATION
+     */
+
+    _this.CHUNK_TIMING_INFORMATION = 'chunkTimingInformation';
+    /**
      * Triggered when a dynamic stream changed to static (transition phase between Live and On-Demand).
      * @event MediaPlayerEvents#DYNAMIC_TO_STATIC
      */
@@ -13083,6 +13145,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
      */
 
     _this.PLAYBACK_STALLED = 'playbackStalled';
+    /**
+     * Sent when a stall in playback has occured but the reason for it is unclear.
+     * @event MediaPlayerEvents#PLAYBACK_FROZEN
+     */
+
+    _this.PLAYBACK_FROZEN = "playbackFrozen";
     /**
      * Sent when playback of the media starts after having been paused;
      * that is, when playback is resumed after a prior pause event.
@@ -15773,10 +15841,12 @@ LowLatencyThroughputModel.__dashjs_factory_name = 'LowLatencyThroughputModel';
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _core_FactoryMaker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/FactoryMaker */ "./src/core/FactoryMaker.js");
-/* harmony import */ var _core_Settings__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/Settings */ "./src/core/Settings.js");
-/* harmony import */ var _constants_Constants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../constants/Constants */ "./src/streaming/constants/Constants.js");
-/* harmony import */ var _utils_RequestModifier__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/RequestModifier */ "./src/streaming/utils/RequestModifier.js");
+/* harmony import */ var _MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../MediaPlayerEvents */ "./src/streaming/MediaPlayerEvents.js");
+/* harmony import */ var _core_EventBus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/EventBus */ "./src/core/EventBus.js");
+/* harmony import */ var _core_FactoryMaker__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/FactoryMaker */ "./src/core/FactoryMaker.js");
+/* harmony import */ var _core_Settings__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/Settings */ "./src/core/Settings.js");
+/* harmony import */ var _constants_Constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../constants/Constants */ "./src/streaming/constants/Constants.js");
+/* harmony import */ var _utils_RequestModifier__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/RequestModifier */ "./src/streaming/utils/RequestModifier.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -15825,6 +15895,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+
+
 /**
  * @module FetchLoader
  * @ignore
@@ -15838,7 +15910,8 @@ function FetchLoader(cfg) {
   var requestModifier = cfg.requestModifier;
   var lowLatencyThroughputModel = cfg.lowLatencyThroughputModel;
   var boxParser = cfg.boxParser;
-  var settings = (0,_core_Settings__WEBPACK_IMPORTED_MODULE_1__["default"])(context).getInstance();
+  var settings = (0,_core_Settings__WEBPACK_IMPORTED_MODULE_3__["default"])(context).getInstance();
+  var eventBus = (0,_core_EventBus__WEBPACK_IMPORTED_MODULE_1__["default"])(context).getInstance();
   var instance, dashMetrics;
 
   function setup(cfg) {
@@ -15847,7 +15920,7 @@ function FetchLoader(cfg) {
 
   function load(httpRequest) {
     if (requestModifier && requestModifier.modifyRequest) {
-      (0,_utils_RequestModifier__WEBPACK_IMPORTED_MODULE_3__.modifyRequest)(httpRequest, requestModifier).then(function () {
+      (0,_utils_RequestModifier__WEBPACK_IMPORTED_MODULE_5__.modifyRequest)(httpRequest, requestModifier).then(function () {
         return request(httpRequest);
       });
     } else {
@@ -15914,7 +15987,7 @@ function FetchLoader(cfg) {
     var requestTime = Date.now();
     var throughputCapacityDelayMS = 0;
     new Promise(function (resolve) {
-      if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_2__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_AAST && lowLatencyThroughputModel) {
+      if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_4__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_AAST && lowLatencyThroughputModel) {
         throughputCapacityDelayMS = lowLatencyThroughputModel.getThroughputCapacityDelayMS(request, dashMetrics.getCurrentBufferLevel(request.mediaType) * 1000);
 
         if (throughputCapacityDelayMS) {
@@ -15982,7 +16055,7 @@ function FetchLoader(cfg) {
         var remaining = new Uint8Array();
         var offset = 0;
 
-        if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_2__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_AAST && lowLatencyThroughputModel) {
+        if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_4__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_AAST && lowLatencyThroughputModel) {
           var fetchMeassurement = function fetchMeassurement(stream) {
             var reader = stream.getReader();
             var measurement = [];
@@ -16052,20 +16125,20 @@ function FetchLoader(cfg) {
           // Bug fix Parse whenever data is coming [value] better than 1ms looking that increase CPU
           if (done) {
             if (remaining) {
-              if (calculationMode !== _constants_Constants__WEBPACK_IMPORTED_MODULE_2__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_AAST) {
+              if (calculationMode !== _constants_Constants__WEBPACK_IMPORTED_MODULE_4__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_AAST) {
                 // If there is pending data, call progress so network metrics
                 // are correctly generated
                 // Same structure as https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequestEventTarget/
                 var calculatedThroughput = null;
                 var calculatedTime = null;
 
-                if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_2__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
+                if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_4__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING) {
                   calculatedThroughput = calculateThroughputByChunkData(startTimeData, endTimeData);
 
                   if (calculatedThroughput) {
                     calculatedTime = bytesReceived * 8 / calculatedThroughput;
                   }
-                } else if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_2__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
+                } else if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_4__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_DOWNLOADED_DATA) {
                   calculatedTime = calculateDownloadedTime(downloadedData, bytesReceived);
                 }
 
@@ -16094,7 +16167,7 @@ function FetchLoader(cfg) {
               bytes: value.length
             });
 
-            if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_2__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING && lastChunkWasFinished) {
+            if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_4__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING && lastChunkWasFinished) {
               // Parse the payload and capture the the 'moof' box
               var _boxesInfo = boxParser.findLastTopIsoBoxCompleted(['moof'], remaining, offset);
 
@@ -16115,7 +16188,7 @@ function FetchLoader(cfg) {
             if (boxesInfo.found) {
               var end = boxesInfo.lastCompletedOffset + boxesInfo.size; // Store the end time of each chunk download  with its size in array EndTimeData
 
-              if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_2__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING && !lastChunkWasFinished) {
+              if (calculationMode === _constants_Constants__WEBPACK_IMPORTED_MODULE_4__["default"].ABR_FETCH_THROUGHPUT_CALCULATION_MOOF_PARSING && !lastChunkWasFinished) {
                 lastChunkWasFinished = true;
                 endTimeData.push({
                   ts: performance.now(),
@@ -16137,6 +16210,28 @@ function FetchLoader(cfg) {
               } else {
                 data = new Uint8Array(remaining.subarray(0, end));
                 remaining = remaining.subarray(end);
+              }
+
+              if (endTimeData.length === 4) {
+                var chunkTimingData = [];
+                var urlParts = httpRequest.url.split('/');
+                var semgmentParts = urlParts[urlParts.length - 1].split('.');
+
+                for (var i = 0; i < 4; i++) {
+                  chunkTimingData.push({
+                    start: startTimeData[i],
+                    end: endTimeData[i],
+                    duration: endTimeData[i].ts - startTimeData[i].ts,
+                    bytes: endTimeData[i].bytes - startTimeData[i].bytes
+                  });
+                }
+
+                eventBus.trigger(_MediaPlayerEvents__WEBPACK_IMPORTED_MODULE_0__["default"].CHUNK_TIMING_INFORMATION, {
+                  chunkTimingData: chunkTimingData,
+                  segment: parseInt(semgmentParts[0]),
+                  repId: urlParts[urlParts.length - 2],
+                  ending: semgmentParts[1]
+                });
               } // Announce progress but don't track traces. Throughput measures are quite unstable
               // when they are based in small amount of data
 
@@ -16302,7 +16397,7 @@ function FetchLoader(cfg) {
 }
 
 FetchLoader.__dashjs_factory_name = 'FetchLoader';
-var factory = _core_FactoryMaker__WEBPACK_IMPORTED_MODULE_0__["default"].getClassFactory(FetchLoader);
+var factory = _core_FactoryMaker__WEBPACK_IMPORTED_MODULE_2__["default"].getClassFactory(FetchLoader);
 /* harmony default export */ __webpack_exports__["default"] = (factory);
 
 /***/ }),
