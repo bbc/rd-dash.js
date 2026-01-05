@@ -973,6 +973,7 @@ declare namespace dashjs {
                 detectPlayreadyMessageFormat?: boolean,
             },
             buffer?: {
+                activeSourceBufferManagement?: boolean,
                 enableSeekDecorrelationFix?: boolean,
                 fastSwitchEnabled?: boolean,
                 flushBufferAtTrackSwitch?: boolean,
@@ -986,7 +987,9 @@ declare namespace dashjs {
                 hybridSwitchBufferTime?: number,
                 longFormContentDurationThreshold?: number,
                 stallThreshold?: number,
+                loadThreshold?: number,
                 lowLatencyStallThreshold?: number,
+                lowLatencyLoadThreshold?: number,
                 useAppendWindow?: boolean,
                 setStallState?: boolean
                 videoFramesNotAdvancing?: {

@@ -142,6 +142,10 @@ function PlaybackController() {
         eventBus.on(MediaPlayerEvents.BUFFER_LEVEL_STATE_CHANGED, _onBufferLevelStateChanged, instance);
         eventBus.on(MediaPlayerEvents.DYNAMIC_TO_STATIC, _onDynamicToStatic, instance);
 
+        if (settings.get().streaming.buffer.activeSourceBufferManagement) {
+            videoModel.setPlaybackRate(0, true);
+        }
+
         if (playOnceInitialized) {
             playOnceInitialized = false;
             play();
@@ -595,6 +599,14 @@ function PlaybackController() {
         }
 
         playbackStalled = e.state === MetricsConstants.BUFFER_EMPTY;
+
+        if (settings.get().streaming.buffer.activeSourceBufferManagement) {
+            if (e.state === MetricsConstants.BUFFER_EMPTY) {
+                videoModel.setPlaybackRate(0, true);
+            } else if (e.state === MetricsConstants.BUFFER_LOADED) {
+                videoModel.setPlaybackRate(1, true);
+            }
+        }
 
         if (settings.get().streaming.buffer.setStallState) {
             videoModel.setStallState(e.mediaType, e.state === MetricsConstants.BUFFER_EMPTY);
