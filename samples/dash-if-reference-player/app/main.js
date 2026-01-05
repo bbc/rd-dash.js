@@ -325,7 +325,10 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
     $scope.cmcdAllKeys = ['br', 'd', 'ot', 'tb', 'bl', 'dl', 'mtp', 'nor', 'nrr', 'su', 'bs', 'rtp', 'cid', 'pr', 'sf', 'sid', 'st', 'v']
 
     $scope.stallThreshold = 0.3;
+    $scope.loadThreshold = 0.3;
+
     $scope.lowLatencyStallThreshold = 0.3;
+    $scope.lowLatencyLoadThreshold = 0.3;
 
     // Persistent license
     $scope.persistentSessionId = {};
@@ -828,11 +831,31 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
         });
     }
 
+    $scope.updateLoadThreshold = function () {
+        $scope.player.updateSettings({
+            streaming: {
+                buffer: {
+                    loadThreshold: parseFloat($scope.loadThreshold)
+                }
+            }
+        });
+    }
+
     $scope.updateLowLatencyStallThreshold = function () {
         $scope.player.updateSettings({
             streaming: {
                 buffer: {
                     lowLatencyStallThreshold: parseFloat($scope.lowLatencyStallThreshold)
+                }
+            }
+        });
+    }
+
+    $scope.updateLowLatencyLoadThreshold = function () {
+        $scope.player.updateSettings({
+            streaming: {
+                buffer: {
+                    lowLatencyLoadThreshold: parseFloat($scope.lowLatencyLoadThreshold)
                 }
             }
         });
@@ -1110,9 +1133,19 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
             config.streaming.buffer.stallThreshold = stallThreshold;
         }
 
+        const loadThreshold = parseFloat($scope.loadThreshold);
+        if (!isNaN(stallThreshold)) {
+            config.streaming.buffer.loadThreshold = loadThreshold;
+        }
+
         const lowLatencyStallThreshold = parseFloat($scope.lowLatencyStallThreshold);
         if (!isNaN(lowLatencyStallThreshold)) {
             config.streaming.buffer.lowLatencyStallThreshold = lowLatencyStallThreshold;
+        }
+
+        const lowLatencyLoadThreshold = parseFloat($scope.lowLatencyLoadThreshold);
+        if (!isNaN(lowLatencyLoadThreshold)) {
+            config.streaming.buffer.lowLatencyLoadThreshold = lowLatencyLoadThreshold;
         }
 
         config.streaming.cmcd.sid = $scope.cmcdSessionId ? $scope.cmcdSessionId : null;
@@ -2253,7 +2286,9 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
         }
         if (currentConfig.streaming.abr.maxBitrate.video !== -1) {
             $scope.stallThreshold = currentConfig.streaming.buffer.stallThreshold;
+            $scope.loadThreshold = currentConfig.streaming.buffer.loadThreshold;
             $scope.lowLatencyStallThreshold = currentConfig.streaming.buffer.lowLatencyStallThreshold;
+            $scope.lowLatencyLoadThreshold = currentConfig.streaming.buffer.lowLatencyLoadThreshold;
         }
 
         if ($scope.player.getInitialMediaSettingsFor('audio')) {

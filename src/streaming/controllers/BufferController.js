@@ -866,12 +866,13 @@ function BufferController(config) {
             return;
         }
 
-        //Set stall threshold based on player mode
+        //Set stall and load threshold based on player mode
         const stallThreshold = playbackController.getLowLatencyModeEnabled() ? settings.get().streaming.buffer.lowLatencyStallThreshold : settings.get().streaming.buffer.stallThreshold;
-        
+        const loadThreshold = playbackController.getLowLatencyModeEnabled() ? settings.get().streaming.buffer.lowLatencyLoadThreshold : settings.get().streaming.buffer.loadThreshold;
+
         if ((bufferLevel <= stallThreshold) && !isBufferingCompleted) {
             _notifyBufferStateChanged(MetricsConstants.BUFFER_EMPTY);
-        } else if (isBufferingCompleted || bufferLevel > stallThreshold) {
+        } else if (isBufferingCompleted || bufferLevel > loadThreshold) {
             _notifyBufferStateChanged(MetricsConstants.BUFFER_LOADED);
         }
     }

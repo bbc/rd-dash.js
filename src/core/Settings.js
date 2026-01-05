@@ -93,6 +93,7 @@ import Events from './events/Events';
  *                detectPlayreadyMessageFormat: true,
  *            },
  *            buffer: {
+ *                activeSourceBufferManagement: false,
  *                enableSeekDecorrelationFix: false,
  *                fastSwitchEnabled: true,
  *                flushBufferAtTrackSwitch: false,
@@ -106,7 +107,9 @@ import Events from './events/Events';
  *                hybridSwitchBufferTime: NaN,
  *                longFormContentDurationThreshold: 600,
  *                stallThreshold: 0.3,
+ *                loadThreshold: 0.3, 
  *                lowLatencyStallThreshold: 0.3,
+ *                lowLatencyLoadThreshold: 0.3,
  *                useAppendWindow: true,
  *                setStallState: true,
  *                videoFramesNotAdvancing: {
@@ -295,6 +298,10 @@ import Events from './events/Events';
 
 /**
  * @typedef {Object} Buffer
+ * @property {boolean} [activeSourceBufferManagement=false]
+ * Put Dash.js in contol of the MSE source buffer level preventing and stopping playback when the stall and load buffer thresholds are met.
+ * 
+ * If you expirence short stall on startup, particularly on TV devices this setting may be useful.
  * @property {boolean} [enableSeekDecorrelationFix=false]
  * Enables a workaround for playback start on some devices, e.g. WebOS 4.9.
  * It is necessary because some browsers do not support setting currentTime on video element to a value that is outside of current buffer.
@@ -350,8 +357,12 @@ import Events from './events/Events';
  * When the time is set higher than the default you will have to wait longer to see automatic bitrate switches but will have a larger buffer which will increase stability.
  * @property {number} [stallThreshold=0.3]
  * Stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune.
- * @property {number} [lowLatencyStallThreshold=0.3]
+ * @property {boolean} [loadThreshold=0.3]
+ * Specifies the length of media required in the buffer before starting playback, either for the first time or recvovering from a stall.  
+* @property {number} [lowLatencyStallThreshold=0.3]
  * Low Latency stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune. 
+ * @property {boolean} [lowLatencyLoadThreshold=0.3]
+ * In Low latency mode specifies the length of media required in the buffer before starting playback, either for the first time or recvovering from a stall. 
  * @property {boolean} [useAppendWindow=true]
  * Specifies if the appendWindow attributes of the MSE SourceBuffers should be set according to content duration from manifest.
  * @property {boolean} [setStallState=true]
@@ -983,6 +994,7 @@ function Settings() {
                 detectPlayreadyMessageFormat: true,
             },
             buffer: {
+                activeSourceBufferManagement: false,
                 enableSeekDecorrelationFix: false,
                 fastSwitchEnabled: true,
                 flushBufferAtTrackSwitch: false,
@@ -996,7 +1008,9 @@ function Settings() {
                 hybridSwitchBufferTime: NaN,
                 longFormContentDurationThreshold: 600,
                 stallThreshold: 0.3,
+                loadThreshold: 0.3,
                 lowLatencyStallThreshold: 0.3,
+                lowLatencyLoadThreshold: 0.3,
                 useAppendWindow: true,
                 setStallState: true,
                 videoFramesNotAdvancing: {
