@@ -604,7 +604,6 @@ function PlaybackController() {
             if (e.state === MetricsConstants.BUFFER_EMPTY) {
                 videoModel.setPlaybackRate(0, true);
             } else if (e.state === MetricsConstants.BUFFER_LOADED) {
-                console.log(getBufferLevel())
                 videoModel.setPlaybackRate(1, true);
             }
         }
