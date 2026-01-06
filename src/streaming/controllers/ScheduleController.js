@@ -203,7 +203,8 @@ function ScheduleController(config) {
      * @private
      */
     function _getJitter() {
-        if(type === Constants.VIDEO) {
+        const currentRepresentationInfo = representationController.getCurrentRepresentationInfo();
+        if(type === Constants.VIDEO && currentRepresentationInfo.quality === topQualityIndex) {
             const maxJitter = settings.get().streaming.scheduling.maxJitter;
             return maxJitter ? Math.floor(Math.random() * maxJitter * 1000) : 0
         }
