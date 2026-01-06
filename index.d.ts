@@ -1025,6 +1025,7 @@ declare namespace dashjs {
             scheduling?: {
                 defaultTimeout?: number,
                 lowLatencyTimeout?: number,
+                maxJitter?: number,
                 scheduleWhilePaused?: boolean
             },
             text?: {

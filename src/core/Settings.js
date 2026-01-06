@@ -150,6 +150,7 @@ import Events from './events/Events';
  *            scheduling: {
  *                defaultTimeout: 500,
  *                lowLatencyTimeout: 0,
+ *                maxJitter: 0,
  *                scheduleWhilePaused: true
  *            },
  *            text: {
@@ -514,6 +515,8 @@ import Events from './events/Events';
  * Default timeout between two consecutive segment scheduling attempts
  * @property {number} [lowLatencyTimeout=0]
  * Default timeout between two consecutive low-latency segment scheduling attempts
+ * @property {number} [maxJitter=0]
+ * The maximum jitter (in seconds) to add to high bitrate video media requests. Used to reduce thundering herd effect on server
  * @property {boolean} [scheduleWhilePaused=true]
  * Set to true if you would like dash.js to keep downloading fragments in the background when the video element is paused.
  */
@@ -1039,6 +1042,7 @@ function Settings() {
             scheduling: {
                 defaultTimeout: 500,
                 lowLatencyTimeout: 0,
+                maxJitter: 0,
                 scheduleWhilePaused: true
             },
             text: {
