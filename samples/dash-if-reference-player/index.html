@@ -726,6 +726,18 @@
                 </div>
             </div>
         </div>
+
+        <div class="options-item">
+            <div class="options-item-title">Scheduling</div>
+            <div class="options-item-body">
+                <div class="sub-options-item-body">
+                    <label class="options-label">Max Jitter:</label>
+                    <input type="number" class="form-control" placeholder="value in seconds" ng-model="maxJitter"
+                        ng-change="updateMaxJitter()">
+                </div>
+            </div>
+        </div>
+
         <div class="options-item">
             <div class="options-item-title">Initial Settings</div>
             <div class="options-item-body">
