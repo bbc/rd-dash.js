@@ -198,6 +198,16 @@ function ScheduleController(config) {
     }
 
     /**
+     * Get a random jitter value based on the max value provided in the settings.
+     * @return {number}
+     * @private
+     */
+    function _getJitter() {
+        const maxJitter = settings.get().streaming.scheduling.maxJitter;
+        return maxJitter ? Math.floor(Math.random() * maxJitter) : 0
+    }
+
+    /**
      * Check if we need to stop scheduling for now.
      * @return {boolean}
      * @private
