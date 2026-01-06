@@ -203,8 +203,11 @@ function ScheduleController(config) {
      * @private
      */
     function _getJitter() {
-        const maxJitter = settings.get().streaming.scheduling.maxJitter;
-        return maxJitter ? Math.floor(Math.random() * maxJitter) : 0
+        if(type === Constants.DASH_JS.MEDIA_TYPES.VIDEO) {
+            const maxJitter = settings.get().streaming.scheduling.maxJitter;
+            return maxJitter ? Math.floor(Math.random() * maxJitter * 1000) : 0
+        }
+        return 0
     }
 
     /**
@@ -390,7 +393,6 @@ function ScheduleController(config) {
         }
     }
 
-
     function _onURLResolutionFailed() {
         fragmentModel.abortRequests();
         clearScheduleTimer();
@@ -411,7 +413,7 @@ function ScheduleController(config) {
     }
 
     function getTimeToLoadDelay() {
-        return timeToLoadDelay;
+        return timeToLoadDelay + _getJitter();
     }
 
     function setCheckPlaybackQuality(value) {
