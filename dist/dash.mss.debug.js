@@ -4703,6 +4703,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
 
     _this.AST_IN_FUTURE = 'astInFuture';
     /**
+     * Triggered when a new baseUrl has been selected.
+     * @event MediaPlayerEvents#BASEURL_SELECTED
+     */
+
+    _this.BASEURL_SELECTED = 'baseUrlSelected';
+    /**
      * Triggered when the BaseURLs have been updated.
      * @event MediaPlayerEvents#BASE_URLS_UPDATED
      */
@@ -4794,6 +4800,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
      */
 
     _this.LOG = 'log';
+    /**
+     * Triggered when the 'Content-Length' header for a fragment does not match the byte length.
+     * @event MediaPlayerEvents#FRAGMENT_CONTENT_LENGTH_MISMATCH
+     */
+
+    _this.FRAGMENT_CONTENT_LENGTH_MISMATCH = 'fragmentContentLengthMismatch';
     /**
      * Triggered when the manifest load is started
      * @event MediaPlayerEvents#MANIFEST_LOADING_STARTED

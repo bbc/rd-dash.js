@@ -32,7 +32,7 @@ import FactoryMaker from './FactoryMaker';
 import Utils from './Utils.js';
 import Debug from '../core/Debug';
 import Constants from '../streaming/constants/Constants';
-import {HTTPRequest} from '../streaming/vo/metrics/HTTPRequest';
+import { HTTPRequest } from '../streaming/vo/metrics/HTTPRequest';
 import EventBus from './EventBus';
 import Events from './events/Events';
 
@@ -77,7 +77,8 @@ import Events from './events/Events';
  *            },
  *            timeShiftBuffer: {
  *                calcFromSegmentTimeline: false,
- *                fallbackToSegmentTimeline: true
+ *                fallbackToSegmentTimeline: true,
+ *                maxDecoderRate: NaN
  *            },
  *            metrics: {
  *              maxListDepth: 100
@@ -103,14 +104,25 @@ import Events from './events/Events';
  *                bufferTimeAtTopQualityLongForm: 60,
  *                initialBufferLevel: NaN,
  *                stableBufferTime: 12,
+ *                hybridSwitchBufferTime: NaN,
  *                longFormContentDurationThreshold: 600,
  *                stallThreshold: 0.3,
+ *                lowLatencyStallThreshold: 0.3,
  *                useAppendWindow: true,
  *                setStallState: true,
+ *                videoFramesNotAdvancing: {
+ *                   enabled: false
+ *                   thresholdInSeconds: 5,
+ *                },
  *                avoidCurrentTimeRangePruning: false,
  *                useChangeTypeForTrackSwitch: true,
  *                mediaSourceDurationInfinity: true,
- *                resetSourceBuffersForTrackSwitch: false
+ *                resetSourceBuffersForTrackSwitch: false,
+ *                syntheticStallEvents: {
+ *                  enabled: false,
+ *                  ignoreReadyState: false
+ *                } 
+ * 
  *            },
  *            gaps: {
  *                jumpGaps: true,
@@ -156,7 +168,12 @@ import Events from './events/Events';
  *            liveCatchup: {
  *                maxDrift: NaN,
  *                playbackRate: {min: NaN, max: NaN},
+ *                step: {
+ *                  start: { min: NaN, max: NaN },
+ *                  stop: { min: NaN, max: NaN }
+ *                },
  *                playbackBufferMin: 0.5,
+ *                liveThreshold: -1,
  *                enabled: null,
  *                mode: Constants.LIVE_CATCHUP_MODE_DEFAULT
  *            },
@@ -217,6 +234,8 @@ import Events from './events/Events';
  *                useDeadTimeLatency: true,
  *                limitBitrateByPortal: false,
  *                usePixelRatioInLimitBitrateByPortal: false,
+ *                portalScale: 1,
+ *                portalMinimum: 0,
  *                maxBitrate: { audio: -1, video: -1 },
  *                minBitrate: { audio: -1, video: -1 },
  *                maxRepresentationRatio: { audio: 1, video: 1 },
@@ -254,9 +273,11 @@ import Events from './events/Events';
  * @typedef {Object} TimeShiftBuffer
  * @property {boolean} [calcFromSegmentTimeline=false]
  * Enable calculation of the DVR window for SegmentTimeline manifests based on the entries in \<SegmentTimeline\>.
- *  * @property {boolean} [fallbackToSegmentTimeline=true]
+ * @property {boolean} [fallbackToSegmentTimeline=true]
  * In case the MPD uses \<SegmentTimeline\ and no segment is found within the DVR window the DVR window is calculated based on the entries in \<SegmentTimeline\>.
- */
+ * @property {number} [maxDecoderRate=NaN]
+ * The maximum rate your decoder can run at, can be used to overshoot the startup seek in anticpation of delay in hardware e.g.) TVs
+*/
 
 /**
  * @typedef {Object} LiveDelay
@@ -329,14 +350,26 @@ import Events from './events/Events';
  * Initial buffer level before playback starts
  * @property {number} [stableBufferTime=12]
  * The time that the internal buffer target will be set to post startup/seeks (NOT top quality).
+ * @property {number} [hybridSwitchBufferTime=NaN]
+ * The buffer time that the hybrid rule will switch between throughput and BOLA at. Defaults to the value of `stableBufferTime`.
  *
  * When the time is set higher than the default you will have to wait longer to see automatic bitrate switches but will have a larger buffer which will increase stability.
  * @property {number} [stallThreshold=0.3]
  * Stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune.
+ * @property {number} [lowLatencyStallThreshold=0.3]
+ * Low Latency stall threshold used in BufferController.js to determine whether a track should still be changed and which buffer range to prune. 
  * @property {boolean} [useAppendWindow=true]
  * Specifies if the appendWindow attributes of the MSE SourceBuffers should be set according to content duration from manifest.
  * @property {boolean} [setStallState=true]
- * Specifies if we fire manual waiting events once the stall threshold is reached
+ * Specifies if we record stalled streams once the stall threshold is reached
+ * @property {module:Settings~SyntheticStallSettings} [syntheticStallEvents]
+ * Specified if we fire manual stall events once the stall threshold is reached
+ * 
+ * @property {number} [videoFramesNotAdvancing={enabled:false,thresholdInSeconds:5}]
+ * Controls a mechanism for handling situations where the player is playing but stops advancing its total frame count to handle https://issues.chromium.org/issues/41243192. 
+ * 
+ * The 'enabled' property signifies whether we attempt to handle the bug should it occur by seeking to the current time.
+ * The 'thresholdInSeconds' a time in seconds that determines how long the issue must be occuring before the handler is triggered, it can be used to control the sensitivity of the mechanism.
  * @property {boolean} [avoidCurrentTimeRangePruning=false]
  * Avoids pruning of the buffered range that contains the current playback time.
  *
@@ -358,6 +391,17 @@ import Events from './events/Events';
  * Configuration for audio media type of tracks.
  * @property {number|boolean|string} [video]
  * Configuration for video media type of tracks.
+ */
+
+/**
+ * @typedef {Object} module:Settings~SyntheticStallSettings
+ * @property {boolean} [enabled]
+ * Fire manual stall events once the stall threshold is reached
+ * @property {boolean} [ignoreReadyState]
+ * Ignore the media element's ready state when entering and exiting a stall
+ * Enable this when either of these scenarios still occur with synthetic stalls enabled:
+ * - If the buffer is empty, but playback is not stalled.
+ * - If playback resumes, but a playing event isn't reported.
  */
 
 /**
@@ -493,6 +537,22 @@ import Events from './events/Events';
  * When true, only those captions where itts:forcedDisplay="true" will be displayed.
  * @property {boolean} [imsc.enableRollUp=true]
  * Enable/disable rollUp style display of IMSC captions.
+ * @property {object} [imsc.options]
+ * IMSC styling options - See the renderHtml function of imscJS for full details 
+ * @property {number} [imsc.options.sizeAdjust]
+ * IMSC styling option - scales the text size and line padding
+ * @property {number} [imsc.options.lineHeightAdjust]
+ * IMSC styling option - scales the line height
+ * @property {number} [imsc.options.backgroundOpacityScale]
+ * IMSC styling option - scales the backgroundColor opacity
+ * @property {string} [imsc.options.fontFamily]
+ * IMSC styling option - comma-separated list of font family values to use, if present.
+ * @property {number} [imsc.options.colorOpacityScale]
+ * IMSC styling option - opacity override on text color
+ * @property {number} [imsc.options.regionOpacityScale]
+ * IMSC styling option - scales the region opacity
+ * @property {string} [imsc.options.textOutline]
+ * IMSC styling option - textOutline value to use, if present
  * @property {object} [webvtt.customRenderingEnabled=false]
  * Enables the custom rendering for WebVTT captions. For details refer to the "Subtitles and Captions" sample section of dash.js.
  * Custom WebVTT rendering requires the external library vtt.js that can be found in the contrib folder.
@@ -524,9 +584,23 @@ import Events from './events/Events';
  * These playback rate limits take precedence over any PlaybackRate values in ServiceDescription elements in an MPD. If only one of the min/max properties is given a value, the property without a value will not fall back to a ServiceDescription value. Its default value of NaN will be used.
  *
  * Note: Catch-up mechanism is only applied when playing low latency live streams.
+ * @property {number} [step={start:{min: NaN, max: NaN},stop:{min: NaN, max: NaN}}]
+ * This object is used for setting the window parameters for "step" mode.
+ * 
+ * It is only applicable if the Catchup mechanism used is of mode "step".
+ * 
+ * The parameters are all percentages of the target latency. Where 1 is on target.
+ * 
+ * The start object sets the window within which catchup should begin. In the range of (0-2) (0% to 200% of the target latency).
+ * 
+ * The stop window is only applicable if a non-unity playback speed is in use. Again in In the range of (0-2) (0% to 200% of the target latency). It sets the point at which playback should return to unity (or stop catching up). This parameter prevents instability when using higher min and max playback rates and should be tuned to prevent overshooting the target.
+ * 
+ * Note: Catch-up mechanism is only applied when playing low latency live streams.
  * @property {number} [playbackBufferMin=0.5]
  * Use this parameter to specify the minimum buffer which is used for LoL+ based playback rate reduction.
  *
+ * @property {boolean} [liveThreshold=-1]
+ * How far in seconds the client has to be behind the absolute target for the catchup controller to attempt catching up. Disabled by setting to -1
  *
  * @property {boolean} [enabled=null]
  * Use this parameter to enable the catchup mode for non low-latency streams.
@@ -534,7 +608,7 @@ import Events from './events/Events';
  * @property {string} [mode="liveCatchupModeDefault"]
  * Use this parameter to switch between different catchup modes.
  *
- * Options: "liveCatchupModeDefault" or "liveCatchupModeLOLP".
+ * Options: "liveCatchupModeDefault" or "liveCatchupModeLOLP" or "liveCatchupModeStep".
  *
  * Note: Catch-up mechanism is automatically applied when playing low latency live streams.
  */
@@ -646,6 +720,10 @@ import Events from './events/Events';
  * If true, the size of the video portal will limit the max chosen video resolution.
  * @property {boolean} [usePixelRatioInLimitBitrateByPortal=false]
  * Sets whether to take into account the device's pixel ratio when defining the portal dimensions.
+ * @property {number} [portalScale=1]
+ * Scales the size of the video portal used to limit the max video resolution. Square root scale.
+ * @property {number} [portalMinimum=0]
+ * Limits the min bandwidth that video playback can go down to depending on the portal size.
  *
  * Useful on, for example, retina displays.
  * @property {module:Settings~AudioVideoSettings} [maxBitrate={audio: -1, video: -1}]
@@ -761,6 +839,10 @@ import Events from './events/Events';
  * Overwrite the manifest segments base information timescale attributes with the timescale set in initialization segments
  * @property {boolean} [enableManifestTimescaleMismatchFix=false]
  * Defines the delay in milliseconds between two consecutive checks for events to be fired.
+ * @property {boolean} [seekWithoutReadyStateCheck=false]
+ * This allows a seek by setting currentTime regardless of the loadedmetadata event being emitted
+ * @property {boolean} [enableDashPlaybackEnded = false]
+ * This enables the synthetic ended behaviour in PlaybackController that seeks and pauses the media element
  * @property {boolean} [parseInbandPrft=false]
  * Set to true if dash.js should parse inband prft boxes (ProducerReferenceTime) and trigger events.
  * @property {module:Settings~Metrics} metrics Metric settings
@@ -874,6 +956,7 @@ function Settings() {
             dispatchEvent: false
         },
         streaming: {
+            blacklistExpiryTime: 0,
             abandonLoadTimeout: 10000,
             wallclockTimeUpdateInterval: 100,
             manifestUpdateRetryInterval: 100,
@@ -886,13 +969,16 @@ function Settings() {
             enableManifestDurationMismatchFix: true,
             parseInbandPrft: false,
             enableManifestTimescaleMismatchFix: false,
+            seekWithoutReadyStateCheck: false,
+            enableDashPlaybackEnded: false,
             capabilities: {
                 filterUnsupportedEssentialProperties: true,
                 useMediaCapabilitiesApi: false
             },
             timeShiftBuffer: {
                 calcFromSegmentTimeline: false,
-                fallbackToSegmentTimeline: true
+                fallbackToSegmentTimeline: true,
+                maxDecoderRate: null
             },
             metrics: {
                 maxListDepth: 100
@@ -918,14 +1004,24 @@ function Settings() {
                 bufferTimeAtTopQualityLongForm: 60,
                 initialBufferLevel: NaN,
                 stableBufferTime: 12,
+                hybridSwitchBufferTime: NaN,
                 longFormContentDurationThreshold: 600,
                 stallThreshold: 0.3,
+                lowLatencyStallThreshold: 0.3,
                 useAppendWindow: true,
                 setStallState: true,
+                videoFramesNotAdvancing: {
+                    enabled: false,
+                    thresholdInSeconds: 5
+                },
                 avoidCurrentTimeRangePruning: false,
                 useChangeTypeForTrackSwitch: true,
                 mediaSourceDurationInfinity: true,
-                resetSourceBuffersForTrackSwitch: false
+                resetSourceBuffersForTrackSwitch: false,
+                syntheticStallEvents: {
+                    enabled: false,
+                    ignoreReadyState: false
+                }
             },
             gaps: {
                 jumpGaps: true,
@@ -962,7 +1058,16 @@ function Settings() {
                 extendSegmentedCues: true,
                 imsc: {
                     displayForcedOnlyMode: false,
-                    enableRollUp: true
+                    enableRollUp: true,
+                    options: {
+                        sizeAdjust: 1,
+                        lineHeightAdjust: 1,
+                        backgroundOpacityScale: null,
+                        fontFamily: null,
+                        colorOpacityScale: 1,
+                        regionOpacityScale: null,
+                        textOutline: null,
+                    },
                 },
                 webvtt: {
                     customRenderingEnabled: false
@@ -974,7 +1079,12 @@ function Settings() {
                     min: NaN,
                     max: NaN
                 },
+                step: {
+                    start: { min: NaN, max: NaN },
+                    stop: { min: NaN, max: NaN }
+                },
                 playbackBufferMin: 0.5,
+                liveThreshold: -1,
                 enabled: null,
                 mode: Constants.LIVE_CATCHUP_MODE_DEFAULT
             },
@@ -1045,6 +1155,8 @@ function Settings() {
                 useDeadTimeLatency: true,
                 limitBitrateByPortal: false,
                 usePixelRatioInLimitBitrateByPortal: false,
+                portalScale: 1,
+                portalMinimum: 0,
                 maxBitrate: {
                     audio: -1,
                     video: -1

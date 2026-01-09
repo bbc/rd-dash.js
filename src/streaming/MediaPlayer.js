@@ -162,7 +162,8 @@ function MediaPlayer() {
         videoModel,
         uriFragmentModel,
         domStorage,
-        segmentBaseController;
+        segmentBaseController,
+        retrieveManifestLoader;
 
     /*
     ---------------------------------------------------------------------------
@@ -456,6 +457,10 @@ function MediaPlayer() {
         if (offlineController) {
             offlineController.reset();
             offlineController = null;
+        }
+
+        if (retrieveManifestLoader) {
+            retrieveManifestLoader.reset();
         }
     }
 
@@ -941,6 +946,22 @@ function MediaPlayer() {
             throw PLAYBACK_NOT_INITIALIZED_ERROR;
         }
         return _getAsUTC(duration());
+    }
+
+    /**
+     * Use this method to override the duration of the current MediaSource object.
+     *
+     * @throws {@link module:MediaPlayer~PLAYBACK_NOT_INITIALIZED_ERROR PLAYBACK_NOT_INITIALIZED_ERROR} if called before initializePlayback function
+     * @param {number} duration
+     * @memberof module:MediaPlayer
+     * @instance
+     */
+    function setMediaDuration (duration) {
+        if (!playbackInitialized) {
+            throw PLAYBACK_NOT_INITIALIZED_ERROR;
+        }
+
+        streamController.setMediaDuration(duration)
     }
 
     /*
@@ -1818,7 +1839,7 @@ function MediaPlayer() {
      * @instance
      */
     function retrieveManifest(url, callback) {
-        let manifestLoader = _createManifestLoader();
+        retrieveManifestLoader = _createManifestLoader();
         let self = this;
 
         const handler = function (e) {
@@ -1828,13 +1849,13 @@ function MediaPlayer() {
                 callback(null, e.error);
             }
             eventBus.off(Events.INTERNAL_MANIFEST_LOADED, handler, self);
-            manifestLoader.reset();
+            retrieveManifestLoader.reset();
         };
 
         eventBus.on(Events.INTERNAL_MANIFEST_LOADED, handler, self);
 
         uriFragmentModel.initialize(url);
-        manifestLoader.load(url);
+        retrieveManifestLoader.load(url);
     }
 
     /**
@@ -1919,7 +1940,7 @@ function MediaPlayer() {
             throw MEDIA_PLAYER_NOT_INITIALIZED_ERROR;
         }
 
-        if (!isReady()) {
+        if(!isReady()) {
             return callback(null, SOURCE_NOT_ATTACHED_ERROR);
         }
 
@@ -2541,6 +2562,7 @@ function MediaPlayer() {
         getCurrentTrackFor,
         setInitialMediaSettingsFor,
         getInitialMediaSettingsFor,
+        setMediaDuration,
         setCurrentTrack,
         addABRCustomRule,
         removeABRCustomRule,

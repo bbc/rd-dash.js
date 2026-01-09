@@ -63,7 +63,7 @@ function StreamController() {
         autoPlay, isStreamSwitchingInProgress, hasMediaError, hasInitialisationError, mediaSource, videoModel,
         playbackController, serviceDescriptionController, mediaPlayerModel, customParametersModel, isPaused,
         initialPlayback, initialSteeringRequest, playbackEndedTimerInterval, bufferSinks, preloadingStreams,
-        supportsChangeType, settings,
+        supportsChangeType, settings, totalVideoFramesAtLastPlaybackProgress, timeAtLastPlaybackProgress, videoFramesNotAdvancingTriggered,
         firstLicenseIsFetched, waitForPlaybackStartTimeout, providedStartTime, errorInformation;
 
     function setup() {
@@ -467,7 +467,7 @@ function StreamController() {
             mediaSource.removeEventListener('sourceopen', _onMediaSourceOpen);
             mediaSource.removeEventListener('webkitsourceopen', _onMediaSourceOpen);
 
-            _setMediaDuration();
+            setMediaDuration();
             const dvrInfo = dashMetrics.getCurrentDVRInfo();
             mediaSourceController.setSeekable(dvrInfo.range.start, dvrInfo.range.end);
             if (streamActivated) {
@@ -798,14 +798,76 @@ function StreamController() {
     }
 
     /**
+     * Checks whether the browser environment is WebKit based or not
+     * @private
+     */
+    function isWebKit() {
+        return typeof window.webkitConvertPointFromNodeToPage === 'function' || false
+    }
+
+    /**
+     * Evaluates whether video frames have potentially stopped advancing, added to address https://issues.chromium.org/issues/41243192
+     * @private
+     */
+    function checkIfVideoFramesNotAdvancing(event) {
+
+        const playbackQuality = videoModel.getPlaybackQuality();
+
+        if(videoModel.isSeeking()){
+            totalVideoFramesAtLastPlaybackProgress = 0
+        }
+
+        const isEnded = event.timeToEnd ? event.timeToEnd <= 0 : false;
+
+        const isVideoFramesNotAdvancing = !isWebKit()
+            && playbackQuality 
+            && typeof playbackQuality.totalVideoFrames === 'number'
+            && !isEnded
+            && timeAtLastPlaybackProgress !== 0
+            && event.time > settings.get().streaming.buffer.videoFramesNotAdvancing.thresholdInSeconds // We should be at least one threshold into the video before triggering
+            && !videoModel.isPaused()
+            && !videoModel.isStalled()
+            && !videoModel.isSeeking()
+            && videoModel.getReadyState() >= Constants.VIDEO_ELEMENT_READY_STATES.HAVE_ENOUGH_DATA
+            && playbackQuality.totalVideoFrames > 0 // Handles devices (some TVs), where Video Quality API, totalVideoFrames always returns 0.
+            && playbackQuality.totalVideoFrames < 2147483647 //Handles devices, where Video Quality API, totalVideoFrames can return the max value of a 32 bit signed integer becuase the implementation uses totalVideoFrames = mediaTime * framerate.
+            && playbackQuality.totalVideoFrames !== playbackQuality.droppedVideoFrames // Handles devices (some TVs), where Video Quality API, totalVideoFrames always equals the number of dropped frames.
+            && playbackQuality.totalVideoFrames === totalVideoFramesAtLastPlaybackProgress // Total frames should advance with time progression, if not something is wrong. On some some TVs the total video frames is reset if the decoder is reinitialised.
+
+        if(isVideoFramesNotAdvancing){
+            if((timeAtLastPlaybackProgress + settings.get().streaming.buffer.videoFramesNotAdvancing.thresholdInSeconds < event.time) && !videoFramesNotAdvancingTriggered){
+                eventBus.trigger(Events.PLAYBACK_FROZEN,{
+                    cause:'Frames have stopped advancing, Chromium bug #41243192',
+                    totalVideoFrames: playbackQuality.totalVideoFrames,
+                    mediaTime: event.time
+                });
+                if(settings.get().streaming.buffer.videoFramesNotAdvancing.enabled){
+                    logger.warn('Video playback has frozen, attempting to recover by seeking to current time')
+                    videoModel.setCurrentTime(videoModel.getTime()-0.0001,false)
+                }
+                videoFramesNotAdvancingTriggered = true
+            }        
+        }
+        else{
+            timeAtLastPlaybackProgress = event.time
+            videoFramesNotAdvancingTriggered = false
+            if(typeof playbackQuality.totalVideoFrames === 'number'){
+                totalVideoFramesAtLastPlaybackProgress = playbackQuality.totalVideoFrames
+            }
+        }
+    }
+    
+    /**
      * When the playback time is updated we add the droppedFrames metric to the dash metric object
      * @private
      */
-    function _onPlaybackTimeUpdated(/*e*/) {
+    function _onPlaybackTimeUpdated(event) {
+
         if (hasVideoTrack()) {
             const playbackQuality = videoModel.getPlaybackQuality();
             if (playbackQuality) {
                 dashMetrics.addDroppedFrames(playbackQuality);
+                checkIfVideoFramesNotAdvancing(event)
             }
         }
     }
@@ -1046,7 +1108,7 @@ function StreamController() {
      * @param {number} duration
      * @private
      */
-    function _setMediaDuration(duration) {
+    function setMediaDuration(duration) {
         const manifestDuration = duration ? duration : getActiveStreamInfo().manifestInfo.duration;
         mediaSourceController.setDuration(manifestDuration);
     }
@@ -1116,6 +1178,19 @@ function StreamController() {
                 // If calcFromSegmentTimeline is enabled we saw problems caused by the MSE.seekableRange when starting at dvrWindow.start. Apply a small offset to avoid this problem.
                 const offset = settings.get().streaming.timeShiftBuffer.calcFromSegmentTimeline ? 0.1 : 0;
                 startTime = Math.max(startTime, dvrWindow.start + offset);
+
+                // In hardware playback use optional maxDecoderRate setting to compensate for startup delay
+                const maxDecoderRate = settings.get().streaming.timeShiftBuffer.maxDecoderRate;
+                if(maxDecoderRate && !isNaN(maxDecoderRate)){
+                    const seektime = liveEdge - playbackController.getOriginalLiveDelay();
+                    const segmentDuration = streams[0].getStreamInfo().manifestInfo.maxFragmentDuration;
+                    const seektimeQuantised = segmentDuration * (1 + parseInt(seektime / segmentDuration))
+                    const positionInSegment = seektimeQuantised - seektime
+
+                    logger.info(`Overshoot start seek by ${positionInSegment/maxDecoderRate} to compensate for decoder.`);
+                    startTime += positionInSegment/maxDecoderRate
+                }
+
             }
         } else {
             // For static stream, start by default at period start
@@ -1449,7 +1524,7 @@ function StreamController() {
 
     function _onManifestValidityChanged(e) {
         if (!isNaN(e.newDuration)) {
-            _setMediaDuration(e.newDuration);
+            setMediaDuration(e.newDuration);
         }
     }
 
@@ -1551,6 +1626,9 @@ function StreamController() {
         supportsChangeType = false;
         preloadingStreams = [];
         waitForPlaybackStartTimeout = null;
+        totalVideoFramesAtLastPlaybackProgress = 0;
+        timeAtLastPlaybackProgress = 0;
+        videoFramesNotAdvancingTriggered = false;
         errorInformation = {
             counts: {
                 mediaErrorDecode: 0
@@ -1611,9 +1689,7 @@ function StreamController() {
     }
 
     function refreshManifest() {
-        if (!manifestUpdater.getIsUpdating()) {
-            manifestUpdater.refreshManifest();
-        }
+        manifestUpdater.refreshManifest();
     }
 
     function getStreams() {
@@ -1642,6 +1718,7 @@ function StreamController() {
         getInitialPlayback,
         getAutoPlay,
         refreshManifest,
+        setMediaDuration,
         reset
     };
 

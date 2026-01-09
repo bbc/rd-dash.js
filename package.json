@@ -17,8 +17,7 @@
         "test-browserunit": "karma start build/karma.conf.js",
         "test-functional": "node test/functional/runTests.js --selenium=remote --app=remote",
         "test-functional-mocha": "karma start karma.functional.conf.js --testsuite=content.js",
-        "prepare": "node githook.js",
-        "prepack": "npm run build"
+        "prepare": "node githook.js"
     },
     "devDependencies": {
         "@babel/core": "^7.13.8",
@@ -61,8 +60,9 @@
         "yargs": "16.0.3"
     },
     "dependencies": {
-        "bcp-47-match": "^1.0.3",
-        "bcp-47-normalize": "^1.1.1",
+        "bcp-47-match": "^2.0.3",
+        "bcp-47-normalize": "^2.3.0",
+        "clean-jsdoc-theme": "^4.2.10",
         "codem-isoboxer": "0.3.9",
         "es6-promise": "^4.2.8",
         "fast-deep-equal": "2.0.1",
@@ -79,7 +79,10 @@
     "files": [
         "githook.js",
         "index.d.ts",
-        "dist",
+        "index.js",
+        "index_mediaplayerOnly.js",
+        "externals",
+        "src",
         "docs/jsdoc",
         "contrib/akamai"
     ]

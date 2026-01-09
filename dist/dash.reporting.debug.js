@@ -831,6 +831,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *                bufferTimeAtTopQualityLongForm: 60,
  *                initialBufferLevel: NaN,
  *                stableBufferTime: 12,
+ *                hybridSwitchBufferTime: NaN,
  *                longFormContentDurationThreshold: 600,
  *                stallThreshold: 0.3,
  *                useAppendWindow: true,
@@ -838,7 +839,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *                avoidCurrentTimeRangePruning: false,
  *                useChangeTypeForTrackSwitch: true,
  *                mediaSourceDurationInfinity: true,
- *                resetSourceBuffersForTrackSwitch: false
+ *                resetSourceBuffersForTrackSwitch: false,
+ *                syntheticStallEvents: {
+ *                  enabled: false,
+ *                  ignoreReadyState: false
+ *                } 
+ * 
  *            },
  *            gaps: {
  *                jumpGaps: true,
@@ -884,7 +890,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *            liveCatchup: {
  *                maxDrift: NaN,
  *                playbackRate: {min: NaN, max: NaN},
+ *                step: {
+ *                  start: { min: NaN, max: NaN },
+ *                  stop: { min: NaN, max: NaN }
+ *                },
  *                playbackBufferMin: 0.5,
+ *                liveThreshold: 30,
  *                enabled: null,
  *                mode: Constants.LIVE_CATCHUP_MODE_DEFAULT
  *            },
@@ -945,6 +956,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *                useDeadTimeLatency: true,
  *                limitBitrateByPortal: false,
  *                usePixelRatioInLimitBitrateByPortal: false,
+ *                portalScale: 1,
+ *                portalMinimum: 0,
  *                maxBitrate: { audio: -1, video: -1 },
  *                minBitrate: { audio: -1, video: -1 },
  *                maxRepresentationRatio: { audio: 1, video: 1 },
@@ -1057,6 +1070,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * Initial buffer level before playback starts
  * @property {number} [stableBufferTime=12]
  * The time that the internal buffer target will be set to post startup/seeks (NOT top quality).
+ * @property {number} [hybridSwitchBufferTime=NaN]
+ * The buffer time that the hybrid rule will switch between throughput and BOLA at. Defaults to the value of `stableBufferTime`.
  *
  * When the time is set higher than the default you will have to wait longer to see automatic bitrate switches but will have a larger buffer which will increase stability.
  * @property {number} [stallThreshold=0.3]
@@ -1064,7 +1079,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @property {boolean} [useAppendWindow=true]
  * Specifies if the appendWindow attributes of the MSE SourceBuffers should be set according to content duration from manifest.
  * @property {boolean} [setStallState=true]
- * Specifies if we fire manual waiting events once the stall threshold is reached
+ * Specifies if we record stalled streams once the stall threshold is reached
+ * @property {module:Settings~SyntheticStallSettings} [syntheticStallEvents]
+ * Specified if we fire manual stall events once the stall threshold is reached
  * @property {boolean} [avoidCurrentTimeRangePruning=false]
  * Avoids pruning of the buffered range that contains the current playback time.
  *
@@ -1086,6 +1103,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * Configuration for audio media type of tracks.
  * @property {number|boolean|string} [video]
  * Configuration for video media type of tracks.
+ */
+
+/**
+ * @typedef {Object} module:Settings~SyntheticStallSettings
+ * @property {boolean} [enabled]
+ * Fire manual stall events once the stall threshold is reached
+ * @property {boolean} [ignoreReadyState]
+ * Ignore the media element's ready state when entering and exiting a stall
+ * Enable this when either of these scenarios still occur with synthetic stalls enabled:
+ * - If the buffer is empty, but playback is not stalled.
+ * - If playback resumes, but a playing event isn't reported.
  */
 
 /**
@@ -1252,9 +1280,23 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * These playback rate limits take precedence over any PlaybackRate values in ServiceDescription elements in an MPD. If only one of the min/max properties is given a value, the property without a value will not fall back to a ServiceDescription value. Its default value of NaN will be used.
  *
  * Note: Catch-up mechanism is only applied when playing low latency live streams.
+ * @property {number} [step={start:{min: NaN, max: NaN},stop:{min: NaN, max: NaN}}]
+ * This object is used for setting the window parameters for "step" mode.
+ * 
+ * It is only applicable if the Catchup mechanism used is of mode "step".
+ * 
+ * The parameters are all percentages of the target latency. Where 1 is on target.
+ * 
+ * The start object sets the window within which catchup should begin. In the range of (0-2) (0% to 200% of the target latency).
+ * 
+ * The stop window is only applicable if a non-unity playback speed is in use. Again in In the range of (0-2) (0% to 200% of the target latency). It sets the point at which playback should return to unity (or stop catching up). This parameter prevents instability when using higher min and max playback rates and should be tuned to prevent overshooting the target.
+ * 
+ * Note: Catch-up mechanism is only applied when playing low latency live streams.
  * @property {number} [playbackBufferMin=0.5]
  * Use this parameter to specify the minimum buffer which is used for LoL+ based playback rate reduction.
  *
+ * @property {boolean} [liveThreshold=30]
+ * How far in seconds the client has to be behind the absolute target for the catchup controller to attempt catching up. Disabled by setting to -1
  *
  * @property {boolean} [enabled=null]
  * Use this parameter to enable the catchup mode for non low-latency streams.
@@ -1262,7 +1304,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @property {string} [mode="liveCatchupModeDefault"]
  * Use this parameter to switch between different catchup modes.
  *
- * Options: "liveCatchupModeDefault" or "liveCatchupModeLOLP".
+ * Options: "liveCatchupModeDefault" or "liveCatchupModeLOLP" or "liveCatchupModeStep".
  *
  * Note: Catch-up mechanism is automatically applied when playing low latency live streams.
  */
@@ -1374,6 +1416,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * If true, the size of the video portal will limit the max chosen video resolution.
  * @property {boolean} [usePixelRatioInLimitBitrateByPortal=false]
  * Sets whether to take into account the device's pixel ratio when defining the portal dimensions.
+ * @property {number} [portalScale=1]
+ * Scales the size of the video portal used to limit the max video resolution. Square root scale.
+ * @property {number} [portalMinimum=0]
+ * Limits the min bandwidth that video playback can go down to depending on the portal size.
  *
  * Useful on, for example, retina displays.
  * @property {module:Settings~AudioVideoSettings} [maxBitrate={audio: -1, video: -1}]
@@ -1489,6 +1535,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * Overwrite the manifest segments base information timescale attributes with the timescale set in initialization segments
  * @property {boolean} [enableManifestTimescaleMismatchFix=false]
  * Defines the delay in milliseconds between two consecutive checks for events to be fired.
+ * @property {boolean} [seekWithoutReadyStateCheck=false]
+ * This allows a seek by setting currentTime regardless of the loadedmetadata event being emitted
+ * @property {boolean} [enableDashPlaybackEnded = false]
+ * This enables the synthetic ended behaviour in PlaybackController that seeks and pauses the media element
  * @property {boolean} [parseInbandPrft=false]
  * Set to true if dash.js should parse inband prft boxes (ProducerReferenceTime) and trigger events.
  * @property {module:Settings~Metrics} metrics Metric settings
@@ -1603,6 +1653,7 @@ function Settings() {
       dispatchEvent: false
     },
     streaming: {
+      blacklistExpiryTime: 0,
       abandonLoadTimeout: 10000,
       wallclockTimeUpdateInterval: 100,
       manifestUpdateRetryInterval: 100,
@@ -1615,6 +1666,8 @@ function Settings() {
       enableManifestDurationMismatchFix: true,
       parseInbandPrft: false,
       enableManifestTimescaleMismatchFix: false,
+      seekWithoutReadyStateCheck: false,
+      enableDashPlaybackEnded: false,
       capabilities: {
         filterUnsupportedEssentialProperties: true,
         useMediaCapabilitiesApi: false
@@ -1647,6 +1700,7 @@ function Settings() {
         bufferTimeAtTopQualityLongForm: 60,
         initialBufferLevel: NaN,
         stableBufferTime: 12,
+        hybridSwitchBufferTime: NaN,
         longFormContentDurationThreshold: 600,
         stallThreshold: 0.3,
         useAppendWindow: true,
@@ -1654,7 +1708,11 @@ function Settings() {
         avoidCurrentTimeRangePruning: false,
         useChangeTypeForTrackSwitch: true,
         mediaSourceDurationInfinity: true,
-        resetSourceBuffersForTrackSwitch: false
+        resetSourceBuffersForTrackSwitch: false,
+        syntheticStallEvents: {
+          enabled: false,
+          ignoreReadyState: false
+        }
       },
       gaps: {
         jumpGaps: true,
@@ -1703,7 +1761,18 @@ function Settings() {
           min: NaN,
           max: NaN
         },
+        step: {
+          start: {
+            min: NaN,
+            max: NaN
+          },
+          stop: {
+            min: NaN,
+            max: NaN
+          }
+        },
         playbackBufferMin: 0.5,
+        liveThreshold: 30,
         enabled: null,
         mode: _streaming_constants_Constants__WEBPACK_IMPORTED_MODULE_3__["default"].LIVE_CATCHUP_MODE_DEFAULT
       },
@@ -1751,6 +1820,8 @@ function Settings() {
         useDeadTimeLatency: true,
         limitBitrateByPortal: false,
         usePixelRatioInLimitBitrateByPortal: false,
+        portalScale: 1,
+        portalMinimum: 0,
         maxBitrate: {
           audio: -1,
           video: -1
@@ -2229,6 +2300,7 @@ var CoreEvents = /*#__PURE__*/function (_EventsBase) {
     _this.SEGMENT_LOCATION_BLACKLIST_CHANGED = 'segmentLocationBlacklistChanged';
     _this.SERVICE_LOCATION_BASE_URL_BLACKLIST_ADD = 'serviceLocationBlacklistAdd';
     _this.SERVICE_LOCATION_BASE_URL_BLACKLIST_CHANGED = 'serviceLocationBlacklistChanged';
+    _this.SERVICE_LOCATION_BASE_URL_BLACKLIST_REMOVED = 'serviceLocationBlacklistRemoved';
     _this.SERVICE_LOCATION_LOCATION_BLACKLIST_ADD = 'serviceLocationLocationBlacklistAdd';
     _this.SERVICE_LOCATION_LOCATION_BLACKLIST_CHANGED = 'serviceLocationLocationBlacklistChanged';
     _this.SET_FRAGMENTED_TEXT_AFTER_DISABLED = 'setFragmentedTextAfterDisabled';
@@ -2563,6 +2635,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
 
     _this.AST_IN_FUTURE = 'astInFuture';
     /**
+     * Triggered when a new baseUrl has been selected.
+     * @event MediaPlayerEvents#BASEURL_SELECTED
+     */
+
+    _this.BASEURL_SELECTED = 'baseUrlSelected';
+    /**
      * Triggered when the BaseURLs have been updated.
      * @event MediaPlayerEvents#BASE_URLS_UPDATED
      */
@@ -2654,6 +2732,12 @@ var MediaPlayerEvents = /*#__PURE__*/function (_EventsBase) {
      */
 
     _this.LOG = 'log';
+    /**
+     * Triggered when the 'Content-Length' header for a fragment does not match the byte length.
+     * @event MediaPlayerEvents#FRAGMENT_CONTENT_LENGTH_MISMATCH
+     */
+
+    _this.FRAGMENT_CONTENT_LENGTH_MISMATCH = 'fragmentContentLengthMismatch';
     /**
      * Triggered when the manifest load is started
      * @event MediaPlayerEvents#MANIFEST_LOADING_STARTED
@@ -3214,6 +3298,13 @@ var Constants = /*#__PURE__*/function () {
        */
 
       this.LIVE_CATCHUP_MODE_LOLP = 'liveCatchupModeLoLP';
+      /**
+       *  @constant {string} LIVE_CATCHUP_MODE_STEP Throughput calculation based on moof parsing
+       *  @memberof Constants#
+       *  @static
+       */
+
+      this.LIVE_CATCHUP_MODE_STEP = 'liveCatchupModeStep';
       /**
        *  @constant {string} MOVING_AVERAGE_SLIDING_WINDOW Moving average sliding window
        *  @memberof Constants#

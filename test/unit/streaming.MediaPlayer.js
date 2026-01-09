@@ -188,6 +188,9 @@ describe('MediaPlayer', function () {
                 expect(player.durationAsUTC).to.throw(PLAYBACK_NOT_INITIALIZED_ERROR);
             });
 
+            it('Method setMediaDuration should throw an exception', function () {
+                expect(player.setMediaDuration).to.throw(PLAYBACK_NOT_INITIALIZED_ERROR);
+            });
         });
 
         describe('When it is initialized', function () {
@@ -380,6 +383,16 @@ describe('MediaPlayer', function () {
                 duration = player.duration();
                 expect(duration).to.equal(4);
             });
+
+            it('Method setMediaDuration should call through to streamController', function () {
+                sinon.spy(streamControllerMock, 'setMediaDuration');
+
+                player.setMediaDuration(15);
+
+                expect(streamControllerMock.setMediaDuration.calledWith(15)).to.be.true;
+
+                streamControllerMock.setMediaDuration.restore();
+            })
         });
     });
 
@@ -1161,7 +1174,7 @@ describe('MediaPlayer with context injected', () => {
         const customParametersModel = CustomParametersModel(context).getInstance();
         eventBus = EventBus(context).getInstance();
         settings = Settings(context).getInstance();
-
+        
         player = MediaPlayer(context).create();
 
         // to avoid unwanted log
@@ -1200,7 +1213,7 @@ describe('MediaPlayer with context injected', () => {
                 player.refreshManifest(stub);
 
                 expect(streamControllerMock.refreshManifest.calledOnce).to.be.true;
-
+                
                 eventBus.trigger(Events.INTERNAL_MANIFEST_LOADED, { manifest: { __mocked: true } });
 
                 expect(stub.calledOnce).to.be.true;

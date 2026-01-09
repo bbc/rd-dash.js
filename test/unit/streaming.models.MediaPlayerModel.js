@@ -56,11 +56,20 @@ describe('MediaPlayerModel', function () {
         expect(maxDrift).to.be.equal(30);
     })
 
-    it('Should return max drift if specified in Service Description', () => {
+    it('Should return max drift if not specified in settings but specified in Service Description', () => {
+        settings.update({ streaming: { liveCatchup: { maxDrift: NaN } } });
         serviceDescriptionController.applyServiceDescription(dummyManifestInfo);
         const maxDrift = mediaPlayerModel.getCatchupMaxDrift();
 
         expect(maxDrift).to.be.equal(3.5);
+    })
+
+    it('Should return max drift as negative number (disabled) if specified in settings and not be overwritten by the Service Description', () => {
+        settings.update({ streaming: { liveCatchup: { maxDrift: -1 } } });
+        serviceDescriptionController.applyServiceDescription(dummyManifestInfo);
+        const maxDrift = mediaPlayerModel.getCatchupMaxDrift();
+
+        expect(maxDrift).to.be.equal(-1);
     })
 
     it('Should return default max drift', () => {
@@ -300,6 +309,22 @@ describe('MediaPlayerModel', function () {
 
         let stableBufferTime = mediaPlayerModel.getStableBufferTime();
         expect(stableBufferTime).to.equal(10);
+    });
+
+    it('should configure HybridSwitchBufferTime', function() {
+        const s = { streaming: { buffer: { hybridSwitchBufferTime: 12.34, stableBufferTime: 14.32 } } };
+        settings.update(s);
+
+        const hybridSwitchBufferTime = mediaPlayerModel.getHybridSwitchBufferTime();
+        expect(hybridSwitchBufferTime).to.equal(12.34);
+    });
+
+    it('should default to StableBufferTime for HybridSwitchBufferTime', function () {
+        const s = { streaming: { buffer: { stableBufferTime: 14.32 } } };
+        settings.update(s);
+
+        const hybridSwitchBufferTime = mediaPlayerModel.getHybridSwitchBufferTime();
+        expect(hybridSwitchBufferTime).to.equal(14.32);
     });
 
     it('should configure initial buffer level', function () {

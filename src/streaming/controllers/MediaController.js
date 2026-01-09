@@ -33,7 +33,7 @@ import Events from '../../core/events/Events';
 import EventBus from '../../core/EventBus';
 import FactoryMaker from '../../core/FactoryMaker';
 import Debug from '../../core/Debug';
-import bcp47Normalize from 'bcp-47-normalize';
+import {bcp47Normalize} from 'bcp-47-normalize';
 import {extendedFilter} from 'bcp-47-match';
 
 function MediaController() {
@@ -430,8 +430,8 @@ function MediaController() {
 
             return (matchLang && matchIndex && matchViewPoint && (matchRole || (track.type === Constants.AUDIO && isTrackActive)) && matchAccessibility && matchAudioChannelConfiguration);
         } catch (e) {
-            return false;
             logger.error(e);
+            return false;
         }
     }
 

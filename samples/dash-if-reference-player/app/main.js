@@ -327,6 +327,9 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
     $scope.cmcdMode = 'query';
     $scope.cmcdAllKeys = ['br', 'd', 'ot', 'tb', 'bl', 'dl', 'mtp', 'nor', 'nrr', 'su', 'bs', 'rtp', 'cid', 'pr', 'sf', 'sid', 'st', 'v']
 
+    $scope.stallThreshold = 0.3;
+    $scope.lowLatencyStallThreshold = 0.3;
+
     // Persistent license
     $scope.persistentSessionId = {};
     $scope.selectedKeySystem = null;
@@ -532,6 +535,26 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
 
     };
 
+    $scope.updateMaxDrift = function () {
+        $scope.player.updateSettings({
+            streaming: {
+                liveCatchup: {
+                    maxDrift: parseInt($scope.maxDrift)
+                }
+            }
+        });
+    };
+
+    $scope.updateLiveThreshold = function () {
+        $scope.player.updateSettings({
+            streaming: {
+                liveCatchup: {
+                    liveThreshold: parseInt($scope.liveThreshold)
+                }
+            }
+        });
+    };
+    
     $scope.changeABRStrategy = function (strategy) {
         $scope.player.updateSettings({
             streaming: {
@@ -797,6 +820,26 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
             lang: $scope.initialSettings.audio
         });
     };
+
+    $scope.updateStallThreshold = function () {
+        $scope.player.updateSettings({
+            streaming: {
+                buffer: {
+                    stallThreshold: parseFloat($scope.stallThreshold)
+                }
+            }
+        });
+    }
+
+    $scope.updateLowLatencyStallThreshold = function () {
+        $scope.player.updateSettings({
+            streaming: {
+                buffer: {
+                    lowLatencyStallThreshold: parseFloat($scope.lowLatencyStallThreshold)
+                }
+            }
+        });
+    }
 
     $scope.updateInitialRoleVideo = function () {
         $scope.player.setInitialMediaSettingsFor('video', {
@@ -1071,6 +1114,16 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
         const maxBitrate = parseInt($scope.maxVideoBitrate);
         if (!isNaN(maxBitrate)) {
             config.streaming.abr.maxBitrate = { 'video': maxBitrate };
+        }
+        
+        const stallThreshold = parseFloat($scope.stallThreshold);
+        if (!isNaN(stallThreshold)) {
+            config.streaming.buffer.stallThreshold = stallThreshold;
+        }
+
+        const lowLatencyStallThreshold = parseFloat($scope.lowLatencyStallThreshold);
+        if (!isNaN(lowLatencyStallThreshold)) {
+            config.streaming.buffer.lowLatencyStallThreshold = lowLatencyStallThreshold;
         }
 
         config.streaming.cmcd.sid = $scope.cmcdSessionId ? $scope.cmcdSessionId : null;
@@ -2214,6 +2267,10 @@ app.controller('DashController', ['$scope', '$window', 'sources', 'contributors'
         }
         if (currentConfig.streaming.abr.maxBitrate.video !== -1) {
             $scope.maxVideoBitrate = currentConfig.streaming.abr.maxBitrate.video;
+        }
+        if (currentConfig.streaming.abr.maxBitrate.video !== -1) {
+            $scope.stallThreshold = currentConfig.streaming.buffer.stallThreshold;
+            $scope.lowLatencyStallThreshold = currentConfig.streaming.buffer.lowLatencyStallThreshold;
         }
 
         if ($scope.player.getInitialMediaSettingsFor('audio')) {

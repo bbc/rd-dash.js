@@ -50,6 +50,12 @@ class MediaPlayerEvents extends EventsBase {
         this.AST_IN_FUTURE = 'astInFuture';
 
         /**
+         * Triggered when a new baseUrl has been selected.
+         * @event MediaPlayerEvents#BASEURL_SELECTED
+         */
+        this.BASEURL_SELECTED = 'baseUrlSelected';
+
+        /**
          * Triggered when the BaseURLs have been updated.
          * @event MediaPlayerEvents#BASE_URLS_UPDATED
          */
@@ -138,6 +144,12 @@ class MediaPlayerEvents extends EventsBase {
          * @event MediaPlayerEvents#LOG
          */
         this.LOG = 'log';
+
+        /**
+         * Triggered when the 'Content-Length' header for a fragment does not match the byte length.
+         * @event MediaPlayerEvents#FRAGMENT_CONTENT_LENGTH_MISMATCH
+         */
+        this.FRAGMENT_CONTENT_LENGTH_MISMATCH = 'fragmentContentLengthMismatch';
 
         /**
          * Triggered when the manifest load is started
@@ -393,6 +405,12 @@ class MediaPlayerEvents extends EventsBase {
          * @event MediaPlayerEvents#PLAYBACK_STALLED
          */
         this.PLAYBACK_STALLED = 'playbackStalled';
+
+        /**
+         * Sent when a stall in playback has occured but the reason for it is unclear.
+         * @event MediaPlayerEvents#PLAYBACK_FROZEN
+         */
+        this.PLAYBACK_FROZEN = `playbackFrozen`;
 
         /**
          * Sent when playback of the media starts after having been paused;

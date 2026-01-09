@@ -80,8 +80,7 @@ function TextTracks(config) {
         previousISDState,
         topZIndex,
         resizeObserver,
-        hasRequestAnimationFrame,
-        currentCaptionEventCue;
+        hasRequestAnimationFrame;
 
     function setup() {
         logger = Debug(context).getInstance().getLogger(instance);
@@ -414,20 +413,21 @@ function TextTracks(config) {
     function _renderCaption(cue) {
         if (captionContainer) {
             clearCaptionContainer.call(this);
-
+            
             const finalCue = document.createElement('div');
             captionContainer.appendChild(finalCue);
-
+            
             previousISDState = renderHTML(
-                cue.isd,
-                finalCue,
-                function (src) { return _resolveImageSrc(cue, src) },
-                captionContainer.clientHeight,
-                captionContainer.clientWidth,
+                cue.isd, 
+                finalCue, 
+                function (src) { return _resolveImageSrc(cue, src) }, 
+                captionContainer.clientHeight, 
+                captionContainer.clientWidth, 
                 settings.get().streaming.text.imsc.displayForcedOnlyMode,
                 function (err) { logger.info('renderCaption :', err) /*TODO: add ErrorHandler management*/ },
                 previousISDState,
-                settings.get().streaming.text.imsc.enableRollUp
+                settings.get().streaming.text.imsc.enableRollUp,
+                settings.get().streaming.text.imsc.options
             );
             finalCue.id = cue.cueID;
             eventBus.trigger(MediaPlayerEvents.CAPTION_RENDERED, { captionDiv: finalCue, currentTrackIdx });
@@ -436,7 +436,7 @@ function TextTracks(config) {
 
     // Check that a new cue immediately follows the previous cue
     function _areCuesAdjacent(cue, prevCue) {
-        if (!prevCue) {
+        if (!prevCue) { 
             return false;
         }
         // Check previous cue endTime with current cue startTime
@@ -452,7 +452,7 @@ function TextTracks(config) {
 
         if (!_cuesContentAreEqual(prevCue, cue, CUE_PROPS_TO_COMPARE)) {
             return false;
-        }
+        } 
 
         prevCue.endTime = Math.max(prevCue.endTime, cue.endTime);
         return true;
@@ -529,22 +529,17 @@ function TextTracks(config) {
 
                             if (_areCuesAdjacent(cue, prevCue)) {
                                 if (!_extendLastCue(cue, prevCue)) {
-                                    /* If cues are adjacent but not identical (extended), let the render function of the next cue
+                                    /* If cues are adjacent but not identical (extended), let the render function of the next cue 
                                      * clear up the captionsContainer so removal and appending are instantaneous.
                                      * Only do this for imsc subs (where isd is present).
                                      */
                                     if (prevCue.isd) {
                                         prevCue.onexit = function () { };
                                     }
-                                    // If cues are added when the track is disabled they can still persist in memory
-                                    if (track.mode !== Constants.TEXT_DISABLED) {
-                                        track.addCue(cue);
-                                    }
-                                }
-                            } else {
-                                if (track.mode !== Constants.TEXT_DISABLED) {
                                     track.addCue(cue);
                                 }
+                            } else {
+                                track.addCue(cue);
                             }
                         }
                     }
@@ -612,7 +607,7 @@ function TextTracks(config) {
         cue.onenter = function () {
             if (track.mode === Constants.TEXT_SHOWING) {
                 if (this.isd) {
-                    if (hasRequestAnimationFrame) {
+                    if (hasRequestAnimationFrame) { 
                         // Ensure everything in _renderCaption happens in the same frame
                         requestAnimationFrame(() => _renderCaption(this));
                     } else {
