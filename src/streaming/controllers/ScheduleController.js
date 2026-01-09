@@ -198,13 +198,29 @@ function ScheduleController(config) {
     }
 
     /**
+     * Checks that if the max request delay was applied that the next fragment could still be requested in a time that would prevent playback stalling.
+     * @return {boolean}
+     * @private
+     */
+    function _isWithinDeadline() {
+        const videoBufferLevel = dashMetrics.getCurrentBufferLevel(Constants.VIDEO);
+        const maxJitter = settings.get().streaming.scheduling.maxJitter;
+
+        const requests = dashMetrics.getHttpRequests('video')
+        const intervals = requests.slice(-3).map(r => r.interval)
+        const averageInterval = intervals.length > 0 ? (intervals.reduce((a, b) => a + b, 0) / intervals.length) / 1000 : 0;
+
+        return averageInterval + maxJitter > videoBufferLevel ? false : true
+    }
+
+    /**
      * Get a random jitter value based on the max value provided in the settings.
      * @return {number}
      * @private
      */
     function _getJitter() {
         const currentRepresentationInfo = representationController.getCurrentRepresentationInfo();
-        if(type === Constants.VIDEO && currentRepresentationInfo.quality === topQualityIndex) {
+        if(type === Constants.VIDEO && currentRepresentationInfo.quality === topQualityIndex && _isWithinDeadline()) {
             const maxJitter = settings.get().streaming.scheduling.maxJitter;
             return maxJitter ? Math.floor(Math.random() * maxJitter * 1000) : 0
         }
