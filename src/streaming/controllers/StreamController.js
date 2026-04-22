@@ -796,7 +796,7 @@ function StreamController() {
             }
         }
     }
-    
+
     /**
      * When the playback time is updated we add the droppedFrames metric to the dash metric object
      * @private
@@ -1120,14 +1120,14 @@ function StreamController() {
 
                 // In hardware playback use optional maxDecoderRate setting to compensate for startup delay
                 const maxDecoderRate = settings.get().streaming.timeShiftBuffer.maxDecoderRate;
-                if(maxDecoderRate && !isNaN(maxDecoderRate)){
+                if (maxDecoderRate && !isNaN(maxDecoderRate)) {
                     const seektime = liveEdge - playbackController.getOriginalLiveDelay();
                     const segmentDuration = streams[0].getStreamInfo().manifestInfo.maxFragmentDuration;
                     const seektimeQuantised = segmentDuration * (1 + parseInt(seektime / segmentDuration))
                     const positionInSegment = seektimeQuantised - seektime
 
-                    logger.info(`Overshoot start seek by ${positionInSegment/maxDecoderRate} to compensate for decoder.`);
-                    startTime += positionInSegment/maxDecoderRate
+                    logger.info(`Overshoot start seek by ${positionInSegment / maxDecoderRate} to compensate for decoder.`);
+                    startTime += positionInSegment / maxDecoderRate
                 }
 
             }
@@ -1431,7 +1431,13 @@ function StreamController() {
      */
     function _handleMediaErrorDecode() {
         logger.warn('A MEDIA_ERR_DECODE occured: Resetting the MediaSource');
-        const time = playbackController.getTime();
+        let time = playbackController.getTime();
+
+        // Optionally, decide how far to seek past the offending media
+        if (settings.get().errors.mediaErrorDecodeSeekTime > 0) {
+            time += settings.get().errors.mediaErrorDecodeSeekTime
+        }
+
         // Deactivate the current stream.
         activeStream.deactivate(false);
 

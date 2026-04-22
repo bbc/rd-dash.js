@@ -1168,7 +1168,8 @@ declare namespace dashjs {
         errors?: {
             recoverAttempts?: {
                 mediaErrorDecode?: number
-            }
+            },
+            mediaErrorDecodeSeekTime?: number
         }
     }
 
