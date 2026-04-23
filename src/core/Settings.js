@@ -258,7 +258,7 @@ import Events from './events/Events';
  *            recoverAttempts: {
  *                mediaErrorDecode: 5
  *             },
- *             mediaErrorDecodeSeekTime: 0
+ *             mediaErrorDecodeSeekDuration: 0
  *          }
  * }
  */
@@ -429,8 +429,8 @@ import Events from './events/Events';
  * @property {object} [recoverAttempts={mediaErrorDecode: 5}]
  * Defines the maximum number of recover attempts for specific media errors.
  *
- * For mediaErrorDecode the player will reset the MSE and skip the blacklisted segment that caused the decode error. The resulting gap will be handled by the GapController.
- * @property {number} [mediaErrorDecodeSeekTime=0] 
+ * For mediaErrorDecode the player will reset the MSE.
+ * @property {number} [mediaErrorDecodeSeekDuration=0] 
  * When resetting MSE determines how far to seek beyond the point when the error occurred in seconds. 
 */
 
@@ -1196,7 +1196,7 @@ function Settings() {
             recoverAttempts: {
                 mediaErrorDecode: 5
             },
-            mediaErrorDecodeSeekTime: 0
+            mediaErrorDecodeSeekDuration: 0
         }
     };
 

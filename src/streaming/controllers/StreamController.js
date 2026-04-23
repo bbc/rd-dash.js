@@ -1421,8 +1421,8 @@ function StreamController() {
         let time = playbackController.getTime();
 
         // Optionally, decide how far to seek past the offending media
-        if (settings.get().errors.mediaErrorDecodeSeekTime > 0) {
-            time += settings.get().errors.mediaErrorDecodeSeekTime
+        if (settings.get().errors.mediaErrorDecodeSeekDuration > 0) {
+            time += settings.get().errors.mediaErrorDecodeSeekDuration
         }
 
         // Deactivate the current stream.
