@@ -101,7 +101,7 @@ function PreBufferSink(onAppendedCallback) {
         for (let i = 0; i < chunks.length; i++) {
             let chunk = chunks[i];
             if (ranges.length === 0 || chunk.start > ranges[ranges.length - 1].end) {
-                ranges.push({start: chunk.start, end: chunk.end});
+                ranges.push({ start: chunk.start, end: chunk.end });
             } else {
                 ranges[ranges.length - 1].end = chunk.end;
             }

@@ -64,7 +64,6 @@ function HTTPLoader(cfg) {
     const mediaPlayerModel = cfg.mediaPlayerModel;
     const boxParser = cfg.boxParser;
     const errors = cfg.errors;
-    const requestTimeout = cfg.requestTimeout || 0;
     const eventBus = EventBus(context).getInstance();
     const settings = Settings(context).getInstance();
 
@@ -367,6 +366,25 @@ function HTTPLoader(cfg) {
             }
         }
 
+        /**
+         * Returns the request timeout value from Settings based on the request type.
+         * This reads the value dynamically so that runtime changes via updateSettings() take effect.
+         * @param {Object} requestObject
+         * @returns {number}
+         * @private
+         */
+        function _getRequestTimeout(requestObject) {
+            if (requestObject.type === HTTPRequest.MPD_TYPE) {
+                return settings.get().streaming.manifestRequestTimeout || 0;
+            }
+
+            if (_isFragmentRequest(requestObject)) {
+                return settings.get().streaming.fragmentRequestTimeout || 0;
+            }
+
+            return 0;
+        }
+
         // Main code after inline functions
         const requestObject = config.request;
         const traces = [];
@@ -407,7 +425,7 @@ function HTTPLoader(cfg) {
             responseType: requestObject.responseType,
             headers: requestObject.headers,
             credentials: withCredentials ? 'include' : 'omit',
-            timeout: requestTimeout,
+            timeout: _getRequestTimeout(requestObject),
             cmcd: cmcdModel.getCmcdData(requestObject),
             customData: { request: requestObject }
         });
@@ -452,6 +470,15 @@ function HTTPLoader(cfg) {
 
             return Promise.resolve();
         }
+    }
+
+
+    function _isFragmentRequest(request) {
+        return request && request.type === HTTPRequest.INIT_SEGMENT_TYPE ||
+            request.type === HTTPRequest.INDEX_SEGMENT_TYPE ||
+            request.type === HTTPRequest.MEDIA_SEGMENT_TYPE ||
+            request.type === HTTPRequest.BITSTREAM_SWITCHING_SEGMENT_TYPE ||
+            request.type === HTTPRequest.MSS_FRAGMENT_INFO_SEGMENT_TYPE;
     }
 
     function _applyRequestInterceptors(httpRequest) {
@@ -529,7 +556,7 @@ function HTTPLoader(cfg) {
         // Update CommonMediaResponse Resource Timing info
         httpResponse.resourceTiming.startTime = resource.startTime;
         httpResponse.resourceTiming.encodedBodySize = resource.encodedBodySize;
-        httpResponse.resourceTiming.responseStart = resource.startTime;
+        httpResponse.resourceTiming.responseStart = resource.responseStart;
         httpResponse.resourceTiming.responseEnd = resource.responseEnd;
         httpResponse.resourceTiming.duration = resource.duration;
     }
@@ -603,12 +630,10 @@ function HTTPLoader(cfg) {
     function _addPathwayCloningParameters(request) {
         // Add queryParams that came from pathway cloning
         if (request.queryParams) {
-            const queryParams = Object.keys(request.queryParams).map((key) => {
-                return {
-                    key,
-                    value: request.queryParams[key]
-                }
-            })
+            const queryParams = [];
+            for (const key in request.queryParams) {
+                queryParams.push({ key, value: request.queryParams[key] });
+            }
             request.url = Utils.addAdditionalQueryParameterToUrl(request.url, queryParams);
         }
     }
