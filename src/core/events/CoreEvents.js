@@ -38,7 +38,7 @@ import EventsBase from './EventsBase';
  * @ignore
  */
 class CoreEvents extends EventsBase {
-    constructor () {
+    constructor() {
         super();
         this.ATTEMPT_BACKGROUND_SYNC = 'attemptBackgroundSync';
         this.BUFFERING_COMPLETED = 'bufferingCompleted';
@@ -49,6 +49,7 @@ class CoreEvents extends EventsBase {
         this.CMSD_STATIC_HEADER = 'cmsdStaticHeader';
         this.CURRENT_TRACK_CHANGED = 'currentTrackChanged';
         this.DATA_UPDATE_COMPLETED = 'dataUpdateCompleted';
+        this.FETCH_LOADER_TIMING = 'fetchLoaderTiming';
         this.INBAND_EVENTS = 'inbandEvents';
         this.INITIAL_STREAM_SWITCH = 'initialStreamSwitch';
         this.INIT_FRAGMENT_LOADED = 'initFragmentLoaded';

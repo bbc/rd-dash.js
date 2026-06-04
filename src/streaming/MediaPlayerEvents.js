@@ -98,6 +98,13 @@ class MediaPlayerEvents extends EventsBase {
          * @event MediaPlayerEvents#ERROR
          */
         this.ERROR = 'error';
+
+        /**
+         * Triggered when data is fetched using the fetch loader, contains detailed timing for debugging.
+         * @event MediaPlayerEvents#FETCH_LOADER_TIMING
+         */
+        this.FETCH_LOADER_TIMING = 'fetchLoaderTiming';
+
         /**
          * Triggered when a fragment download has completed.
          * @event MediaPlayerEvents#FRAGMENT_LOADING_COMPLETED

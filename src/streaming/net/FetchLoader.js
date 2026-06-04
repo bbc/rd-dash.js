@@ -33,6 +33,8 @@ import FactoryMaker from '../../core/FactoryMaker';
 import Settings from '../../core/Settings';
 import Constants from '../constants/Constants';
 import { modifyRequest } from '../utils/RequestModifier';
+import EventBus from '../../core/EventBus';
+import Events from '../../core/events/Events';
 
 /**
  * @module FetchLoader
@@ -44,6 +46,7 @@ function FetchLoader(cfg) {
 
     cfg = cfg || {};
     const context = this.context;
+    const eventBus = EventBus(context).getInstance();
     const requestModifier = cfg.requestModifier;
     const lowLatencyThroughputModel = cfg.lowLatencyThroughputModel;
     const boxParser = cfg.boxParser;
@@ -236,6 +239,16 @@ function FetchLoader(cfg) {
 
 
                     const processResult = function ({ value, done }) { // Bug fix Parse whenever data is coming [value] better than 1ms looking that increase CPU
+
+                        if (endTimeData.length === 4) {
+                            eventBus.trigger(Events.FETCH_LOADER_TIMING, {
+                                startTime: markBeforeFetch,
+                                url: httpRequest.url,
+                                startTimes: startTimeData.map(({ ts, bytes }) => { return { ts: ts + performance.timeOrigin, bytes } }),
+                                endTimes: endTimeData.map(({ ts, bytes }) => { return { ts: ts + performance.timeOrigin, bytes } }),
+                            });
+                        }
+
                         if (done) {
                             if (remaining) {
                                 if (calculationMode !== Constants.ABR_FETCH_THROUGHPUT_CALCULATION_AAST) {

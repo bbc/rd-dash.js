@@ -1535,6 +1535,7 @@ declare namespace dashjs {
         ERROR: 'error';
         EVENT_MODE_ON_RECEIVE: 'eventModeOnReceive';
         EVENT_MODE_ON_START: 'eventModeOnStart';
+        FETCH_LOADER_TIMING: 'fetchLoaderTiming';
         FRAGMENT_LOADING_COMPLETED: 'fragmentLoadingCompleted';
         FRAGMENT_LOADING_PROGRESS: 'fragmentLoadingProgress';
         FRAGMENT_LOADING_STARTED: 'fragmentLoadingStarted';
