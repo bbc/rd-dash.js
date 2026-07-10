@@ -142,7 +142,6 @@ function HTTPLoader(cfg) {
         };
 
         const onloadend = function () {
-            console.log('onloadend', httpRequest, httpRequest.response ? httpRequest.response.status : null, httpRequest.response ? httpRequest.response.responseURL : null, needFailureReport, remainingAttempts);
             if (progressTimeout) {
                 clearTimeout(progressTimeout);
                 progressTimeout = null;
@@ -258,7 +257,6 @@ function HTTPLoader(cfg) {
         };
 
         const onload = function () {
-            console.log('onload', httpRequest.response.status, httpRequest.response.responseURL);
             if (httpRequest.response.status >= 200 && httpRequest.response.status <= 299) {
                 if (hasContentLengthMismatch(httpRequest.response)) {
                     const responseUrl = httpRequest.response.responseURL;
