@@ -238,7 +238,13 @@ function HTTPLoader(cfg) {
                 progressTimeout = setTimeout(function () {
                     // No more progress => abort request and treat as an error
                     logger.warn('Abort request ' + httpRequest.url + ' due to progress timeout');
-                    httpRequest.response.onabort = null;
+                    if (httpRequest.response) {
+                        httpRequest.response.onabort = null;
+                    }
+                    if (httpRequest.abortController) {
+                        httpRequest.abortController.signal.onabort = null;
+                    }
+                    httpRequest.onabort = null;
                     httpRequest.loader.abort(httpRequest);
                     onloadend();
                 }, settings.get().streaming.fragmentRequestProgressTimeout);
@@ -271,19 +277,14 @@ function HTTPLoader(cfg) {
             }
         };
 
-        const onabort = function (e) {
-            console.log(`RnD: in onabort function`)
-            console.log(e)
-            if (e) {
-                addHttpRequestMetric(true);
-
-                if (progressTimeout) {
-                    clearTimeout(progressTimeout);
-                    progressTimeout = null;
-                }
-                if (config.abort) {
-                    config.abort(request);
-                }
+        const onabort = function () {
+            addHttpRequestMetric(true);
+            if (progressTimeout) {
+                clearTimeout(progressTimeout);
+                progressTimeout = null;
+            }
+            if (config.abort) {
+                config.abort(request);
             }
         };
 
