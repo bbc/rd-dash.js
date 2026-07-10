@@ -30,7 +30,7 @@
  */
 import XHRLoader from './XHRLoader';
 import FetchLoader from './FetchLoader';
-import {HTTPRequest} from '../vo/metrics/HTTPRequest';
+import { HTTPRequest } from '../vo/metrics/HTTPRequest';
 import FactoryMaker from '../../core/FactoryMaker';
 import DashJSError from '../vo/DashJSError';
 import CmcdModel from '../models/CmcdModel';
@@ -114,7 +114,7 @@ function HTTPLoader(cfg) {
             throw new Error('config object is not correct or missing');
         }
 
-        const addHttpRequestMetric = function(success) {
+        const addHttpRequestMetric = function (success) {
             request.requestStartDate = requestStartTime;
             request.requestEndDate = new Date();
             request.firstByteDate = request.firstByteDate || requestStartTime;
@@ -271,15 +271,19 @@ function HTTPLoader(cfg) {
             }
         };
 
-        const onabort = function () {
-            addHttpRequestMetric(true);
+        const onabort = function (e) {
+            console.log(`RnD: in onabort function`)
+            console.log(e)
+            if (e) {
+                addHttpRequestMetric(true);
 
-            if (progressTimeout) {
-                clearTimeout(progressTimeout);
-                progressTimeout = null;
-            }
-            if (config.abort) {
-                config.abort(request);
+                if (progressTimeout) {
+                    clearTimeout(progressTimeout);
+                    progressTimeout = null;
+                }
+                if (config.abort) {
+                    config.abort(request);
+                }
             }
         };
 
@@ -349,7 +353,7 @@ function HTTPLoader(cfg) {
             onend: onloadend,
             onerror: onloadend,
             progress: progress,
-            onabort: _shouldAbortOnError(config, remainingAttempts) ? onabort : () => { logger.debug(`Don't allow a request abort, we're retrying internally`) },
+            onabort: onabort,
             ontimeout: ontimeout,
             loader: loader,
             timeout: requestTimeout,

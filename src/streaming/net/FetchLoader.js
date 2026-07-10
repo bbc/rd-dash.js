@@ -375,12 +375,12 @@ function FetchLoader(cfg) {
     function abort(request) {
         if (request.abortController) {
             // For firefox and edge
-            request.abortController.abort();
+            request.abortController.abort(`abortController`);
         } else if (request.reader) {
             // For Chrome
             try {
                 request.reader.cancel();
-                request.onabort();
+                request.onabort(`noAbortController`);
             } catch (e) {
                 // throw exceptions (TypeError) when reader was previously closed,
                 // for example, because a network issue
