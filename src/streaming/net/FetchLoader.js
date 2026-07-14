@@ -44,9 +44,7 @@ import Debug from '../../core/Debug';
 function FetchLoader(cfg) {
 
     cfg = cfg || {};
-    
     let instance, dashMetrics;
-
     const context = this.context;
     const logger = Debug(context).getInstance().getLogger(instance);
     const requestModifier = cfg.requestModifier;
@@ -137,10 +135,15 @@ function FetchLoader(cfg) {
             .then(() => {
                 let markBeforeFetch = Date.now();
 
+                if (!httpRequest.response) {
+                    httpRequest.response = {
+                        status: 0,
+                        statusText: 'No status received',
+                        responseURL: httpRequest.url
+                    };
+                }
+
                 fetch(httpRequest.url, reqOptions).then(function (response) {
-                    if (!httpRequest.response) {
-                        httpRequest.response = {};
-                    }
                     httpRequest.response.status = response.status;
                     httpRequest.response.statusText = response.statusText;
                     httpRequest.response.responseURL = response.url;
