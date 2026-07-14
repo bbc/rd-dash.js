@@ -33,6 +33,7 @@ import FactoryMaker from '../../core/FactoryMaker';
 import Settings from '../../core/Settings';
 import Constants from '../constants/Constants';
 import { modifyRequest } from '../utils/RequestModifier';
+import Debug from '../../core/Debug';
 
 /**
  * @module FetchLoader
@@ -43,12 +44,15 @@ import { modifyRequest } from '../utils/RequestModifier';
 function FetchLoader(cfg) {
 
     cfg = cfg || {};
+    
+    let instance, dashMetrics;
+
     const context = this.context;
+    const logger = Debug(context).getInstance().getLogger(instance);
     const requestModifier = cfg.requestModifier;
     const lowLatencyThroughputModel = cfg.lowLatencyThroughputModel;
     const boxParser = cfg.boxParser;
     const settings = Settings(context).getInstance();
-    let instance, dashMetrics;
 
     function setup(cfg) {
         dashMetrics = cfg.dashMetrics;
@@ -344,7 +348,9 @@ function FetchLoader(cfg) {
                     read(httpRequest, processResult);
                 })
                     .catch(function (e) {
-                        if (httpRequest.onerror) {
+                        if (e.name == 'AbortError') {
+                            logger.warn('processResult caught AbortError: Request ' + httpRequest.url + ' aborted', e);
+                        } else if (httpRequest.onerror) {
                             httpRequest.onerror(e);
                         }
                     });
@@ -355,7 +361,9 @@ function FetchLoader(cfg) {
         httpRequest.reader.read()
             .then(processResult)
             .catch(function (e) {
-                if (httpRequest.onerror && httpRequest.response.status === 200) {
+                if (e.name == 'AbortError') {
+                    logger.warn('Reader caught AbortError: Request ' + httpRequest.url + ' aborted', e);
+                } else  if (httpRequest.onerror && httpRequest.response.status === 200) {
                     // Error, but response code is 200, trigger error
                     httpRequest.onerror(e);
                 }
