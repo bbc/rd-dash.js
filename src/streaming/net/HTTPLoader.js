@@ -123,7 +123,7 @@ function HTTPLoader(cfg) {
             const responseUrl = httpRequest.response ? httpRequest.response.responseURL : null;
             const responseStatus = httpRequest.response ? httpRequest.response.status : null;
             const responseHeaders = httpRequest.response && httpRequest.response.getAllResponseHeaders ? httpRequest.response.getAllResponseHeaders() :
-                httpRequest.response ? httpRequest.response.responseHeaders : null;
+                httpRequest.response && httpRequest.response.responseHeaders ? httpRequest.response.responseHeaders : null;
 
             const cmsd = responseHeaders && settings.get().streaming.cmsd && settings.get().streaming.cmsd.enabled ? cmsdModel.parseResponseHeaders(responseHeaders, request.mediaType) : null;
 
@@ -238,7 +238,14 @@ function HTTPLoader(cfg) {
                 progressTimeout = setTimeout(function () {
                     // No more progress => abort request and treat as an error
                     logger.warn('Abort request ' + httpRequest.url + ' due to progress timeout');
-                    httpRequest.response.onabort = null;
+                    // Suppress onabort across all loader paths so config.abort is not called.
+                    if (httpRequest.response) {
+                        httpRequest.response.onabort = null;  // Suppress XHR path
+                    }
+                    if (httpRequest.abortController) {
+                        httpRequest.abortController.signal.onabort = null;  // Suppress Fetch AbortController path
+                    }
+                    httpRequest.onabort = null;  // Suppress calling this directly from Fetch abort reader path
                     httpRequest.loader.abort(httpRequest);
                     onloadend();
                 }, settings.get().streaming.fragmentRequestProgressTimeout);
